@@ -10,7 +10,7 @@
      xPos = X, yPos = Y; //static original position on the map
    }
    
-   void Entity::noSpriteSettings(float X,float Y, float W, float H, float Angle,int radius)
+   void Entity::noSpriteSettings(float X,float Y, float W, float H, sf::Color color, float Angle,int radius)
    {
        x=X; y=Y; //current ever-changing position relative to window
        angle = Angle;
@@ -19,9 +19,9 @@
        xPos = X, yPos = Y; //static original position on the map
        
        rectangle.setSize(sf::Vector2f(w, h));
-       rectangle.setFillColor(sf::Color::Black);
+       rectangle.setFillColor(color);
        rectangle.setOutlineColor(sf::Color::Black);
-       rectangle.setOutlineThickness(5);
+       rectangle.setOutlineThickness(1);
        rectangle.setOrigin(w/2, h/2);
        rectangle.setPosition(x, y);
    

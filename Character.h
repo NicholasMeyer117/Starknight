@@ -16,12 +16,12 @@ using namespace std;
 class Character
 {
     public:
-    int credits; //purchase in-run items
-    int crewSlots;
-    int upgradeSlots;
-    int weaponSlots;
-    int starCrystals; //purchase items for next run
-    int voidShards; //unlock new ships or crew members
+    int credits = 0; //purchase in-run items
+    int crewSlots = 1;
+    int upgradeSlots = 3;
+    int weaponSlots = 3;
+    int starCrystals = 0; //purchase items for next run
+    int voidShards = 0; //unlock new ships or crew members
     
     void resetCredits();
 

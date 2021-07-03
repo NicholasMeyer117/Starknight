@@ -25,7 +25,7 @@ class Entity
    
    void settings(Sprite &a,float X,float Y, float W, float H, float Angle=0,int radius=1);
    
-   void noSpriteSettings(float X,float Y, float W, float H, float Angle=0,int radius=1);
+   void noSpriteSettings(float X,float Y, float W, float H,  Color color, float Angle=0,int radius=1);
    
    void setPosition(float X, float Y);
    

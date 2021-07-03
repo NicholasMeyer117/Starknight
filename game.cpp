@@ -18,6 +18,9 @@ using namespace std;
 float DEGTORAD = 0.017453f;
 const int screenW = 1200;
 const int screenH = 800;
+    
+sf::Text source;
+sf::Font mainGameFont;
 
 class bullet: public Entity
 {
@@ -42,14 +45,14 @@ class bullet: public Entity
 
 
 //check if bullet hits player, player bullet hits enemy, player hits bar, etc
-bool checkCollisions(Entity a, std::list<Entity*> entities)
+Entity* checkCollisions(Entity a, std::list<Entity*> entities)
 {
     for(auto i:entities)
     {
         if (a.isCollide(i))
-            return true;
+            return i;
     }
-    return false;
+    return NULL;
 }
 
 void spawnBars(Entity *bar1, Entity *bar2)
@@ -84,12 +87,39 @@ int moveBars(Entity *bar1, Entity *bar2, float speed, int progress)
 
 }
 
+void spawnCredit(Entity *credit)
+{
+    
+    int randY = rand() % 500 + 100;
+    int randX = rand() % 400 + 1200;
+    
+    credit->rectangle.setPosition(randX, randY);
+    credit->setPosition(randX, randY);
+
+
+}
+
+void moveCredit(Entity *credit, float speed)
+{
+    credit->x = credit->x - 1 * speed;
+    credit->rectangle.setPosition(credit->x, credit->y);
+
+    if (credit->x <= 0)
+        spawnCredit(credit);
+}
+
+void drawText( const sf::String &str, const int Size, const float xposition, const float yposition, sf::RenderWindow& window)
+{
+    source.setString(str);
+    source.setCharacterSize(Size); //only the lower cased word size is reserved. A capital S fixes that.
+    source.setPosition(xposition,yposition);
+    source.setFillColor(Color::White);
+    window.draw(source);
+}
+
 int main() {
 
     srand(time(NULL));
-    
-    sf::Text source;
-    sf::Font mainGameFont;
     
     RenderWindow app(VideoMode(screenW, screenH), "Starship Straffer!");
     app.setFramerateLimit(60);
@@ -100,6 +130,7 @@ int main() {
     t1.loadFromFile("images/triShip.png");
     t2.loadFromFile("images/background.jpg");
     t3.loadFromFile("images/bullet.png");
+    t4.loadFromFile("images/heart.png");
 
     t1.setSmooth(true);
     t2.setSmooth(true);
@@ -107,6 +138,7 @@ int main() {
     Sprite background(t2);
     Sprite playerShip(t1);
     Sprite bulletSprite(t3);
+    Sprite heartSprite(t4);
     
     sf::Sound engineSound;
     sf::Sound bulletSound;
@@ -120,6 +152,7 @@ int main() {
         
     std::list<Entity*> entities;
     std::list<Entity*> collidableEntities;
+    std::list<Entity*> creditList;
     //std::list<Entity*> noSpriteEntities;
     std::vector<Button*> listButtons;
         
@@ -129,45 +162,69 @@ int main() {
     entities.push_back(player);
     
     Entity *topBar = new Entity();
-    topBar->noSpriteSettings(600, 50, 1200, 100);
+    topBar->noSpriteSettings(600, 50, 1200, 100, Color::Black);
     entities.push_back(topBar);
     collidableEntities.push_back(topBar);
     
     Entity *botBar = new Entity();
-    botBar->noSpriteSettings(600, 750, 1200, 100);
+    botBar->noSpriteSettings(600, 750, 1200, 100, Color::Black);
     entities.push_back(botBar);
     collidableEntities.push_back(botBar);
     
     Entity *bar1 = new Entity();
-    bar1->noSpriteSettings(1100, 150, 80, 300);
+    bar1->noSpriteSettings(1100, 150, 80, 350, Color::Black);
     entities.push_back(bar1);
     collidableEntities.push_back(bar1);
     
     Entity *bar2 = new Entity();
-    bar2->noSpriteSettings(1100, 650, 80, 300);
+    bar2->noSpriteSettings(1100, 650, 80, 350, Color::Black);
     entities.push_back(bar2);
     collidableEntities.push_back(bar2);
     
     Entity *bar3 = new Entity();
-    bar3->noSpriteSettings(3000, 150, 80, 300);
+    bar3->noSpriteSettings(3000, 150, 80, 350, Color::Black);
     entities.push_back(bar3);
     collidableEntities.push_back(bar3);
     
     Entity *bar4 = new Entity();
-    bar4->noSpriteSettings(3000, 650, 80, 300);
+    bar4->noSpriteSettings(3000, 650, 80, 350, Color::Black);
     entities.push_back(bar4);
     collidableEntities.push_back(bar4);
+    
+    Entity *credit = new Entity();
+    //Color *color(sf::Color::Yellow);
+    credit -> noSpriteSettings(3000, 1000, 8, 8, Color::Yellow);
+    entities.push_back(credit);
+    creditList.push_back(credit);
+    
+    Entity *creditImage = new Entity();
+    creditImage -> noSpriteSettings(50, 25, 25, 25, Color::Yellow);
+    entities.push_back(creditImage);
+    
+    Entity *heartImage = new Entity();
+    heartImage -> settings(heartSprite,50,75,25,25);
+    entities.push_back(heartImage);
+    
+    Character *character = new Character;
     
     float startGameSpeed = 3.5;
     float curGameSpeed = startGameSpeed;
     bool secondBarsSpawned = false;
-    float gameProgress = 0;
+    float gameProgress = 0; // ticks each time a bar passes (dynamic)
+    float levelProgress = 0; // ticks depending on tick (static)
+    float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
+    int progressPercent;
+    int tick = 0;
     
     spawnBars(bar1, bar2);
+    spawnCredit(credit);
     
         
     while (app.isOpen())
     {
+        tick++;
+        levelProgress++;
+        progressPercent = (levelProgress/maxLevelProgress) * 100;
         Event event;
         while (app.pollEvent(event))
         {
@@ -178,16 +235,27 @@ int main() {
             {
                  if (event.key.code == Keyboard::Space)
                  {
-                     bullet *b = new bullet();
+                     /*bullet *b = new bullet();
                      b->settings(bulletSprite,player->x,player->y,5, 5, player->angle, 3);
                      entities.push_back(b);
                      //bulletsFired++;
                      bulletSound.setBuffer(laserSound);
-                     bulletSound.play();
+                     bulletSound.play();*/
                  }
              
              }
                 
+        }
+        
+        if (tick%50 == 0)
+        {
+            bullet *b = new bullet();
+            b->settings(bulletSprite,player->x,player->y,5, 5, player->angle, 3);
+            entities.push_back(b);
+            //bulletsFired++;
+            bulletSound.setBuffer(laserSound);
+            bulletSound.play();
+
         }
         
         //Player Movement
@@ -207,23 +275,42 @@ int main() {
         gameProgress = moveBars(bar1, bar2, curGameSpeed, gameProgress);
         gameProgress = moveBars(bar3, bar4, curGameSpeed, gameProgress);
         curGameSpeed = startGameSpeed + gameProgress/4;
+        moveCredit(credit, curGameSpeed);
         
-        if (secondBarsSpawned == false and bar1->x == screenW/2)
+        if (secondBarsSpawned == false and bar1->x <= screenW/2)
         {
             spawnBars(bar3, bar4);
             secondBarsSpawned = true;
         }
         
-        if (checkCollisions(*player, collidableEntities))
+        if (checkCollisions(*player, collidableEntities) != NULL)
         {
             player->xPos = 200;
             player->yPos = 400;
             cout << "COLLISION!";
+            player -> health = player->health - 10; 
+        }
+        
+        Entity* temp = checkCollisions(*player, creditList);
+        if (temp != NULL)
+        {
+            character->credits += 1;
+            temp->setPosition(0, 0);
+            cout << "Credits: " + to_string(character->credits);
+        }
+        
+        if (tick == 1000)
+        {
+            tick = 0;
         }
         
         //draw
         app.clear(Color(255,255,255,255));
         for(auto i:entities) i->draw(app);
+        drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
+        drawText(": " + std::to_string(player->health), 20, 65, 60, app);
+        drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
+        drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
         app.display();
 
     
