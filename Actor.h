@@ -16,11 +16,15 @@ class Actor: public Entity
     int health, shields;
     float speed, firerate, xPos, yPos;
     bool isEnemy;
+    int ticksSinceLastHit =0;
+    int iFrames;
     enum direction {up, down, left, right};
     
-    void createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy);
+    void createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames);
 
     void moveActor(enum direction);
+    
+    void setActorPosition(float X, float Y);
     
     void update();
 

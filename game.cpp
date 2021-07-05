@@ -12,6 +12,9 @@
 #include "Button.h"
 #include "Actor.h"
 #include "Character.h"
+#include "Enemy.h"
+#include "DarkFighter.h"
+#include "Bullets.h"
 
 using namespace sf;
 using namespace std;
@@ -22,34 +25,19 @@ const int screenH = 800;
 sf::Text source;
 sf::Font mainGameFont;
 
-class bullet: public Entity
-{
-   public:
-   bullet()
-   {
-     name="bullet";
-   }
-
-   void update()
-   {
-     dx=cos((angle - 90)*DEGTORAD)*12;
-     dy=sin((angle - 90)*DEGTORAD)*12;
-     // angle+=rand()%7-3;  /*try this*/
-     x+=dx;
-     y+=dy;
-
-     if (x>screenW || x<0 || y>screenH || y<0) life=0;
-   }
-
-};
+template<typename Base, typename T>
+inline bool instanceof(const T*) {
+   return is_base_of<Base, T>::value;
+}
 
 
 //check if bullet hits player, player bullet hits enemy, player hits bar, etc
-Entity* checkCollisions(Entity a, std::list<Entity*> entities)
+template <class T1, class T2>
+T2* checkCollisions(T1 *a, std::vector<T2*> entities)
 {
     for(auto i:entities)
     {
-        if (a.isCollide(i))
+        if (a->isCollide(i))
             return i;
     }
     return NULL;
@@ -99,6 +87,27 @@ void spawnCredit(Entity *credit)
 
 }
 
+template <class T>
+std::vector<T*> removeDeadEntity(std::vector<T*> entities)
+{
+    for(auto i=entities.begin();i!=entities.end();)
+        {
+            Entity *e = *i;
+
+            e->update();
+            //e->anim.update();
+
+            if (e->life==false) 
+            {
+                i=entities.erase(i); 
+                //delete e;
+            }
+            else i++;
+        }
+    return entities;
+
+}
+
 void moveCredit(Entity *credit, float speed)
 {
     credit->x = credit->x - 1 * speed;
@@ -117,6 +126,30 @@ void drawText( const sf::String &str, const int Size, const float xposition, con
     window.draw(source);
 }
 
+void checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, std::vector<Bullet*> enemyBulletList)
+{
+        if (player -> ticksSinceLastHit > player -> iFrames)
+        {
+	    if (checkCollisions(player, collidableEntities) != NULL)
+	    {
+	        player->xPos = 200;
+	        player->yPos = 400;
+	        player -> health = player->health - 10; 
+	        player -> ticksSinceLastHit = 0;
+	    }
+
+	    Bullet *temp = checkCollisions(player, enemyBulletList);
+	    if (temp != NULL)
+	    {
+	        player -> health = player->health - 10; 
+	        temp -> life = 0;
+	        player -> ticksSinceLastHit = 0;
+	    }
+	}
+	
+	player -> ticksSinceLastHit++;
+}
+
 int main() {
 
     srand(time(NULL));
@@ -131,6 +164,8 @@ int main() {
     t2.loadFromFile("images/background.jpg");
     t3.loadFromFile("images/bullet.png");
     t4.loadFromFile("images/heart.png");
+    t5.loadFromFile("images/darkFighter.png");
+    t6.loadFromFile("images/darkBullet.png");
 
     t1.setSmooth(true);
     t2.setSmooth(true);
@@ -139,6 +174,8 @@ int main() {
     Sprite playerShip(t1);
     Sprite bulletSprite(t3);
     Sprite heartSprite(t4);
+    Sprite darkFighterSprite(t5);
+    Sprite darkBulletSprite(t6);
     
     sf::Sound engineSound;
     sf::Sound bulletSound;
@@ -150,15 +187,18 @@ int main() {
     if (!thrustSound.loadFromFile("sounds/thrust.ogg"))
         return -1;
         
-    std::list<Entity*> entities;
-    std::list<Entity*> collidableEntities;
-    std::list<Entity*> creditList;
+    std::vector<Entity*> entities;
+    std::vector<Entity*> collidableEntities;
+    std::vector<Entity*> creditList;
     //std::list<Entity*> noSpriteEntities;
     std::vector<Button*> listButtons;
+    std::vector<Enemy*> enemyList;
+    std::vector<Bullet*> bulletList;
+    std::vector<Bullet*> enemyBulletList;
         
     Actor *player = new Actor();
     player->settings(playerShip,200,400,32,33,90,20);
-    player->createActor(100, 100, 5, 10, false);
+    player->createActor(100, 100, 5, 10, false, 50);
     entities.push_back(player);
     
     Entity *topBar = new Entity();
@@ -192,7 +232,6 @@ int main() {
     collidableEntities.push_back(bar4);
     
     Entity *credit = new Entity();
-    //Color *color(sf::Color::Yellow);
     credit -> noSpriteSettings(3000, 1000, 8, 8, Color::Yellow);
     entities.push_back(credit);
     creditList.push_back(credit);
@@ -204,6 +243,7 @@ int main() {
     Entity *heartImage = new Entity();
     heartImage -> settings(heartSprite,50,75,25,25);
     entities.push_back(heartImage);
+    
     
     Character *character = new Character;
     
@@ -235,28 +275,14 @@ int main() {
             {
                  if (event.key.code == Keyboard::Space)
                  {
-                     /*bullet *b = new bullet();
-                     b->settings(bulletSprite,player->x,player->y,5, 5, player->angle, 3);
-                     entities.push_back(b);
-                     //bulletsFired++;
-                     bulletSound.setBuffer(laserSound);
-                     bulletSound.play();*/
+                   
                  }
              
              }
                 
         }
         
-        if (tick%50 == 0)
-        {
-            bullet *b = new bullet();
-            b->settings(bulletSprite,player->x,player->y,5, 5, player->angle, 3);
-            entities.push_back(b);
-            //bulletsFired++;
-            bulletSound.setBuffer(laserSound);
-            bulletSound.play();
-
-        }
+        
         
         //Player Movement
         if (Keyboard::isKeyPressed(Keyboard::W))
@@ -270,7 +296,12 @@ int main() {
         
         
         //update
-        for(auto i:entities) i->update();
+        
+        
+        //remove dead entities
+        entities = removeDeadEntity(entities);
+        enemyList = removeDeadEntity(enemyList);
+        bulletList = removeDeadEntity(bulletList);
         
         gameProgress = moveBars(bar1, bar2, curGameSpeed, gameProgress);
         gameProgress = moveBars(bar3, bar4, curGameSpeed, gameProgress);
@@ -283,20 +314,70 @@ int main() {
             secondBarsSpawned = true;
         }
         
-        if (checkCollisions(*player, collidableEntities) != NULL)
+        //update is player hit
+        checkIfPlayerHit(player, collidableEntities, enemyBulletList);
+        
+        //update enemies
+        for (auto i:enemyList)
         {
-            player->xPos = 200;
-            player->yPos = 400;
-            cout << "COLLISION!";
-            player -> health = player->health - 10; 
+        
+            i -> enemyMove();
+            Bullet *temp = checkCollisions(i, bulletList);
+            if (temp != NULL)
+            {
+               i -> takeDamage(temp->damage);
+               temp -> life = 0;
+            }
+            
+            if (i->ticksSinceLastFire == i->firerate)
+            {
+                DarkBullet *b = new DarkBullet();
+                b->settings(darkBulletSprite,i->x,i->y,5, 5, i->angle, 3);
+                b->createBullet (5, 20);
+                entities.push_back(b);
+                enemyBulletList.push_back(b);
+                //bulletsFired++;
+                bulletSound.setBuffer(laserSound);
+                bulletSound.play();
+                i->ticksSinceLastFire = 0;
+            
+            }
+            else
+                i->ticksSinceLastFire++;
+
         }
         
-        Entity* temp = checkCollisions(*player, creditList);
+        
+        //check if picked up gold
+        Entity* temp = checkCollisions(player, creditList);
         if (temp != NULL)
         {
             character->credits += 1;
             temp->setPosition(0, 0);
-            cout << "Credits: " + to_string(character->credits);
+        }
+        
+        if (tick%50 == 0)
+        {
+            NormalBullet *b = new NormalBullet();
+            b->settings(bulletSprite,player->x,player->y,5, 5, player->angle, 3);
+            b->createBullet (5, 20);
+            entities.push_back(b);
+            bulletList.push_back(b);
+            //bulletsFired++;
+            bulletSound.setBuffer(laserSound);
+            bulletSound.play();
+
+        }
+        
+        if (tick%400 == 0)
+        {
+            DarkFighter *darkFighter = new DarkFighter();
+            darkFighter -> settings(darkFighterSprite,1300,75,50,50);
+            darkFighter -> createActor(10, 0, 2, 60, true, 0);
+            entities.push_back(darkFighter);
+            enemyList.push_back(darkFighter);
+            darkFighter->enemySpawn();
+        
         }
         
         if (tick == 1000)
