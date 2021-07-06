@@ -12,7 +12,7 @@
 #include "State.h"
 #include "Button.h"
 
-class MenuState: public State
+class HubState: public State
 {
     public:
     std::vector<Button*> buttonList;
@@ -27,27 +27,14 @@ class MenuState: public State
         screenH = game->screenH;
         source = game->source;
         gameFont = game->gameFont;
-        
-    
+
     }
     
     int Run(sf::RenderWindow &app)
     {
-        Button *startButton = new Button;
-        startButton->createButton(600, 200, 200, 50, &gameFont, "START", 20); 
-        buttonList.push_back(startButton);
-        
-        Button *settingsButton = new Button;
-        settingsButton->createButton(600, 300, 200, 50, &gameFont, "SETTINGS", 20); 
-        buttonList.push_back(settingsButton);
-        
-        Button *creditsButton = new Button;
-        creditsButton->createButton(600, 400, 200, 50, &gameFont, "CREDITS", 20); 
-        buttonList.push_back(creditsButton);
-        
-        Button *quitButton = new Button;
-        quitButton->createButton(600, 500, 200, 50, &gameFont, "QUIT", 20); 
-        buttonList.push_back(quitButton);
+        Button *playButton = new Button;
+        playButton->createButton(1000, 700, 200, 50, &gameFont, "PLAY", 20); 
+        buttonList.push_back(playButton);
         
         while (app.isOpen())
         {
@@ -75,7 +62,7 @@ class MenuState: public State
             if (buttonList[0]->clicked == true)
             {
                 buttonList[0]->clicked = false;
-                return 1;
+                return 2;
             
             }
 
@@ -90,6 +77,8 @@ class MenuState: public State
         }
     
     
-        return 0;
+    return -1;
     }
+    
+    
 };
