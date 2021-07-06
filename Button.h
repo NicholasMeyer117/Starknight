@@ -9,10 +9,10 @@ class Button
 {
 
     public:
-    sf::IntRect rect;
+    sf::FloatRect rect;
     sf::RectangleShape rectangle;
     sf::Text buttonText;
-    bool visible = false;
+    bool visible = true;
     bool clicked = false;
 
     void createButton(int x, int y, int w, int h, Font *font, String text, int textSize);

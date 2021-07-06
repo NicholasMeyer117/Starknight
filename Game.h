@@ -23,12 +23,14 @@ class Game
     int screenW;
     int screenH;
     sf::Text source;
+    sf::Font gameFont;
     
     void resizeWindow();
     
-    void startGame(int W, int H, sf::Text Source)
+    void startGame(int W, int H, sf::Text Source, sf::Font font)
     {
         source = Source;
+        gameFont = font;
         screenW = W;
         screenH = H;
     }

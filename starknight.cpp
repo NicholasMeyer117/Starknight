@@ -165,7 +165,7 @@ int main() {
     mainGameFont.loadFromFile("futura.ttf");
     source.setFont(mainGameFont);
     
-    game->startGame(screenW, screenH, source);
+    game->startGame(screenW, screenH, source, mainGameFont);
     MenuState *menuState = new MenuState;
     menuState -> createState(game);
     stateList.push_back(menuState);
