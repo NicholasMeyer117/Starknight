@@ -8,6 +8,7 @@
 #include <math.h>
 #include <cstring>
 #include "Entity.h"
+#include "Bullets.h"
 #include "Actor.h"
 #define PI 3.14159265
 
@@ -19,11 +20,11 @@ class Enemy: public Actor
     
     virtual void takeDamage(int damage){}
     
-    virtual void enemySpawn(){}
+    virtual void enemySpawn(Sprite BulletSprite){}
     
     virtual void enemyMove(){}
     
-    virtual void enemyAttack(){}
+    virtual void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities){}
     
 
 };

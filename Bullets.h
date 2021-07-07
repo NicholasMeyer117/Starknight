@@ -51,3 +51,35 @@ class DarkBullet: public Bullet
     }
 
 };
+
+class DiagonalBullet: public Bullet
+{
+    public: 
+    bool right; //1: right, 0: left
+    bool up; //1: up, 0: down
+    //1, 1 = diaginol up and right
+    
+    void direction(bool Right, bool Up)
+    {
+        right = Right;
+        up = Up;
+    }
+    
+    void update()
+    {
+        if (right)
+            x+=bulletSpeed*4;
+        else
+            x-=bulletSpeed*4;
+        if (up)
+            y-=bulletSpeed;
+        else
+            y+=bulletSpeed;
+        
+    
+    }
+    
+    
+    
+
+};

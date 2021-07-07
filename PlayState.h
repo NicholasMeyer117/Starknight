@@ -21,16 +21,30 @@
 #include "State.h"
 #include "MenuState.h"
 #include "HubState.h"
+#include "Attachment.h"
 
 class PlayState: public State
 {
     public:
     std::vector<Button*> buttonList;
+    std::vector<Entity*> entities;
+    std::vector<Entity*> collidableEntities;
+    std::vector<Entity*> creditList;
+    std::vector<Button*> listButtons;
+    std::vector<Enemy*> enemyList;
+    std::vector<Bullet*> bulletList;
+    std::vector<Bullet*> enemyBulletList;
+    std::vector<Sprite> spriteList;
+    std::vector<Sprite> bulletSpriteList; //0: bullet, 1:dark bullet
+    std::vector<Attachment*> attachmentList;
+    
     Game *curGame;
     int screenW;
     int screenH;
     sf::Font gameFont;
     sf::Text source;
+    
+    Actor *player = new Actor();
     
     void createState(Game *game)
     {
@@ -39,8 +53,6 @@ class PlayState: public State
         source = game->source;
         gameFont = game->gameFont;
         curGame = game;
-        
-        
     
     }
     
@@ -160,7 +172,7 @@ class PlayState: public State
 	    Bullet *temp = checkCollisions(player, enemyBulletList);
 	    if (temp != NULL)
 	    {
-	        player -> health = player->health - 10; 
+	        player -> health = player->health - temp->damage; 
 	        temp -> life = 0;
 	        player -> ticksSinceLastHit = 0;
 	    }
@@ -178,6 +190,7 @@ class PlayState: public State
         t4.loadFromFile("images/heart.png");
         t5.loadFromFile("images/darkFighter.png");
         t6.loadFromFile("images/darkBullet.png");
+        t7.loadFromFile("images/triShooter.png");
 
         t1.setSmooth(true);
         t2.setSmooth(true);
@@ -192,26 +205,20 @@ class PlayState: public State
         if (!thrustSound.loadFromFile("sounds/thrust.ogg"))
             return -1;
         
-        std::vector<Entity*> entities;
-        std::vector<Entity*> collidableEntities;
-        std::vector<Entity*> creditList;
-        //std::list<Entity*> noSpriteEntities;
-        std::vector<Button*> listButtons;
-        std::vector<Enemy*> enemyList;
-        std::vector<Bullet*> bulletList;
-        std::vector<Bullet*> enemyBulletList;
-        std::vector<Sprite> spriteList;
         
         Sprite background(t2);
         Sprite playerShip(t1);
         Sprite bulletSprite(t3);
+        bulletSpriteList.push_back(bulletSprite);
         Sprite heartSprite(t4);
         Sprite darkFighterSprite(t5);
         spriteList.push_back(darkFighterSprite);
+        Sprite triShooterSprite(t7);
+        spriteList.push_back(triShooterSprite);
         Sprite darkBulletSprite(t6);
+        bulletSpriteList.push_back(darkBulletSprite);
          
         
-        Actor *player = new Actor();
         player->settings(playerShip,200,400,32,33,90,20);
         player->createActor(100, 100, 5, 10, false, 50);
         entities.push_back(player);
@@ -261,7 +268,7 @@ class PlayState: public State
     
         Character *character = new Character;
         EnemySpawner *enemySpawner = new EnemySpawner;
-        enemySpawner->createSpawner(spriteList);
+        enemySpawner->createSpawner(spriteList, bulletSpriteList);
     
         float startGameSpeed = 3.5;
         float curGameSpeed = startGameSpeed;
@@ -274,6 +281,14 @@ class PlayState: public State
     
         spawnBars(bar1, bar2);
         spawnCredit(credit);
+        
+        Cannon *cannon = new Cannon;
+        cannon->createAttachment(bulletSpriteList[0]);
+        attachmentList.push_back(cannon);
+        
+        MachineGun *machineGun = new MachineGun;
+        machineGun->createAttachment(bulletSpriteList[0]);
+        attachmentList.push_back(machineGun);
     
         while (app.isOpen())
         {
@@ -342,20 +357,14 @@ class PlayState: public State
                 }
             
                 if (i->ticksSinceLastFire == i->firerate)
-                {
-                    DarkBullet *b = new DarkBullet();
-                    b->settings(darkBulletSprite,i->x,i->y,5, 5, i->angle, 3);
-                    b->createBullet (5, 20);
-                    entities.push_back(b);
-                    enemyBulletList.push_back(b);
+                { 
+                    i->enemyAttack(&enemyBulletList, &entities);
                     bulletSound.setBuffer(laserSound);
                     bulletSound.play();
                     i->ticksSinceLastFire = 0;
-            
                 }
                 else
                     i->ticksSinceLastFire++;
-
             } 
         
             //check if picked up gold
@@ -366,19 +375,13 @@ class PlayState: public State
                 temp->setPosition(0, 0);
             }
         
-            if (tick%50 == 0)
+            //check all attachments to activate
+            for (auto i:attachmentList)
             {
-                NormalBullet *b = new NormalBullet();
-                b->settings(bulletSprite,player->x,player->y,5, 5, player->angle, 3);
-                b->createBullet (5, 20);
-                entities.push_back(b);
-                bulletList.push_back(b);
-                bulletSound.setBuffer(laserSound);
-                bulletSound.play();
-
+                i->activate(tick, &entities, &bulletList, player);
             }
         
-            if (tick%400 == 0)
+            if (tick%200 == 0)
             {
                 Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick);
                 if (newEnemy != NULL)

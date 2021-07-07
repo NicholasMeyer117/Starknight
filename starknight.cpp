@@ -21,6 +21,7 @@
 #include "HubState.h"
 #include "PlayState.h"
 #include "ShopState.h"
+#include "Attachment.h"
 
 using namespace sf;
 using namespace std;
@@ -60,6 +61,8 @@ int main() {
     ShopState *shopState = new ShopState;
     shopState -> createState(game);
     stateList.push_back(shopState);
+    
+    game->stateList = stateList;
     
     while (state >= 0)
     {
