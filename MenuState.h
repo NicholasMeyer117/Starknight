@@ -19,13 +19,16 @@ class MenuState: public State
     int screenW;
     int screenH;
     sf::Font gameFont;
+    sf::Font spaceFont;
     sf::Text source;
+    sf::Text titleText;
     
     void createState(Game *game)
     {
         screenW = game->screenW;
         screenH = game->screenH;
         source = game->source;
+        spaceFont.loadFromFile("space_age.ttf");
         gameFont = game->gameFont;
         
     
@@ -33,20 +36,28 @@ class MenuState: public State
     
     int Run(sf::RenderWindow &app)
     {
+        titleText.setFont(spaceFont);
+        titleText.setString("STARKNIGHT");
+        titleText.setCharacterSize(70);
+        titleText.setFillColor(sf::Color::Black);
+        sf::FloatRect textRect = titleText.getLocalBounds();
+        titleText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+        titleText.setPosition(600, 150);
+        
         Button *startButton = new Button;
-        startButton->createButton(600, 200, 200, 50, &gameFont, "START", 20); 
+        startButton->createButton(600, 300, 200, 50, &gameFont, "START", 20); 
         buttonList.push_back(startButton);
         
         Button *settingsButton = new Button;
-        settingsButton->createButton(600, 300, 200, 50, &gameFont, "SETTINGS", 20); 
+        settingsButton->createButton(600, 400, 200, 50, &gameFont, "SETTINGS", 20); 
         buttonList.push_back(settingsButton);
         
         Button *creditsButton = new Button;
-        creditsButton->createButton(600, 400, 200, 50, &gameFont, "CREDITS", 20); 
+        creditsButton->createButton(600, 500, 200, 50, &gameFont, "CREDITS", 20); 
         buttonList.push_back(creditsButton);
         
         Button *quitButton = new Button;
-        quitButton->createButton(600, 500, 200, 50, &gameFont, "QUIT", 20); 
+        quitButton->createButton(600, 600, 200, 50, &gameFont, "QUIT", 20); 
         buttonList.push_back(quitButton);
         
         while (app.isOpen())
@@ -86,6 +97,7 @@ class MenuState: public State
                 app.draw(i->rectangle);
                 app.draw(i->buttonText);
             }
+            app.draw(titleText);
             app.display();
         }
     

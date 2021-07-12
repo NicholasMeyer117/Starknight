@@ -7,6 +7,7 @@
 #include <list>
 #include <math.h>
 #include <cstring>
+#include "Character.h"
 #include "Entity.h"
 #include "Actor.h"
 #include "Enemy.h"
@@ -20,11 +21,12 @@ class Game
     RenderWindow app;
     enum gameState {mainMenu, hub, game, shop, settings};
     int area = 1; //each area consists of several levels and ends with a boss
-    int level = 2;
+    int level = 1;
     int screenW;
     int screenH;
     sf::Text source;
     sf::Font gameFont;
+    Character *character = new Character;
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
     
     void resizeWindow();

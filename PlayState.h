@@ -37,6 +37,7 @@ class PlayState: public State
     std::vector<Sprite> spriteList;
     std::vector<Sprite> bulletSpriteList; //0: bullet, 1:dark bullet
     std::vector<Attachment*> attachmentList;
+    Character *character = new Character;
     
     Game *curGame;
     int screenW;
@@ -53,6 +54,22 @@ class PlayState: public State
         source = game->source;
         gameFont = game->gameFont;
         curGame = game;
+        character = game->character;
+    
+    }
+    
+    void emptyState()
+    {
+        buttonList.clear();
+        entities.clear();
+        collidableEntities.clear();
+        creditList.clear();
+        listButtons.clear();
+        enemyList.clear();
+        bulletList.clear();
+        enemyBulletList.clear();
+        spriteList.clear();
+        bulletSpriteList.clear();
     
     }
     
@@ -121,8 +138,9 @@ class PlayState: public State
     template <class T>
     std::vector<T*> removeDeadEntity(std::vector<T*> entities)
     {
+        
         for(auto i=entities.begin();i!=entities.end();)
-         {
+        {
             Entity *e = *i;
 
             e->update();
@@ -186,7 +204,7 @@ class PlayState: public State
 	Texture t1,t2,t3,t4,t5,t6,t7;
         t1.loadFromFile("images/triShip.png");
         t2.loadFromFile("images/background.jpg");
-        t3.loadFromFile("images/bullet.png");
+        t3.loadFromFile("images/cannonBullet.png");
         t4.loadFromFile("images/heart.png");
         t5.loadFromFile("images/darkFighter.png");
         t6.loadFromFile("images/darkBullet.png");
@@ -266,7 +284,6 @@ class PlayState: public State
         heartImage -> settings(heartSprite,50,75,25,25);
         entities.push_back(heartImage);
     
-        Character *character = new Character;
         EnemySpawner *enemySpawner = new EnemySpawner;
         enemySpawner->createSpawner(spriteList, bulletSpriteList);
     
@@ -282,13 +299,11 @@ class PlayState: public State
         spawnBars(bar1, bar2);
         spawnCredit(credit);
         
-        Cannon *cannon = new Cannon;
-        cannon->createAttachment(bulletSpriteList[0]);
-        attachmentList.push_back(cannon);
-        
         MachineGun *machineGun = new MachineGun;
         machineGun->createAttachment(bulletSpriteList[0]);
-        attachmentList.push_back(machineGun);
+        //attachmentList.push_back(machineGun);
+        
+        attachmentList = character->attachments;
     
         while (app.isOpen())
         {
@@ -309,7 +324,6 @@ class PlayState: public State
                      }
              
                  }
-                
             }
         
             //Player Movement
@@ -396,9 +410,10 @@ class PlayState: public State
                 tick = 0;
             }
             
-            if (progressPercent >= 100)
+            if (progressPercent >= 5)
             {
                 curGame->level++;
+                emptyState();
                 return 3;
             }
         

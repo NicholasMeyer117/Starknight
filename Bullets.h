@@ -33,6 +33,7 @@ class NormalBullet: public Bullet
     void update()
     {
         x += bulletSpeed;
+        if (x>2000 || x<-1000) life=0;
     
     }
 

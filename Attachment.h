@@ -10,8 +10,6 @@
 #include <cstring>
 #include "Entity.h"
 #include "Actor.h"
-#include "Game.h"
-#include "State.h"
 #include "Bullets.h"
 #define PI 3.14159265
 
@@ -48,7 +46,6 @@ class Cannon: public Attachment
         firerate = 50;
         credits = 5;
         
-        
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
         bulletSprite = BulletSprite;
@@ -60,7 +57,7 @@ class Cannon: public Attachment
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
-            b->settings(bulletSprite,player->x,player->y,5, 5,player->angle, 3);
+            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0,  3);
             b->createBullet (5, 20);
             entities->push_back(b);
             bulletList->push_back(b);
@@ -91,7 +88,7 @@ class MachineGun: public Attachment
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
-            b->settings(bulletSprite,player->x,player->y,5, 5,player->angle, 3);
+            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 3);
             b->createBullet (2, 25);
             entities->push_back(b);
             bulletList->push_back(b);

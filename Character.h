@@ -8,6 +8,7 @@
 #include <math.h>
 #include <cstring>
 #include "Entity.h"
+#include "Attachment.h"
 #define PI 3.14159265
 
 using namespace sf;
@@ -23,7 +24,10 @@ class Character
     int starCrystals = 0; //purchase items for next run
     int voidShards = 0; //unlock new ships or crew members
     
+    std::vector<Attachment*> attachments;
+    
     void resetCredits();
+
 
 
 
