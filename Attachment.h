@@ -97,3 +97,35 @@ class MachineGun: public Attachment
         }
     }
 };
+
+class RepairDroid: public Attachment
+{
+    public:
+    
+    void createAttachment()
+    {
+        classList.push_back(Repair);
+        firerate = 300;
+        soundBuffer.loadFromFile("sounds/heal.wav");
+        sound.setBuffer(soundBuffer);
+
+    }
+
+    
+    void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
+    {
+        if (tick%firerate == 0)
+        {
+            cout << "check heal";
+            if (player->health < player->maxHealth)
+            {
+                cout << "Heal!";
+                player->health+=5;
+                sound.play();
+            }
+            
+        }
+    }
+
+
+};

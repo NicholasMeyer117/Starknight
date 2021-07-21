@@ -11,12 +11,14 @@
 #include "Actor.h"
 #define PI 3.14159265
 
+//Bullets for player, allies, and enemies
 class Bullet: public Entity
 {
    public:
    float damage; 
    float bulletSpeed;
 
+   //sets bullet stats
    void createBullet(float Damage, float BulletSpeed)
    {
        damage = Damage;
@@ -26,6 +28,7 @@ class Bullet: public Entity
 
 };
 
+//Bullet used by cannon and machine gun
 class NormalBullet: public Bullet
 {
     public:
@@ -39,7 +42,7 @@ class NormalBullet: public Bullet
 
 };
 
-
+//Bullet used by dark fighter and tri shooter
 class DarkBullet: public Bullet
 {
 
@@ -53,6 +56,7 @@ class DarkBullet: public Bullet
 
 };
 
+//used by tri-shooter
 class DiagonalBullet: public Bullet
 {
     public: 

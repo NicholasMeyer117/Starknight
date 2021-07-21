@@ -235,7 +235,6 @@ class PlayState: public State
         spriteList.push_back(triShooterSprite);
         Sprite darkBulletSprite(t6);
         bulletSpriteList.push_back(darkBulletSprite);
-         
         
         player->settings(playerShip,200,400,32,33,90,20);
         player->createActor(100, 100, 5, 10, false, 50);
@@ -292,7 +291,7 @@ class PlayState: public State
         bool secondBarsSpawned = false;
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
-        float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
+        float maxLevelProgress = 1500; // level is over when levelProgress = maxLevelProgress
         int progressPercent;
         int tick = 0;
     
@@ -334,7 +333,11 @@ class PlayState: public State
             if (Keyboard::isKeyPressed(Keyboard::A))
 	         player->moveActor(Actor::left);
             if (Keyboard::isKeyPressed(Keyboard::D))
-	         player->moveActor(Actor::right);                  
+	         player->moveActor(Actor::right);    
+	         
+	     //Quit Game
+	     if (Keyboard::isKeyPressed(Keyboard::Q))
+	         return -1;                   
          
             //update
         
@@ -346,7 +349,7 @@ class PlayState: public State
         
             gameProgress = moveBars(bar1, bar2, curGameSpeed, gameProgress);
             gameProgress = moveBars(bar3, bar4, curGameSpeed, gameProgress);
-            curGameSpeed = startGameSpeed + gameProgress/4;
+            curGameSpeed = startGameSpeed + gameProgress/2;
             moveCredit(credit, curGameSpeed);
         
             if (secondBarsSpawned == false and bar1->x <= screenW/2)
@@ -361,7 +364,6 @@ class PlayState: public State
             //update enemies
             for (auto i:enemyList)
             {
-                cout<<"\nHi!\n";
                 i -> enemyMove();
                 Bullet *temp = checkCollisions(i, bulletList);
                 if (temp != NULL)
@@ -410,7 +412,7 @@ class PlayState: public State
                 tick = 0;
             }
             
-            if (progressPercent >= 5)
+            if (progressPercent >= 100)
             {
                 curGame->level++;
                 emptyState();

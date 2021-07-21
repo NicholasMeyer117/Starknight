@@ -28,6 +28,7 @@ class Game
     sf::Font gameFont;
     Character *character = new Character;
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
+    std::array<Texture, 1> bulletTextureList;
     
     void resizeWindow();
     
@@ -37,6 +38,10 @@ class Game
         gameFont = font;
         screenW = W;
         screenH = H;
+        
+        Texture b1, b2, b3, b4;
+        b1.loadFromFile("images/cannonBullet.png");
+        bulletTextureList[0] = b1;
     }
     
     void changeState();

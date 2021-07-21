@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <array>
 #include <string>
 #include <algorithm>
 #include <SFML/Graphics.hpp>
@@ -16,11 +17,11 @@
 class ShopState: public State
 {
     public:
+    std::vector<Entity*> entities;
     std::vector<Button*> buttonList;
     std::vector<ShopButton*> shopButtonList;
     std::vector<Texture> textureList;
     std::vector<Sprite> spriteList;
-    std::vector<Texture*> bulletTextureList;
     std::vector<Sprite> bulletSpriteList;
     std::vector<Attachment*> shopAttachments;
     Character *character = new Character;
@@ -42,6 +43,8 @@ class ShopState: public State
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
         textureList.push_back(t2);
+        t3.loadFromFile("images/repairDroid.png");
+        textureList.push_back(t3);
         
         for (auto i:textureList)
         {
@@ -51,19 +54,57 @@ class ShopState: public State
            
         }
         
-        Texture *b1, *b2, *b3, *b4;
-        b1->loadFromFile("images/cannonBullet.png");
-        bulletTextureList.push_back(b1);
-        
-        for (auto i:bulletTextureList)
+        for (int i = 0; i < game->bulletTextureList.size(); i++)
         {
             Sprite sprite;
-            sprite.setTexture(*i);
+            sprite.setTexture(game->bulletTextureList[i]);
             bulletSpriteList.push_back(sprite);
            
         }
         
     
+    }
+    
+    void createButton(ShopButton *button, int attachNum, int butNum )
+    {
+        switch(attachNum)
+        {
+            case 0:
+            {
+                button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, "Cannon: 3 Cr", 20, 3);
+                Cannon *cannon = new Cannon;
+                cannon->createAttachment(bulletSpriteList[0]);
+                shopAttachments.push_back(cannon);
+                return;     
+            } 
+            case 1:
+            {
+                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, "Machine Gun: 3 Cr", 20, 3);
+                MachineGun *machineGun = new MachineGun;
+                machineGun->createAttachment(bulletSpriteList[0]);
+                shopAttachments.push_back(machineGun);
+                return;
+            }
+            case 2:
+            {
+                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Reapair Droid: 3 Cr", 20, 3);
+                RepairDroid *repairDroid = new RepairDroid;
+                repairDroid->createAttachment();
+                shopAttachments.push_back(repairDroid);
+                return;
+            }
+        
+        }
+        
+    }
+    
+    void drawText( const sf::String &str, const int Size, const float xposition, const float yposition, sf::RenderWindow& window)
+    {
+        source.setString(str);
+        source.setCharacterSize(Size);
+        source.setPosition(xposition,yposition);
+        source.setFillColor(Color::Black);
+        window.draw(source);
     }
     
     int Run(sf::RenderWindow &app)
@@ -72,28 +113,29 @@ class ShopState: public State
         continueButton->createButton(1000, 700, 200, 50, &gameFont, "CONTINUE", 20); 
         buttonList.push_back(continueButton);
         
+        srand(time(NULL));
+        
+        int randNum = rand() % 3;
         ShopButton *button1 = new ShopButton;
-        button1->createIcon(textureList[0], spriteList[0], 1, 250, 250, &gameFont, "Cannon: 3 Cr", 20);
+        createButton(button1, randNum, 1);
         buttonList.push_back(button1);
         shopButtonList.push_back(button1);
         
+        randNum = rand() % 3;
         ShopButton *button2 = new ShopButton;
-        button2->createIcon(textureList[1], spriteList[1], 2, 250, 250, &gameFont, "Machine Gun: 3 Cr", 20);
+        createButton(button2, randNum, 2);
         buttonList.push_back(button2);
         shopButtonList.push_back(button2);
         
+        randNum = rand() % 3;
         ShopButton *button3 = new ShopButton;
-        button3->createIcon(textureList[0], spriteList[0], 3, 250, 250, &gameFont, "Cannon: 3 Cr", 20);
+        createButton(button3, randNum, 3);
         buttonList.push_back(button3);
         shopButtonList.push_back(button3);
         
-        Cannon *cannon = new Cannon;
-        cannon->createAttachment(bulletSpriteList[0]);
-        shopAttachments.push_back(cannon);
-        
-        MachineGun *machineGun = new MachineGun;
-        machineGun->createAttachment(bulletSpriteList[0]);
-        shopAttachments.push_back(machineGun);
+        Entity *creditImage = new Entity();
+        creditImage -> noSpriteSettings(75, 75, 25, 25, Color::Yellow);
+        entities.push_back(creditImage);
            
         while (app.isOpen())
         {
@@ -112,11 +154,14 @@ class ShopState: public State
                         if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                         {
                             i->clicked = true;
-                            cout << "click!";
                         }
                     }   
                 }
             }
+            
+            //Quit Game
+	     if (Keyboard::isKeyPressed(Keyboard::Q))
+	         return -1;
             
             if (buttonList[0]->clicked == true)
             {
@@ -128,28 +173,43 @@ class ShopState: public State
             
             }
             
-            if (buttonList[1]->clicked == true)
+            if (buttonList[1]->clicked == true and character->credits >= button1->cost)
             {
                 buttonList[1]->clicked = false;
                 character->attachments.push_back(shopAttachments[0]);
                 buttonList[1]->visible = false;
+                character->credits -= button1->cost;
             
             }
             
-            if (buttonList[2]->clicked == true)
+            if (buttonList[2]->clicked == true and character->credits >= button2->cost)
             {
                 buttonList[2]->clicked = false;
                 character->attachments.push_back(shopAttachments[1]);
                 buttonList[2]->visible = false;
+                character->credits -= button2->cost;
+            }
+            
+            if (buttonList[3]->clicked == true and character->credits >= button3->cost)
+            {
+                buttonList[3]->clicked = false;
+                character->attachments.push_back(shopAttachments[2]);
+                buttonList[3]->visible = false;
+                character->credits -= button3->cost;
             }
 
 
             //draw
             app.clear(Color(255,255,255,255));
+            for(auto i:entities)
+                i->draw(app);
             for(auto i:buttonList)
             {
-                   app.draw(i->rectangle);
-                   app.draw(i->buttonText);
+                   if (i->visible == true)
+                   {
+                       app.draw(i->rectangle);
+                       app.draw(i->buttonText);
+                   }
             }
             for(auto i:shopButtonList)
             {
@@ -160,6 +220,7 @@ class ShopState: public State
                     app.draw(i->icon);
                 }
             }
+            drawText(": " + std::to_string(character->credits), 20, 95, 61, app);
             app.display();
         }
     

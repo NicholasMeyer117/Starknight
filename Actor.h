@@ -10,10 +10,11 @@
 #include "Entity.h"
 #define PI 3.14159265
 
+//An Entity that moves and acts on in dynamic ways
 class Actor: public Entity
 {
     public:
-    int health, shields;
+    int maxHealth, health, shields;
     float speed, firerate, xPos, yPos;
     bool isEnemy;
     int ticksSinceLastHit =0;

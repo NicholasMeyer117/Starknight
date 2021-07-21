@@ -3,6 +3,7 @@
 void Actor::createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames)
 {
     health = Health;
+    maxHealth = Health;
     shields = Shields;
     speed = Speed;
     firerate = Firerate;
@@ -34,12 +35,6 @@ void Actor::moveActor(enum direction dir)
     }
 }
 
-void Actor::setActorPosition(float X, float Y)
-{
-    xPos = X;
-    yPos = Y;
-}
-
 void Actor::update()
 {
 
@@ -47,4 +42,11 @@ void Actor::update()
     y = yPos;
 
 
+}
+
+
+void Actor::setActorPosition(float X, float Y)
+{
+    xPos = X;
+    yPos = Y;
 }

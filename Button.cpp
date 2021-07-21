@@ -19,7 +19,7 @@ void Button::createButton(int x, int y, int w, int h, Font *font, String text, i
         rect = rectangle.getGlobalBounds();
 }
 
-void ShopButton::createIcon(Texture iconTexture, Sprite sprite, int shopNumber, int w, int h, Font *font, String text, int textSize)
+void ShopButton::createIcon(Texture iconTexture, Sprite sprite, int shopNumber, int w, int h, Font *font, String text, int textSize, int Cost)
 {
     texture = iconTexture;
     icon = sprite;
@@ -43,6 +43,7 @@ void ShopButton::createIcon(Texture iconTexture, Sprite sprite, int shopNumber, 
     buttonText.setPosition(rectangle.getPosition().x, rectangle.getPosition().y + h - 100);
         
     rect = icon.getGlobalBounds();
+    cost = Cost;
     
 
 }

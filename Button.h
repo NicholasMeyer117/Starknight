@@ -24,8 +24,9 @@ class ShopButton: public Button
     public:
     Texture texture;
     Sprite icon;
+    int cost;
     
-    void createIcon(Texture iconTexture, Sprite sprite, int shopNumber, int w, int h, Font *font, String text, int textSize);
+    void createIcon(Texture iconTexture, Sprite sprite, int shopNumber, int w, int h, Font *font, String text, int textSize, int Cost);
 
 
 

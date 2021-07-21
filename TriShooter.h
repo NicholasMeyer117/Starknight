@@ -12,7 +12,7 @@
 #include "Enemy.h"
 #define PI 3.14159265
 
-class TriShooter: public Enemy //number one!
+class TriShooter: public Enemy
 {
 
     public:
