@@ -57,7 +57,7 @@ class Cannon: public Attachment
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
-            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0,  3);
+            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
             b->createBullet (5, 20);
             entities->push_back(b);
             bulletList->push_back(b);
@@ -88,7 +88,7 @@ class MachineGun: public Attachment
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
-            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 3);
+            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
             b->createBullet (2, 25);
             entities->push_back(b);
             bulletList->push_back(b);
@@ -123,6 +123,39 @@ class RepairDroid: public Attachment
                 player->health+=5;
                 sound.play();
             }
+            
+        }
+    }
+
+
+};
+
+class SiphonDroid: public Attachment
+{
+    public:
+    
+    void createAttachment(Sprite BulletSprite)
+    {
+        classList.push_back(Repair);
+        classList.push_back(Gun);
+        firerate = 60;
+        soundBuffer.loadFromFile("sounds/laser.wav");
+        sound.setBuffer(soundBuffer);
+        bulletSprite = BulletSprite;
+
+    }
+
+    
+    void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
+    {
+        if (tick%firerate == 0)
+        {
+            SiphonBullet *b = new SiphonBullet();
+            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
+            b->createBullet (5, 20);
+            entities->push_back(b);
+            bulletList->push_back(b);
+            sound.play();
             
         }
     }

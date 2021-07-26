@@ -17,7 +17,7 @@ class Actor: public Entity
     int maxHealth, health, shields;
     float speed, firerate, xPos, yPos;
     bool isEnemy;
-    int ticksSinceLastHit =0;
+    int ticksSinceLastHit = 0;
     int iFrames;
     enum direction {up, down, left, right};
     

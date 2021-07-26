@@ -22,6 +22,7 @@
 #include "MenuState.h"
 #include "HubState.h"
 #include "Attachment.h"
+#include "EnergyShield.h"
 
 class PlayState: public State
 {
@@ -37,6 +38,7 @@ class PlayState: public State
     std::vector<Sprite> spriteList;
     std::vector<Sprite> bulletSpriteList; //0: bullet, 1:dark bullet
     std::vector<Attachment*> attachmentList;
+    std::vector<Enemy*> miscEnemyList; //uncoventional enemies i dont want in enemyList: shields, etc
     Character *character = new Character;
     
     Game *curGame;
@@ -49,8 +51,8 @@ class PlayState: public State
     
     void createState(Game *game)
     {
-        screenW = game->screenW;
-        screenH = game->screenH;
+        screenW = game->screenWidth;
+        screenH = game->screenHeight;
         source = game->source;
         gameFont = game->gameFont;
         curGame = game;
@@ -97,11 +99,11 @@ class PlayState: public State
     
         //move rectangle
         bar1->rectangle.setPosition(screenW, 150 + randNum);
-        bar2->rectangle.setPosition(screenW, 650 + randNum); 
+        bar2->rectangle.setPosition(screenW, 850 + randNum); 
     
         //move hitbox
         bar1->setPosition(screenW, 150 + randNum);
-        bar2->setPosition(screenW, 650 + randNum);
+        bar2->setPosition(screenW, 850 + randNum);
     
 
     }
@@ -201,7 +203,7 @@ class PlayState: public State
     
     int Run(sf::RenderWindow &app)
     {
-	Texture t1,t2,t3,t4,t5,t6,t7;
+	Texture t1,t2,t3,t4,t5,t6,t7,t8,t9;
         t1.loadFromFile("images/triShip.png");
         t2.loadFromFile("images/background.jpg");
         t3.loadFromFile("images/cannonBullet.png");
@@ -209,6 +211,8 @@ class PlayState: public State
         t5.loadFromFile("images/darkFighter.png");
         t6.loadFromFile("images/darkBullet.png");
         t7.loadFromFile("images/triShooter.png");
+        t8.loadFromFile("images/doubleShooter.png");
+        t9.loadFromFile("images/shielder.png");
 
         t1.setSmooth(true);
         t2.setSmooth(true);
@@ -233,40 +237,47 @@ class PlayState: public State
         spriteList.push_back(darkFighterSprite);
         Sprite triShooterSprite(t7);
         spriteList.push_back(triShooterSprite);
+        Sprite doubleShooterSprite(t8);
+        doubleShooterSprite.setScale(1.25, 1.25f);
+        spriteList.push_back(doubleShooterSprite);
         Sprite darkBulletSprite(t6);
         bulletSpriteList.push_back(darkBulletSprite);
+        
+        Sprite shielderSprite(t9);
+        shielderSprite.setScale(2.5, 2.5);
+        spriteList.push_back(shielderSprite); 
         
         player->settings(playerShip,200,400,32,33,90,20);
         player->createActor(100, 100, 5, 10, false, 50);
         entities.push_back(player);
     
         Entity *topBar = new Entity();
-        topBar->noSpriteSettings(600, 50, 1200, 100, Color::Black);
+        topBar->noSpriteSettings(960, 50, 1920, 100, Color::Black);
         entities.push_back(topBar);
         collidableEntities.push_back(topBar);
     
         Entity *botBar = new Entity();
-        botBar->noSpriteSettings(600, 750, 1200, 100, Color::Black);
+        botBar->noSpriteSettings(960, 1000, 1920, 100, Color::Black);
         entities.push_back(botBar);
         collidableEntities.push_back(botBar);
     
         Entity *bar1 = new Entity();
-        bar1->noSpriteSettings(1100, 150, 80, 350, Color::Black);
+        bar1->noSpriteSettings(1920, 150, 80, 550, Color::Black);
         entities.push_back(bar1);
         collidableEntities.push_back(bar1);
     
         Entity *bar2 = new Entity();
-        bar2->noSpriteSettings(1100, 650, 80, 350, Color::Black);
+        bar2->noSpriteSettings(1920, 850, 80, 550, Color::Black);
         entities.push_back(bar2);
         collidableEntities.push_back(bar2);
     
         Entity *bar3 = new Entity();
-        bar3->noSpriteSettings(3000, 150, 80, 350, Color::Black);
+        bar3->noSpriteSettings(3000, 150, 80, 550, Color::Black);
         entities.push_back(bar3);
         collidableEntities.push_back(bar3);
     
         Entity *bar4 = new Entity();
-        bar4->noSpriteSettings(3000, 650, 80, 350, Color::Black);
+        bar4->noSpriteSettings(3000, 850, 80, 550, Color::Black);
         entities.push_back(bar4);
         collidableEntities.push_back(bar4);
     
@@ -283,15 +294,16 @@ class PlayState: public State
         heartImage -> settings(heartSprite,50,75,25,25);
         entities.push_back(heartImage);
     
+        std::cout << "\nScreen Width0: " + std::to_string(screenW);
         EnemySpawner *enemySpawner = new EnemySpawner;
-        enemySpawner->createSpawner(spriteList, bulletSpriteList);
+        enemySpawner->createSpawner(spriteList, bulletSpriteList, screenW, screenH);
     
         float startGameSpeed = 3.5;
         float curGameSpeed = startGameSpeed;
         bool secondBarsSpawned = false;
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
-        float maxLevelProgress = 1500; // level is over when levelProgress = maxLevelProgress
+        float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
         int progressPercent;
         int tick = 0;
     
@@ -368,19 +380,27 @@ class PlayState: public State
                 Bullet *temp = checkCollisions(i, bulletList);
                 if (temp != NULL)
                 {
+                   temp->onContact(player);
                    i -> takeDamage(temp->damage);
                    temp -> life = 0;
                 }
             
-                if (i->ticksSinceLastFire == i->firerate)
-                { 
-                    i->enemyAttack(&enemyBulletList, &entities);
-                    bulletSound.setBuffer(laserSound);
-                    bulletSound.play();
-                    i->ticksSinceLastFire = 0;
+                i->enemyAttack(&enemyBulletList, &entities);
+                i->ability(enemyList, &bulletList, app);
+                //bulletSound.setBuffer(laserSound);
+                //bulletSound.play();
+                    //i->ticksSinceLastFire = 0;
+
+            } 
+            
+            for (auto i:miscEnemyList)
+            {
+                Bullet *temp = checkCollisions(i, bulletList);
+                if (temp != NULL)
+                {
+                   i -> takeDamage(temp->damage);
+                   temp -> life = 0;
                 }
-                else
-                    i->ticksSinceLastFire++;
             } 
         
             //check if picked up gold
@@ -399,7 +419,7 @@ class PlayState: public State
         
             if (tick%200 == 0)
             {
-                Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick);
+                Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick, enemyList);
                 if (newEnemy != NULL)
                 {
                     entities.push_back(newEnemy);
@@ -420,13 +440,16 @@ class PlayState: public State
             }
         
             //draw
-            app.clear(Color(255,255,255,255));
+          
             for(auto i:entities) i->draw(app);
+            //for(auto i:shieldList) 
+                //app.draw(i->circle);
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
             drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
             app.display();
+            app.clear(Color(255,255,255,255));
         }
     
     

@@ -23,8 +23,8 @@ class HubState: public State
     
     void createState(Game *game)
     {
-        screenW = game->screenW;
-        screenH = game->screenH;
+        screenW = game->screenWidth;
+        screenH = game->screenHeight;
         source = game->source;
         gameFont = game->gameFont;
 

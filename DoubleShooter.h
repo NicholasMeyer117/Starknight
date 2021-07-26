@@ -7,17 +7,19 @@
 #include <list>
 #include <math.h>
 #include <cstring>
+#include <unistd.h>
 #include "Entity.h"
 #include "Actor.h"
 #include "Enemy.h"
 #define PI 3.14159265
 
-class TriShooter: public Enemy
+class DoubleShooter: public Enemy
 {
 
     public:
     bool movingUp = true;
     Sprite bulletSprite;
+    int volleyNum = 0;
     
     void takeDamage(int damage)
     {
@@ -35,7 +37,8 @@ class TriShooter: public Enemy
         sprite.setPosition(screenW, randNum);
         setActorPosition(screenW, randNum);
         bulletSprite = BulletSprite;
-        enemyType = triShooter;
+        enemyType = doubleShooter;
+
     }
     
     void enemyMove()
@@ -68,30 +71,32 @@ class TriShooter: public Enemy
     {
         if (ticksSinceLastFire == firerate)
         { 
-            DiagonalBullet *b1 = new DiagonalBullet();
-            b1->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b1->createBullet (5, 2.5);
-            b1->direction (false, true);
+            DarkBullet *b1 = new DarkBullet();
+            b1->settings(bulletSprite,x,y + 13,5, 5, angle, 3);
+            b1->createBullet (2, 25);
             entities->push_back(b1);                
             bulletList->push_back(b1);   
         
-            DiagonalBullet *b2 = new DiagonalBullet();
-            b2->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b2->createBullet (5, 2.5);
-            b2->direction (false, false);
+            DarkBullet *b2 = new DarkBullet();
+            b2->settings(bulletSprite,x,y - 13,5, 5, angle, 3);
+            b2->createBullet (2, 25);
             entities->push_back(b2);                
-            bulletList->push_back(b2);
+            bulletList->push_back(b2); 
         
-            DarkBullet *b3 = new DarkBullet();
-            b3->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b3->createBullet (5, 10);
-            entities->push_back(b3);                
-            bulletList->push_back(b3); 
-        
-            ticksSinceLastFire = 0;    
-         }
-         else
-            ticksSinceLastFire++;                    
+            if (volleyNum < 1)
+            {
+                volleyNum++;
+                ticksSinceLastFire = firerate - 10;
+            }
+            else
+            {
+                ticksSinceLastFire = 0;
+                volleyNum = 0;
+            }
+        }
+        else
+            ticksSinceLastFire++;  
+                    
     }
 
 };

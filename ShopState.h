@@ -32,8 +32,8 @@ class ShopState: public State
     
     void createState(Game *game)
     {
-        screenW = game->screenW;
-        screenH = game->screenH;
+        screenW = game->screenWidth;
+        screenH = game->screenHeight;
         source = game->source;
         gameFont = game->gameFont; 
         character = game->character;
@@ -45,6 +45,8 @@ class ShopState: public State
         textureList.push_back(t2);
         t3.loadFromFile("images/repairDroid.png");
         textureList.push_back(t3);
+        t4.loadFromFile("images/siphonDroid.png");
+        textureList.push_back(t4);
         
         for (auto i:textureList)
         {
@@ -87,10 +89,18 @@ class ShopState: public State
             }
             case 2:
             {
-                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Reapair Droid: 3 Cr", 20, 3);
+                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Repair Droid: 3 Cr", 20, 3);
                 RepairDroid *repairDroid = new RepairDroid;
                 repairDroid->createAttachment();
                 shopAttachments.push_back(repairDroid);
+                return;
+            }
+            case 3:
+            {
+                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, "Siphon Droid: 6 Cr", 20, 6);
+                SiphonDroid *siphonDroid = new SiphonDroid;
+                siphonDroid->createAttachment(bulletSpriteList[1]);
+                shopAttachments.push_back(siphonDroid);
                 return;
             }
         
@@ -115,19 +125,19 @@ class ShopState: public State
         
         srand(time(NULL));
         
-        int randNum = rand() % 3;
+        int randNum = rand() % 4;
         ShopButton *button1 = new ShopButton;
         createButton(button1, randNum, 1);
         buttonList.push_back(button1);
         shopButtonList.push_back(button1);
         
-        randNum = rand() % 3;
+        randNum = rand() % 4;
         ShopButton *button2 = new ShopButton;
         createButton(button2, randNum, 2);
         buttonList.push_back(button2);
         shopButtonList.push_back(button2);
         
-        randNum = rand() % 3;
+        randNum = rand() % 4;
         ShopButton *button3 = new ShopButton;
         createButton(button3, randNum, 3);
         buttonList.push_back(button3);

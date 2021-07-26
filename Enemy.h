@@ -17,14 +17,20 @@ class Enemy: public Actor
     public:
     bool reachedBegin = false;
     int ticksSinceLastFire = 0;
+    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder};
+    EnemyType enemyType;
+    int screenH;
+    int screenW;
     
     virtual void takeDamage(int damage){}
     
-    virtual void enemySpawn(Sprite BulletSprite){}
+    virtual void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH){}
     
     virtual void enemyMove(){}
     
     virtual void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities){}
+    
+    virtual void ability(std::vector<Enemy*> enemyList, std::vector<Bullet*> *bulletList, RenderWindow &window){}
     
 
 };

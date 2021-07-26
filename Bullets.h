@@ -24,6 +24,9 @@ class Bullet: public Entity
        damage = Damage;
        bulletSpeed = BulletSpeed;
    }
+   
+   //special function in case bullet impact affects player
+   virtual void onContact(Actor *player){}
 
 
 };
@@ -40,6 +43,27 @@ class NormalBullet: public Bullet
     
     }
 
+};
+
+class SiphonBullet: public Bullet
+{
+    
+    public:
+    
+    void update()
+    {
+        x += bulletSpeed;
+        if (x>2000 || x<-1000) life=0;
+    
+    }
+
+    void onContact(Actor *player)
+    {
+        if(player->health < player->maxHealth)
+        {
+            player->health+=damage;
+        }
+    }
 };
 
 //Bullet used by dark fighter and tri shooter

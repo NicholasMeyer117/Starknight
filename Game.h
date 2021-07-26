@@ -22,13 +22,13 @@ class Game
     enum gameState {mainMenu, hub, game, shop, settings};
     int area = 1; //each area consists of several levels and ends with a boss
     int level = 1;
-    int screenW;
-    int screenH;
+    int screenWidth;
+    int screenHeight;
     sf::Text source;
     sf::Font gameFont;
     Character *character = new Character;
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
-    std::array<Texture, 1> bulletTextureList;
+    std::array<Texture, 2> bulletTextureList;
     
     void resizeWindow();
     
@@ -36,12 +36,14 @@ class Game
     {
         source = Source;
         gameFont = font;
-        screenW = W;
-        screenH = H;
+        screenWidth = W;
+        screenHeight = H;
         
         Texture b1, b2, b3, b4;
         b1.loadFromFile("images/cannonBullet.png");
         bulletTextureList[0] = b1;
+        b2.loadFromFile("images/siphonBullet.png");
+        bulletTextureList[1] = b2;
     }
     
     void changeState();

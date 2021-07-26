@@ -25,8 +25,8 @@ class MenuState: public State
     
     void createState(Game *game)
     {
-        screenW = game->screenW;
-        screenH = game->screenH;
+        screenW = game->screenWidth;
+        screenH = game->screenHeight;
         source = game->source;
         spaceFont.loadFromFile("space_age.ttf");
         gameFont = game->gameFont;

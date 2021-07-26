@@ -26,13 +26,16 @@ class DarkFighter: public Enemy //number one!
             life=0;
     }
     
-    void enemySpawn(Sprite BulletSprite)
+    void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
     {
+        screenH = ScreenH;
+        screenW = ScreenW;
         srand(time(NULL));
-        int randNum = rand() % 400 + 200;
-        sprite.setPosition(1200, randNum);
-        setActorPosition(1200, randNum);
+        int randNum = rand() % screenH/2 + 200;
+        sprite.setPosition(screenW, randNum);
+        setActorPosition(screenW, randNum);
         bulletSprite = BulletSprite;
+        enemyType = darkFighter;
     }
     
     void enemyMove()
@@ -40,7 +43,7 @@ class DarkFighter: public Enemy //number one!
         if (!reachedBegin)
         {
             moveActor(left);
-            if (x <= 1000)
+            if (x <= screenW - screenW/10)
                 reachedBegin = true;
         }
         else
@@ -48,13 +51,13 @@ class DarkFighter: public Enemy //number one!
             if (movingUp)
             {
                 moveActor(up);
-                if (y <= 100)
+                if (y <= screenH/10)
                     movingUp = false;
             }
             else
             {
                 moveActor(down);
-                if (y >= 700)
+                if (y >= screenH - screenH/10)
                     movingUp = true;
             }
 
@@ -63,11 +66,17 @@ class DarkFighter: public Enemy //number one!
     
     void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
     {
-        DarkBullet *b = new DarkBullet();
-        b->settings(bulletSprite,x,y,5, 5, angle, 3);
-        b->createBullet (5, 20);
-        entities->push_back(b);                
-        bulletList->push_back(b);                       
+        if (ticksSinceLastFire == firerate)
+        { 
+            DarkBullet *b = new DarkBullet();
+            b->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b->createBullet (5, 20);
+            entities->push_back(b);                
+            bulletList->push_back(b);  
+            ticksSinceLastFire = 0;  
+        }
+        else
+            ticksSinceLastFire++;                   
     }
     
 };

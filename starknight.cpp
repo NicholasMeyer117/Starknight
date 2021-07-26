@@ -26,8 +26,8 @@
 using namespace sf;
 using namespace std;
 float DEGTORAD = 0.017453f;
-const int screenW = 1200;
-const int screenH = 800;
+const int screenW = 1920;
+const int screenH = 1080;
     
 sf::Text source;
 sf::Font mainGameFont;
@@ -39,7 +39,7 @@ int main() {
     Game *game = new Game;
     int state = 0;
     
-    RenderWindow app(VideoMode(screenW, screenH), "Starship Straffer!");
+    RenderWindow app(VideoMode(screenW, screenH), "Starknight!");
     app.setFramerateLimit(60);
     mainGameFont.loadFromFile("futura.ttf");
     source.setFont(mainGameFont);

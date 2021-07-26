@@ -81,7 +81,6 @@
      else
      {
          app.draw(rectangle);
-         
      }
 
      CircleShape circle(R);
