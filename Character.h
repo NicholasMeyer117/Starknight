@@ -19,8 +19,7 @@ class Character
     public:
     int credits = 3; //purchase in-run items
     int crewSlots = 1;
-    int upgradeSlots = 3;
-    int weaponSlots = 3;
+    int attachmentSlots = 4;
     int starCrystals = 0; //purchase items for next run
     int voidShards = 0; //unlock new ships or crew members
     

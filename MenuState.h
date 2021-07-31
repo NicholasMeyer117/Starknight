@@ -42,22 +42,22 @@ class MenuState: public State
         titleText.setFillColor(sf::Color::Black);
         sf::FloatRect textRect = titleText.getLocalBounds();
         titleText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
-        titleText.setPosition(600, 150);
+        titleText.setPosition(screenW/2, screenH/8);
         
         Button *startButton = new Button;
-        startButton->createButton(600, 300, 200, 50, &gameFont, "START", 20); 
+        startButton->createButton(screenW/2, 350, 400, 100, &gameFont, "START", 20); 
         buttonList.push_back(startButton);
         
         Button *settingsButton = new Button;
-        settingsButton->createButton(600, 400, 200, 50, &gameFont, "SETTINGS", 20); 
+        settingsButton->createButton(screenW/2, 500, 400, 100, &gameFont, "SETTINGS", 20); 
         buttonList.push_back(settingsButton);
         
         Button *creditsButton = new Button;
-        creditsButton->createButton(600, 500, 200, 50, &gameFont, "CREDITS", 20); 
+        creditsButton->createButton(screenW/2, 650, 400, 100, &gameFont, "CREDITS", 20); 
         buttonList.push_back(creditsButton);
         
         Button *quitButton = new Button;
-        quitButton->createButton(600, 600, 200, 50, &gameFont, "QUIT", 20); 
+        quitButton->createButton(screenW/2, 800, 400, 100, &gameFont, "QUIT", 20); 
         buttonList.push_back(quitButton);
         
         while (app.isOpen())

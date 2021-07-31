@@ -64,9 +64,17 @@ int main() {
     
     game->stateList = stateList;
     
+    sf::Music music;
+    if (!music.openFromFile("sounds/starknightTheme.wav"))
+        return -1; // error
+    music.play();
+    music.setPlayingOffset(sf::seconds(.2f));
+    music.setLoop(true);
+    
     while (state >= 0)
     {
         state = stateList[state]->Run(app);
+        music.stop();
     }
 
     return 0;

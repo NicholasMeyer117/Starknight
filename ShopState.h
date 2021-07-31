@@ -108,6 +108,20 @@ class ShopState: public State
         
     }
     
+    String getDesc(Attachment attachment)
+    {
+        String name = attachment.name;
+        if (name == "Cannon")
+            return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s\nSpeed: 20\nDamage: 5";
+        else if (name == "Machine Gun")
+            return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 4/s\nSpeed: 25\nDamage: 2";
+        else if (name == "Repair Droid")
+            return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5";
+        else if (name == "Siphon Droid")
+            return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5";
+        return "No Name"; 
+    }
+    
     void drawText( const sf::String &str, const int Size, const float xposition, const float yposition, sf::RenderWindow& window)
     {
         source.setString(str);
@@ -120,7 +134,7 @@ class ShopState: public State
     int Run(sf::RenderWindow &app)
     {
         Button *continueButton = new Button;
-        continueButton->createButton(1000, 700, 200, 50, &gameFont, "CONTINUE", 20); 
+        continueButton->createButton(screenW - screenW/4, screenH - screenH/4, 200, 50, &gameFont, "CONTINUE", 20); 
         buttonList.push_back(continueButton);
         
         srand(time(NULL));
@@ -146,6 +160,13 @@ class ShopState: public State
         Entity *creditImage = new Entity();
         creditImage -> noSpriteSettings(75, 75, 25, 25, Color::Yellow);
         entities.push_back(creditImage);
+        
+        sf::Music music;
+        if (!music.openFromFile("sounds/shopMusic.wav"))
+            return -1; // error
+        music.play();
+        //music.setPlayingOffset(sf::seconds(.2f));
+        music.setLoop(true);
            
         while (app.isOpen())
         {
@@ -169,6 +190,18 @@ class ShopState: public State
                 }
             }
             
+            for (int i = 0; i < shopButtonList.size(); i++)
+            {
+                cout << "Test";
+                if (shopButtonList[i] -> visible == true and shopButtonList[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                {
+                    cout << "Yes";
+                    drawText(getDesc(*shopAttachments[i]), 20, screenW/6, 600, app);
+                    
+                }
+            
+            }
+            
             //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))
 	         return -1;
@@ -183,7 +216,7 @@ class ShopState: public State
             
             }
             
-            if (buttonList[1]->clicked == true and character->credits >= button1->cost)
+            if (buttonList[1]->clicked == true and character->credits >= button1->cost && character->attachments.size() < character->attachmentSlots)
             {
                 buttonList[1]->clicked = false;
                 character->attachments.push_back(shopAttachments[0]);
@@ -192,7 +225,7 @@ class ShopState: public State
             
             }
             
-            if (buttonList[2]->clicked == true and character->credits >= button2->cost)
+            if (buttonList[2]->clicked == true and character->credits >= button2->cost && character->attachments.size() < character->attachmentSlots)
             {
                 buttonList[2]->clicked = false;
                 character->attachments.push_back(shopAttachments[1]);
@@ -200,7 +233,7 @@ class ShopState: public State
                 character->credits -= button2->cost;
             }
             
-            if (buttonList[3]->clicked == true and character->credits >= button3->cost)
+            if (buttonList[3]->clicked == true and character->credits >= button3->cost && character->attachments.size() < character->attachmentSlots)
             {
                 buttonList[3]->clicked = false;
                 character->attachments.push_back(shopAttachments[2]);
@@ -210,7 +243,7 @@ class ShopState: public State
 
 
             //draw
-            app.clear(Color(255,255,255,255));
+            
             for(auto i:entities)
                 i->draw(app);
             for(auto i:buttonList)
@@ -232,6 +265,7 @@ class ShopState: public State
             }
             drawText(": " + std::to_string(character->credits), 20, 95, 61, app);
             app.display();
+            app.clear(Color(255,255,255,255));
         }
     
         return -1;

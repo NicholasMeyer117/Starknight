@@ -31,8 +31,8 @@ void ShopButton::createIcon(Texture iconTexture, Sprite sprite, int shopNumber, 
     rectangle.setOutlineColor(sf::Color::Black);
     rectangle.setOutlineThickness(1);
     rectangle.setOrigin(w/2, (h)/2);
-    rectangle.setPosition(300 * shopNumber, 400);
-    icon.setPosition(300 * shopNumber, 400);
+    rectangle.setPosition((300 * shopNumber) + 300, 300);
+    icon.setPosition((300 * shopNumber) + 300, 300);
     
     buttonText.setFont(*font);
     buttonText.setString(text);

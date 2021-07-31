@@ -303,7 +303,7 @@ class PlayState: public State
         bool secondBarsSpawned = false;
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
-        float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
+        float maxLevelProgress = 2500; // level is over when levelProgress = maxLevelProgress
         int progressPercent;
         int tick = 0;
     

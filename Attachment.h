@@ -21,6 +21,7 @@ class Attachment
     int credits; //cost
     int level = 1; //current level
     enum attachClass {Gun, Repair, Utility, Seeker, AOE, Support, Bleeder, Merchant, Orbital, Summoner, Chainer, Manipulator};
+    String name;
     std::vector<attachClass> classList;
     sf::Sound sound;
     sf::SoundBuffer soundBuffer;
@@ -43,7 +44,8 @@ class Cannon: public Attachment
     void createAttachment(Sprite BulletSprite)
     {
         classList.push_back(Gun);
-        firerate = 50;
+        name = "Cannon";
+        firerate = 60;
         credits = 5;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
@@ -74,6 +76,7 @@ class MachineGun: public Attachment
     void createAttachment(Sprite BulletSprite)
     {
         classList.push_back(Gun);
+        name = "Machine Gun";
         firerate = 15;
         credits = 5;
         
@@ -104,6 +107,7 @@ class RepairDroid: public Attachment
     
     void createAttachment()
     {
+        name = "Repair Droid";
         classList.push_back(Repair);
         firerate = 300;
         soundBuffer.loadFromFile("sounds/heal.wav");
@@ -136,9 +140,10 @@ class SiphonDroid: public Attachment
     
     void createAttachment(Sprite BulletSprite)
     {
+        name = "Siphon Droid";
         classList.push_back(Repair);
         classList.push_back(Gun);
-        firerate = 60;
+        firerate = 75;
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
         bulletSprite = BulletSprite;

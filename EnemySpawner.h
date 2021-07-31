@@ -60,15 +60,7 @@ class EnemySpawner
                 switch(level)
                 {
                     case 1:
-                    
-                        if (randNum > 80 && !contains(enemyList, Enemy::EnemyType::shielder))
-                        {
-                            return spawn(3);
-                        }
-                        else
-                        {
-                            return spawn(0);
-                        }
+                        return spawn(0);
                         break;
                     case 2:
                         if (randNum > 66)
