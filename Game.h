@@ -21,7 +21,7 @@ class Game
     RenderWindow app;
     enum gameState {mainMenu, hub, game, shop, settings};
     int area = 1; //each area consists of several levels and ends with a boss
-    int level = 1;
+    int level = 5;
     int screenWidth;
     int screenHeight;
     sf::Text source;

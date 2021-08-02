@@ -60,12 +60,19 @@ class Cannon: public Attachment
         {
             NormalBullet *b = new NormalBullet();
             b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b->createBullet (5, 20);
+            b->createBullet ((5 * level), 20);
             entities->push_back(b);
             bulletList->push_back(b);
             sound.play();
             
         }
+    }
+    
+    void upgrade(int Level)
+    {
+        level = Level;
+        firerate = firerate/level;
+        
     }
 };
 

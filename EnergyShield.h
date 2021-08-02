@@ -35,6 +35,7 @@ class EnergyShield: public Actor
         circle.setPointCount(100);
         circle.setOutlineThickness(10);
         circle.setOutlineColor(sf::Color::Cyan);
+        circle.setFillColor(sf::Color::Transparent);
     }
     
     

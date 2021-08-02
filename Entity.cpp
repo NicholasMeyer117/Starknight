@@ -8,6 +8,7 @@
      R = radius;
      w = W; h = H;
      xPos = X, yPos = Y; //static original position on the map
+     sprite.setOrigin(w/2,h/2);
    }
    
    void Entity::noSpriteSettings(float X,float Y, float W, float H, sf::Color color, float Angle,int radius)

@@ -24,6 +24,8 @@ class ShopState: public State
     std::vector<Sprite> spriteList;
     std::vector<Sprite> bulletSpriteList;
     std::vector<Attachment*> shopAttachments;
+    std::vector<RectangleShape> slotRectangles;
+    std::vector<Sprite> attachmentSlotSprites;
     Character *character = new Character;
     int screenW;
     int screenH;
@@ -61,7 +63,7 @@ class ShopState: public State
             Sprite sprite;
             sprite.setTexture(game->bulletTextureList[i]);
             bulletSpriteList.push_back(sprite);
-           
+            
         }
         
     
@@ -108,6 +110,42 @@ class ShopState: public State
         
     }
     
+    void createSlotButtons(int attachNum)
+    {
+        String name = character->attachments[attachNum]->name;
+        Sprite sprite;
+        if (name == "Cannon")
+        {
+            sprite.setTexture(textureList[0]);
+            sprite.setScale(.4, .4);
+            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
+            
+        }
+        else if (name == "Machine Gun")
+        {
+            sprite.setTexture(textureList[1]);
+            sprite.setScale(.4, .4);
+            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
+            
+        }
+        else if (name == "Repair Droid")
+        {
+            sprite.setTexture(textureList[2]);
+            sprite.setScale(.4, .4);
+            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
+            
+        }
+        else if (name == "Siphon Droid")
+        {
+            sprite.setTexture(textureList[3]);
+            sprite.setScale(.4, .4);
+            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
+            
+        }
+    
+        attachmentSlotSprites.push_back(sprite);
+    }
+    
     String getDesc(Attachment attachment)
     {
         String name = attachment.name;
@@ -120,6 +158,18 @@ class ShopState: public State
         else if (name == "Siphon Droid")
             return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5";
         return "No Name"; 
+    }
+    
+    //checks if the player already has a given attachment
+    bool ifContains (Attachment *attachment)
+    {
+        String Name = attachment->name;
+        for (auto i:character->attachments)
+        {
+            if (i->name == Name)
+            return true;
+        }
+        return false;
     }
     
     void drawText( const sf::String &str, const int Size, const float xposition, const float yposition, sf::RenderWindow& window)
@@ -161,6 +211,22 @@ class ShopState: public State
         creditImage -> noSpriteSettings(75, 75, 25, 25, Color::Yellow);
         entities.push_back(creditImage);
         
+       for (int i = 0; i < character->attachmentSlots; i++)
+       {
+           sf::RectangleShape slot;
+           slot.setSize(sf::Vector2f(100, 100));
+           slot.setOutlineColor(sf::Color::Black);
+           slot.setOutlineThickness(5);
+           slot.setPosition(screenW - 400, 150 + (150 * i));
+           slotRectangles.push_back(slot);
+       
+       }
+       
+       for (int i = 0; i < character->attachments.size(); i++)
+       {
+           createSlotButtons(i);
+       }
+        
         sf::Music music;
         if (!music.openFromFile("sounds/shopMusic.wav"))
             return -1; // error
@@ -192,14 +258,22 @@ class ShopState: public State
             
             for (int i = 0; i < shopButtonList.size(); i++)
             {
-                cout << "Test";
                 if (shopButtonList[i] -> visible == true and shopButtonList[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                 {
-                    cout << "Yes";
                     drawText(getDesc(*shopAttachments[i]), 20, screenW/6, 600, app);
                     
                 }
+            }
             
+            FloatRect rect;
+            for (int i = 0; i < attachmentSlotSprites.size(); i++)
+            {
+                rect = attachmentSlotSprites[i].getGlobalBounds();
+                if (rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                {
+                    drawText(getDesc(*character->attachments[i]), 20, screenW/6, 600, app);
+                    //cout<<to_string(i);
+                }
             }
             
             //Quit Game
@@ -212,33 +286,55 @@ class ShopState: public State
                 buttonList.clear();
                 shopButtonList.clear();
                 shopAttachments.clear();
+                attachmentSlotSprites.clear();
                 return 2;
             
             }
             
             if (buttonList[1]->clicked == true and character->credits >= button1->cost && character->attachments.size() < character->attachmentSlots)
             {
+                bool alreadyHas = ifContains(shopAttachments[0]);
                 buttonList[1]->clicked = false;
-                character->attachments.push_back(shopAttachments[0]);
                 buttonList[1]->visible = false;
                 character->credits -= button1->cost;
+                
+                character->attachments.push_back(shopAttachments[0]);
+                attachmentSlotSprites.clear();
+                for (int i = 0; i < character->attachments.size(); i++)
+                {
+                    createSlotButtons(i);
+                }
             
             }
             
             if (buttonList[2]->clicked == true and character->credits >= button2->cost && character->attachments.size() < character->attachmentSlots)
             {
+                bool alreadyHas = ifContains(shopAttachments[1]);
                 buttonList[2]->clicked = false;
                 character->attachments.push_back(shopAttachments[1]);
                 buttonList[2]->visible = false;
                 character->credits -= button2->cost;
+                
+                attachmentSlotSprites.clear();
+                for (int i = 0; i < character->attachments.size(); i++)
+                {
+                    createSlotButtons(i);
+                }
             }
             
             if (buttonList[3]->clicked == true and character->credits >= button3->cost && character->attachments.size() < character->attachmentSlots)
             {
+                bool alreadyHas = ifContains(shopAttachments[2]);
                 buttonList[3]->clicked = false;
                 character->attachments.push_back(shopAttachments[2]);
                 buttonList[3]->visible = false;
                 character->credits -= button3->cost;
+                
+                attachmentSlotSprites.clear();
+                for (int i = 0; i < character->attachments.size(); i++)
+                {
+                    createSlotButtons(i);
+                }
             }
 
 
@@ -246,6 +342,10 @@ class ShopState: public State
             
             for(auto i:entities)
                 i->draw(app);
+            for(auto i:slotRectangles)
+                app.draw(i);
+            for(auto i:attachmentSlotSprites)
+                app.draw(i);
             for(auto i:buttonList)
             {
                    if (i->visible == true)

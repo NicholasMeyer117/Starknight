@@ -203,9 +203,9 @@ class PlayState: public State
     
     int Run(sf::RenderWindow &app)
     {
-	Texture t1,t2,t3,t4,t5,t6,t7,t8,t9;
+	Texture t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11;
         t1.loadFromFile("images/triShip.png");
-        t2.loadFromFile("images/background.jpg");
+        //t2.loadFromFile("images/background.jpg");
         t3.loadFromFile("images/cannonBullet.png");
         t4.loadFromFile("images/heart.png");
         t5.loadFromFile("images/darkFighter.png");
@@ -213,9 +213,11 @@ class PlayState: public State
         t7.loadFromFile("images/triShooter.png");
         t8.loadFromFile("images/doubleShooter.png");
         t9.loadFromFile("images/shielder.png");
+        t10.loadFromFile("images/pirateLordRobard.png");
+        t11.loadFromFile("images/pirateTurret.png");
 
         t1.setSmooth(true);
-        t2.setSmooth(true);
+        //t2.setSmooth(true);
     
         sf::Sound engineSound;
         sf::Sound bulletSound;
@@ -228,7 +230,7 @@ class PlayState: public State
             return -1;
         
         
-        Sprite background(t2);
+        //Sprite background(t2);
         Sprite playerShip(t1);
         Sprite bulletSprite(t3);
         bulletSpriteList.push_back(bulletSprite);
@@ -246,6 +248,12 @@ class PlayState: public State
         Sprite shielderSprite(t9);
         shielderSprite.setScale(2.5, 2.5);
         spriteList.push_back(shielderSprite); 
+        
+        Sprite pirateLordSprite(t10);
+        spriteList.push_back(pirateLordSprite); 
+        
+        Sprite pirateTurretSprite(t11);
+        spriteList.push_back(pirateTurretSprite); 
         
         player->settings(playerShip,200,400,32,33,90,20);
         player->createActor(100, 100, 5, 10, false, 50);
@@ -310,10 +318,6 @@ class PlayState: public State
         spawnBars(bar1, bar2);
         spawnCredit(credit);
         
-        MachineGun *machineGun = new MachineGun;
-        machineGun->createAttachment(bulletSpriteList[0]);
-        //attachmentList.push_back(machineGun);
-        
         attachmentList = character->attachments;
     
         while (app.isOpen())
@@ -374,24 +378,7 @@ class PlayState: public State
             checkIfPlayerHit(player, collidableEntities, enemyBulletList);
         
             //update enemies
-            for (auto i:enemyList)
-            {
-                i -> enemyMove();
-                Bullet *temp = checkCollisions(i, bulletList);
-                if (temp != NULL)
-                {
-                   temp->onContact(player);
-                   i -> takeDamage(temp->damage);
-                   temp -> life = 0;
-                }
-            
-                i->enemyAttack(&enemyBulletList, &entities);
-                i->ability(enemyList, &bulletList, app);
-                //bulletSound.setBuffer(laserSound);
-                //bulletSound.play();
-                    //i->ticksSinceLastFire = 0;
-
-            } 
+           
             
             for (auto i:miscEnemyList)
             {
@@ -444,6 +431,28 @@ class PlayState: public State
             for(auto i:entities) i->draw(app);
             //for(auto i:shieldList) 
                 //app.draw(i->circle);
+            for (auto i:enemyList)
+            {
+                i -> enemyMove();
+                
+                if (!(i->bulletsPassThrough))
+                {
+                    Bullet *temp = checkCollisions(i, bulletList);
+                    if (temp != NULL)
+                    {
+                       temp->onContact(player);
+                       i -> takeDamage(temp->damage);
+                       temp -> life = 0;
+                    }
+                }
+            
+                i->enemyAttack(&enemyBulletList, &entities);
+                i->ability(enemyList, &bulletList, app);
+                //bulletSound.setBuffer(laserSound);
+                //bulletSound.play();
+                    //i->ticksSinceLastFire = 0;
+
+            } 
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);

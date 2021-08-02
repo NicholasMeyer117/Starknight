@@ -17,8 +17,9 @@ class Enemy: public Actor
     public:
     bool reachedBegin = false;
     int ticksSinceLastFire = 0;
-    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder};
+    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder, pirateLord, pirateTurret};
     EnemyType enemyType;
+    int bulletsPassThrough = false;
     int screenH;
     int screenW;
     
