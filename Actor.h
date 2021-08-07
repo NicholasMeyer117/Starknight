@@ -16,6 +16,7 @@ class Actor: public Entity
     public:
     float maxHealth, health, shields;
     float speed, firerate, xPos, yPos;
+    float damageMult, fireRateMult, bulletSpeedMult, speedMult, healthMult; 
     bool isEnemy;
     int ticksSinceLastHit = 0;
     int iFrames;

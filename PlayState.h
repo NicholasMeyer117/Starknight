@@ -24,6 +24,7 @@
 #include "Attachment.h"
 #include "EnergyShield.h"
 #include "ProgressBar.h"
+#include "ParticleSystem.h"
 
 class PlayState: public State
 {
@@ -322,6 +323,18 @@ class PlayState: public State
         spawnCredit(credit);
         
         attachmentList = character->attachments;
+        
+        ParticleSystem shipParticles(1000, 100, 5, 50, 1, Color::Red);
+        ParticleSystem hitParticles(1000, 50, 10, 50, 3, Color::White);
+        ParticleSystem explosionParticles(4000, 50, 10, 100, 2, Color(255, 165, 0));
+        sf::Clock clock;
+        
+        sf::Music music;
+        if (!music.openFromFile("sounds/mawTheme.wav"))
+            return -1; // error
+        music.play();
+        //music.setPlayingOffset(sf::seconds(.2f));
+        music.setLoop(true);
     
         while (app.isOpen())
         {
@@ -389,13 +402,12 @@ class PlayState: public State
             checkIfPlayerHit(player, collidableEntities, enemyBulletList);
         
             //update enemies
-           
-            
             for (auto i:miscEnemyList)
             {
                 Bullet *temp = checkCollisions(i, bulletList);
                 if (temp != NULL)
                 {
+                   hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
                    i -> takeDamage(temp->damage);
                    temp -> life = 0;
                 }
@@ -466,8 +478,11 @@ class PlayState: public State
                     Bullet *temp = checkCollisions(i, bulletList);
                     if (temp != NULL)
                     {
+                       hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
                        temp->onContact(player);
                        i -> takeDamage(temp->damage);
+                       if (i->health <= 0)
+                           explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
                        temp -> life = 0;
                     }
                 }
@@ -479,12 +494,23 @@ class PlayState: public State
                     //i->ticksSinceLastFire = 0;
 
             } 
+            
+             //update particles
+            shipParticles.setEmitter(sf::Vector2f(player->x - 20, player->y - 5));
+            sf::Time elapsed = clock.restart();
+            shipParticles.update(elapsed);
+            hitParticles.update(elapsed);
+            explosionParticles.update(elapsed);
+            
+            app.draw(shipParticles);
+            app.draw(hitParticles);
+            app.draw(explosionParticles);
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
             drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
             app.display();
-            app.clear(Color(255,255,255,255));
+            app.clear(Color(56,10,56,255));
         }
     
     
