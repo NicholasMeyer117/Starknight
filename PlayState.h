@@ -23,6 +23,7 @@
 #include "HubState.h"
 #include "Attachment.h"
 #include "EnergyShield.h"
+#include "ProgressBar.h"
 
 class PlayState: public State
 {
@@ -39,6 +40,7 @@ class PlayState: public State
     std::vector<Sprite> bulletSpriteList; //0: bullet, 1:dark bullet
     std::vector<Attachment*> attachmentList;
     std::vector<Enemy*> miscEnemyList; //uncoventional enemies i dont want in enemyList: shields, etc
+    std::vector<Boss*> bosses;
     Character *character = new Character;
     
     Game *curGame;
@@ -312,8 +314,9 @@ class PlayState: public State
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
         float maxLevelProgress = 2500; // level is over when levelProgress = maxLevelProgress
-        int progressPercent;
+        int progressPercent = 0;
         int tick = 0;
+        bool spawnedBoss = false;
     
         spawnBars(bar1, bar2);
         spawnCredit(credit);
@@ -323,8 +326,16 @@ class PlayState: public State
         while (app.isOpen())
         {
             tick++;
-            levelProgress++;
-            progressPercent = (levelProgress/maxLevelProgress) * 100;
+            if (curGame->level!=5)
+            {
+                levelProgress++;
+                progressPercent = (levelProgress/maxLevelProgress) * 100;
+            }
+            else if (bosses.size() > 0 and bosses[0]->health <= 0)
+            {
+                progressPercent = 100;
+            
+            }
             Event event;
             while (app.pollEvent(event))
             {
@@ -403,7 +414,8 @@ class PlayState: public State
             {
                 i->activate(tick, &entities, &bulletList, player);
             }
-        
+             
+            //spawn enemies
             if (tick%200 == 0)
             {
                 Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick, enemyList);
@@ -411,6 +423,20 @@ class PlayState: public State
                 {
                     entities.push_back(newEnemy);
                     enemyList.push_back(newEnemy);
+                }
+                
+                if (spawnedBoss == false)
+                {
+                    spawnedBoss = true;
+                    vector<Boss*> tempBosses = enemySpawner->checkToSpawnBoss(curGame->level, curGame->area);
+                    for (auto i:tempBosses)
+                    {
+                        entities.push_back(i);
+                        enemyList.push_back(i);
+                        bosses.push_back(i);
+                    }
+                
+                
                 }
             }
         

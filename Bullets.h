@@ -86,24 +86,26 @@ class DiagonalBullet: public Bullet
     public: 
     bool right; //1: right, 0: left
     bool up; //1: up, 0: down
+    float cone;
     //1, 1 = diaginol up and right
     
-    void direction(bool Right, bool Up)
+    void direction(bool Right, bool Up, float Cone = 1)
     {
         right = Right;
         up = Up;
+        cone = Cone;
     }
     
     void update()
     {
         if (right)
-            x+=bulletSpeed*4;
+            x+=(bulletSpeed*4);
         else
-            x-=bulletSpeed*4;
+            x-=(bulletSpeed*4);
         if (up)
-            y-=bulletSpeed;
+            y-=(bulletSpeed/cone);
         else
-            y+=bulletSpeed;
+            y+=(bulletSpeed/cone);
         
     
     }

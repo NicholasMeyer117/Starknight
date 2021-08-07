@@ -40,7 +40,7 @@ class ShopState: public State
         gameFont = game->gameFont; 
         character = game->character;
         
-        Texture t1, t2, t3, t4;
+        Texture t1, t2, t3, t4, t5;
         t1.loadFromFile("images/cannon.png");
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
@@ -49,6 +49,8 @@ class ShopState: public State
         textureList.push_back(t3);
         t4.loadFromFile("images/siphonDroid.png");
         textureList.push_back(t4);
+        t5.loadFromFile("images/shotgun.png");
+        textureList.push_back(t5);
         
         for (auto i:textureList)
         {
@@ -105,6 +107,14 @@ class ShopState: public State
                 shopAttachments.push_back(siphonDroid);
                 return;
             }
+            case 4:
+            {
+                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, "Shotgun: 3 Cr", 20, 3);
+                Shotgun *shotgun = new Shotgun;
+                shotgun->createAttachment(bulletSpriteList[0]);
+                shopAttachments.push_back(shotgun);
+                return;
+            }
         
         }
         
@@ -115,61 +125,87 @@ class ShopState: public State
         String name = character->attachments[attachNum]->name;
         Sprite sprite;
         if (name == "Cannon")
-        {
             sprite.setTexture(textureList[0]);
-            sprite.setScale(.4, .4);
-            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
-            
-        }
         else if (name == "Machine Gun")
-        {
             sprite.setTexture(textureList[1]);
-            sprite.setScale(.4, .4);
-            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
-            
-        }
         else if (name == "Repair Droid")
-        {
             sprite.setTexture(textureList[2]);
-            sprite.setScale(.4, .4);
-            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
-            
-        }
         else if (name == "Siphon Droid")
-        {
             sprite.setTexture(textureList[3]);
-            sprite.setScale(.4, .4);
-            sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
+        else if (name == "Shotgun")
+            sprite.setTexture(textureList[4]);
             
-        }
-    
+        sprite.setScale(.4, .4);
+        sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
         attachmentSlotSprites.push_back(sprite);
     }
     
     String getDesc(Attachment attachment)
     {
         String name = attachment.name;
+        int levelNum = 1;
+        if (ifContains(&attachment) != NULL)
+        {
+            levelNum = ifContains(&attachment)->level;
+        }
         if (name == "Cannon")
-            return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s\nSpeed: 20\nDamage: 5";
+        {
+            if (levelNum == 1)
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s\nSpeed: 20\nDamage: 5";
+            if (levelNum == 2)
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 2/s\nSpeed: 20\nDamage: 10";
+            if (levelNum == 3)
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 4/s\nSpeed: 20\nDamage: 20";
+        }
         else if (name == "Machine Gun")
-            return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 4/s\nSpeed: 25\nDamage: 2";
+        {
+            if (levelNum == 1)
+                return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 4/s\nSpeed: 25\nDamage: 2";
+            if (levelNum == 2)
+                return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 6/s\nSpeed: 25\nDamage: 3";
+            if (levelNum == 3)
+                return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 9/s\nSpeed: 25\nDamage: 4.5";
+        }
         else if (name == "Repair Droid")
-            return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5";
+        {
+            if (levelNum == 1)
+                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5";
+            if (levelNum == 2)
+                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 10";
+            if (levelNum == 3)
+                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 20";
+        }
         else if (name == "Siphon Droid")
-            return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5";
+        {
+            if (levelNum == 1)
+                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5";
+            if (levelNum == 2)
+                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 10";
+            if (levelNum == 3)
+                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 20";
+        }
+        else if (name == "Shotgun")
+        {
+            if (levelNum == 1)
+                return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/2s\nSpeed: 15\nDamage: 5\nShots: 3\nAngle: 45";
+            if (levelNum == 2)
+                return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/1.5s\nSpeed: 15\nDamage: 10\nShots: 3\nAngle: 22.5";
+            if (levelNum == 3)
+                return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/s\nSpeed: 15\nDamage: 20\nShots: 3\nAngle: 11.25";
+        }
         return "No Name"; 
     }
     
     //checks if the player already has a given attachment
-    bool ifContains (Attachment *attachment)
+    Attachment* ifContains (Attachment *attachment)
     {
         String Name = attachment->name;
         for (auto i:character->attachments)
         {
             if (i->name == Name)
-            return true;
+                return i;
         }
-        return false;
+        return NULL;
     }
     
     void drawText( const sf::String &str, const int Size, const float xposition, const float yposition, sf::RenderWindow& window)
@@ -187,24 +223,28 @@ class ShopState: public State
         continueButton->createButton(screenW - screenW/4, screenH - screenH/4, 200, 50, &gameFont, "CONTINUE", 20); 
         buttonList.push_back(continueButton);
         
+        Button *rerollButton = new Button;
+        rerollButton->createButton(screenW/2 - 57, screenH/8, 200, 50, &gameFont, "REROLL", 20); 
+        buttonList.push_back(rerollButton);
+        
         srand(time(NULL));
         
-        int randNum = rand() % 4;
+        int randNum = rand() % 5;
         ShopButton *button1 = new ShopButton;
         createButton(button1, randNum, 1);
-        buttonList.push_back(button1);
+        //buttonList.push_back(button1);
         shopButtonList.push_back(button1);
         
-        randNum = rand() % 4;
+        randNum = rand() % 5;
         ShopButton *button2 = new ShopButton;
         createButton(button2, randNum, 2);
-        buttonList.push_back(button2);
+        //buttonList.push_back(button2);
         shopButtonList.push_back(button2);
         
-        randNum = rand() % 4;
+        randNum = rand() % 5;
         ShopButton *button3 = new ShopButton;
         createButton(button3, randNum, 3);
-        buttonList.push_back(button3);
+        //buttonList.push_back(button3);
         shopButtonList.push_back(button3);
         
         Entity *creditImage = new Entity();
@@ -253,6 +293,13 @@ class ShopState: public State
                             i->clicked = true;
                         }
                     }   
+                    for (auto i:shopButtonList)
+                    {
+                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        {
+                            i->clicked = true;
+                        }
+                    }   
                 }
             }
             
@@ -291,52 +338,53 @@ class ShopState: public State
             
             }
             
-            if (buttonList[1]->clicked == true and character->credits >= button1->cost && character->attachments.size() < character->attachmentSlots)
+            if (buttonList[1]->clicked == true)
             {
-                bool alreadyHas = ifContains(shopAttachments[0]);
                 buttonList[1]->clicked = false;
-                buttonList[1]->visible = false;
-                character->credits -= button1->cost;
-                
-                character->attachments.push_back(shopAttachments[0]);
-                attachmentSlotSprites.clear();
-                for (int i = 0; i < character->attachments.size(); i++)
-                {
-                    createSlotButtons(i);
-                }
-            
+                shopAttachments.clear();
+                shopButtonList.clear();
+                int randNum = rand() % 5;
+                ShopButton *button1 = new ShopButton;
+                createButton(button1, randNum, 1);
+                shopButtonList.push_back(button1);
+        
+                randNum = rand() % 5;
+                ShopButton *button2 = new ShopButton;
+                createButton(button2, randNum, 2);
+                shopButtonList.push_back(button2);
+        
+                randNum = rand() % 5;
+                ShopButton *button3 = new ShopButton;
+                createButton(button3, randNum, 3);
+                shopButtonList.push_back(button3);
             }
             
-            if (buttonList[2]->clicked == true and character->credits >= button2->cost && character->attachments.size() < character->attachmentSlots)
+            //check if any of the shop buttons are clicked
+            for (int i = 0; i < 3; i++)
             {
-                bool alreadyHas = ifContains(shopAttachments[1]);
-                buttonList[2]->clicked = false;
-                character->attachments.push_back(shopAttachments[1]);
-                buttonList[2]->visible = false;
-                character->credits -= button2->cost;
-                
-                attachmentSlotSprites.clear();
-                for (int i = 0; i < character->attachments.size(); i++)
+                if (shopButtonList[i]->clicked == true and character->credits >= shopButtonList[i]->cost 
+                && (character->attachments.size() < character->attachmentSlots or ifContains(shopAttachments[i])!=NULL))
                 {
-                    createSlotButtons(i);
+                    Attachment *alreadyHas = ifContains(shopAttachments[i]);
+                    shopButtonList[i]->clicked = false;
+                    shopButtonList[i]->visible = false;
+                    character->credits -= shopButtonList[i]->cost;
+                    
+                    if (alreadyHas == NULL)
+                    {
+                        character->attachments.push_back(shopAttachments[i]);
+                        attachmentSlotSprites.clear();
+                        for (int j = 0; j < character->attachments.size(); j++)
+                        {
+                            createSlotButtons(j);
+                        }
+                    }
+                    else
+                    {
+                        alreadyHas->upgrade();
+                    }
                 }
             }
-            
-            if (buttonList[3]->clicked == true and character->credits >= button3->cost && character->attachments.size() < character->attachmentSlots)
-            {
-                bool alreadyHas = ifContains(shopAttachments[2]);
-                buttonList[3]->clicked = false;
-                character->attachments.push_back(shopAttachments[2]);
-                buttonList[3]->visible = false;
-                character->credits -= button3->cost;
-                
-                attachmentSlotSprites.clear();
-                for (int i = 0; i < character->attachments.size(); i++)
-                {
-                    createSlotButtons(i);
-                }
-            }
-
 
             //draw
             

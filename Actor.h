@@ -14,7 +14,7 @@
 class Actor: public Entity
 {
     public:
-    int maxHealth, health, shields;
+    float maxHealth, health, shields;
     float speed, firerate, xPos, yPos;
     bool isEnemy;
     int ticksSinceLastHit = 0;

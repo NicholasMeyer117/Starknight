@@ -51,6 +51,62 @@ class EnemySpawner
         return false;
     }
     
+    vector<Boss*> checkToSpawnBoss(int level, int area)
+    {
+        vector<Boss*> bosses;
+        Sprite sprite;
+        switch(area) 
+        {
+            case 1 :
+                switch(level)
+                {
+                    case 5:
+                        PirateLord *pirateLord = new PirateLord();
+                        sprite = spriteList[4];
+                        pirateLord -> settings(sprite,screenW + 100,75,485,402);
+                        pirateLord -> createActor(1000, 0, 1, 240, true, 0);
+                        pirateLord -> enemySpawn(bulletSpriteList[1], screenW, screenH);
+                        bosses.push_back(pirateLord);
+            
+                        //std::vector<Enemy*> partList
+            
+                        PirateTurret *turret1 = new PirateTurret();
+                        Sprite turretSprite = spriteList[5];
+                        turret1 -> settings(turretSprite,500,500,51,51);
+                        turret1 -> createActor(100, 0, 1, 60, true, 0);
+                        turret1 -> enemySpawn(bulletSpriteList[1], screenW, screenH);
+            
+                        pirateLord -> Parts.push_back(turret1);
+                        bosses.push_back(turret1);
+            
+                        PirateTurret *turret2 = new PirateTurret();
+                        turret2 -> settings(turretSprite,500,500,51,51);
+                        turret2 -> createActor(100, 0, 1, 60, true, 0);
+                        turret2 -> enemySpawn(bulletSpriteList[1], screenW, screenH);
+            
+                        pirateLord -> Parts.push_back(turret2);
+                        bosses.push_back(turret2);
+            
+                        PirateTurret *turret3 = new PirateTurret();
+                        turret3 -> settings(turretSprite,500,500,51,51);
+                        turret3 -> createActor(100, 0, 1, 60, true, 0);
+                        turret3 -> enemySpawn(bulletSpriteList[1], screenW, screenH);
+            
+                        pirateLord -> Parts.push_back(turret3);
+                        bosses.push_back(turret3);
+            
+                        pirateLord ->setTurretPositions();
+            
+                        return bosses;
+                        break;
+                }
+                
+                break;
+        }
+        return bosses; 
+    
+    }
+    
     Enemy* checkToSpawn(int level, int area, int tick, std::vector<Enemy*> enemyList)
     {
         srand(time(NULL));
@@ -92,10 +148,6 @@ class EnemySpawner
                             return spawn(3);
                         else
                             return spawn(0);
-                    case 5:
-                        if (!contains(enemyList, Enemy::EnemyType::pirateLord))
-                            return spawn(4);
-                        break;
                 
                 
                 } 
@@ -152,39 +204,7 @@ class EnemySpawner
         }
         else if (enemyType == 4)
         {
-            PirateLord *pirateLord = new PirateLord();
-            sprite = spriteList[4];
-            pirateLord -> settings(sprite,screenW + 100,75,485,402);
-            pirateLord -> createActor(1000, 0, 1, 240, true, 0);
-            pirateLord -> enemySpawn(bulletSpriteList[1], screenW, screenH);
             
-            //std::vector<Enemy*> partList
-            
-            Enemy *turret1 = new PirateTurret();
-            Sprite turretSprite = spriteList[5];
-            turret1 -> settings(turretSprite,500,500,51,51);
-            turret1 -> createActor(500, 0, 1, 60, true, 0);
-            turret1 -> enemySpawn(bulletSpriteList[1], screenW, screenH);
-            
-            pirateLord -> Parts.push_back(turret1);
-            
-            Enemy *turret2 = new PirateTurret();
-            turret2 -> settings(turretSprite,500,500,51,51);
-            turret2 -> createActor(500, 0, 1, 60, true, 0);
-            turret2 -> enemySpawn(bulletSpriteList[1], screenW, screenH);
-            
-            pirateLord -> Parts.push_back(turret2);
-            
-            Enemy *turret3 = new PirateTurret();
-            turret3 -> settings(turretSprite,500,500,51,51);
-            turret3 -> createActor(500, 0, 1, 60, true, 0);
-            turret3 -> enemySpawn(bulletSpriteList[1], screenW, screenH);
-            
-            pirateLord -> Parts.push_back(turret3);
-            
-            pirateLord ->setTurretPositions();
-            
-            enemy = pirateLord;
         
         }
         
