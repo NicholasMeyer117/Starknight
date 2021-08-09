@@ -151,9 +151,9 @@ class ShopState: public State
         if (name == "Cannon")
         {
             if (levelNum == 1)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s\nSpeed: 20\nDamage: 5";
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s  ->  2/s\nSpeed: 20\nDamage: 5    ->  10";
             if (levelNum == 2)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 2/s\nSpeed: 20\nDamage: 10";
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 2/s  ->  4/s\nSpeed: 20\nDamage: 10   ->  20";
             if (levelNum == 3)
                 return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 4/s\nSpeed: 20\nDamage: 20";
         }

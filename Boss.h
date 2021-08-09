@@ -20,6 +20,7 @@ class PirateLord: public Boss
     public:
     bool movingUp = true;
     Sprite bulletSprite;
+    int volleyNum = 0;
     std::vector<ProgressBar> bars;
     
     void takeDamage(int damage)
@@ -27,8 +28,6 @@ class PirateLord: public Boss
         health = health - damage;
         if (phase == 1)
             bars[0].changePercentage(health/maxHealth);
-        if (health <= 0)
-            life=0;
     }
     
     void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
@@ -137,6 +136,60 @@ class PirateLord: public Boss
             } 
         }
     }
+    
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    {
+        if (ticksSinceLastFire == firerate && bulletsPassThrough == false)
+        { 
+        
+            DiagonalBullet *b1 = new DiagonalBullet();
+            b1->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b1->createBullet (5, 2.5);
+            b1->direction (false, true);
+            entities->push_back(b1);                
+            bulletList->push_back(b1);   
+        
+            DiagonalBullet *b2 = new DiagonalBullet();
+            b2->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b2->createBullet (5, 2.5);
+            b2->direction (false, false);
+            entities->push_back(b2);                
+            bulletList->push_back(b2);
+        
+            DarkBullet *b3 = new DarkBullet();
+            b3->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b3->createBullet (5, 10);
+            entities->push_back(b3);                
+            bulletList->push_back(b3); 
+            
+            DiagonalBullet *b4 = new DiagonalBullet();
+            b4->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b4->createBullet (5, 2.5);
+            b4->direction (false, true, 2);
+            entities->push_back(b4);                
+            bulletList->push_back(b4);   
+        
+            DiagonalBullet *b5 = new DiagonalBullet();
+            b5->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b5->createBullet (5, 2.5);
+            b5->direction (false, false, 2);
+            entities->push_back(b5);                
+            bulletList->push_back(b5);
+            
+            if (volleyNum < 10)
+            {
+                volleyNum++;
+                ticksSinceLastFire = firerate - 15;
+            }
+            else
+            {
+                ticksSinceLastFire = 0;
+                volleyNum = 0;
+            }
+        }
+        else if (bulletsPassThrough == false)
+            ticksSinceLastFire++;                   
+    }
 
 };
 
@@ -145,6 +198,7 @@ class PirateTurret: public Boss
     public:
     bool movingUp = true;
     Sprite bulletSprite;
+    int volleyNum = 0;
     
     void takeDamage(int damage)
     {
@@ -164,6 +218,46 @@ class PirateTurret: public Boss
         bulletsPassThrough = false;
     }
     
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    {
+        if (ticksSinceLastFire == firerate)
+        { 
+        
+            DarkBullet *b1 = new DarkBullet();
+            b1->settings(bulletSprite,x,y,15, 15, angle, 3);
+            b1->createBullet (10, 20);
+            entities->push_back(b1);                
+            bulletList->push_back(b1);  
+            ticksSinceLastFire = 0; 
+            
+            DarkBullet *b2 = new DarkBullet();
+            b2->settings(bulletSprite,x,y + 5,15, 15, angle, 3);
+            b2->createBullet (10, 20);
+            entities->push_back(b2);                
+            bulletList->push_back(b2);  
+            ticksSinceLastFire = 0;  
+            
+            DarkBullet *b3 = new DarkBullet();
+            b3->settings(bulletSprite,x,y - 5,15, 15, angle, 3);
+            b3->createBullet (10, 20);
+            entities->push_back(b3);                
+            bulletList->push_back(b3);  
+            ticksSinceLastFire = 0; 
+            
+            if (volleyNum < 2)
+            {
+                volleyNum++;
+                ticksSinceLastFire = firerate - 10;
+            }
+            else
+            {
+                ticksSinceLastFire = 0;
+                volleyNum = 0;
+            }
+        }
+        else
+            ticksSinceLastFire++;                   
+    }
     
 
 };

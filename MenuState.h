@@ -86,7 +86,7 @@ class MenuState: public State
             if (buttonList[0]->clicked == true)
             {
                 buttonList[0]->clicked = false;
-                return 3;
+                return 1;
             
             }
 

@@ -37,8 +37,9 @@ class PlayState: public State
     std::vector<Enemy*> enemyList;
     std::vector<Bullet*> bulletList;
     std::vector<Bullet*> enemyBulletList;
-    std::vector<Sprite> spriteList;
+    std::vector<Sprite> enemySpriteList;
     std::vector<Sprite> bulletSpriteList; //0: bullet, 1:dark bullet
+    std::vector<Sprite> playerShipSpriteList;
     std::vector<Attachment*> attachmentList;
     std::vector<Enemy*> miscEnemyList; //uncoventional enemies i dont want in enemyList: shields, etc
     std::vector<Boss*> bosses;
@@ -49,8 +50,6 @@ class PlayState: public State
     int screenH;
     sf::Font gameFont;
     sf::Text source;
-    
-    Actor *player = new Actor();
     
     void createState(Game *game)
     {
@@ -73,7 +72,7 @@ class PlayState: public State
         enemyList.clear();
         bulletList.clear();
         enemyBulletList.clear();
-        spriteList.clear();
+        enemySpriteList.clear();
         bulletSpriteList.clear();
     
     }
@@ -180,7 +179,7 @@ class PlayState: public State
         window.draw(source);
     }
     
-    void checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, std::vector<Bullet*> enemyBulletList)
+    void checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, std::vector<Bullet*> enemyBulletList, ParticleSystem *particles)
     {
         if (player -> ticksSinceLastHit > player -> iFrames)
         {
@@ -196,6 +195,7 @@ class PlayState: public State
 	    if (temp != NULL)
 	    {
 	        player -> health = player->health - temp->damage; 
+	        particles->setEmitter(sf::Vector2f(temp->x, temp->y));
 	        temp -> life = 0;
 	        player -> ticksSinceLastHit = 0;
 	    }
@@ -204,10 +204,29 @@ class PlayState: public State
 	player -> ticksSinceLastHit++;
     }
     
+    void createPlayer(int shipNum, Actor *player)
+    {
+        switch (shipNum)
+        {
+            case 0:
+                player->settings(playerShipSpriteList[character->shipType],200,400,32,33,90,20);
+                player->createActor(100, 100, 5, 10, false, 50);
+                return;
+            case 1:
+                player->settings(playerShipSpriteList[character->shipType],200,400,22,51,0,20);
+                player->createActor(200, 100, 4, 10, false, 50);
+                return;
+        }
+    
+    }
+    
+    
+    
     int Run(sf::RenderWindow &app)
     {
-	Texture t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11;
-        t1.loadFromFile("images/triShip.png");
+	Texture p1,p2,p3,p4,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12;
+        p1.loadFromFile("images/triShip.png");
+        p2.loadFromFile("images/batteringRam.png");
         //t2.loadFromFile("images/background.jpg");
         t3.loadFromFile("images/cannonBullet.png");
         t4.loadFromFile("images/heart.png");
@@ -218,8 +237,9 @@ class PlayState: public State
         t9.loadFromFile("images/shielder.png");
         t10.loadFromFile("images/pirateLordRobard.png");
         t11.loadFromFile("images/pirateTurret.png");
+        t12.loadFromFile("images/blueBullet.png");
 
-        t1.setSmooth(true);
+        p1.setSmooth(true);
         //t2.setSmooth(true);
     
         sf::Sound engineSound;
@@ -234,32 +254,38 @@ class PlayState: public State
         
         
         //Sprite background(t2);
-        Sprite playerShip(t1);
+        Sprite warhorse(p1);
+        playerShipSpriteList.push_back(warhorse);
+        Sprite batteringRam(p2);
+        playerShipSpriteList.push_back(batteringRam);
+        
         Sprite bulletSprite(t3);
         bulletSpriteList.push_back(bulletSprite);
         Sprite heartSprite(t4);
         Sprite darkFighterSprite(t5);
-        spriteList.push_back(darkFighterSprite);
+        enemySpriteList.push_back(darkFighterSprite);
         Sprite triShooterSprite(t7);
-        spriteList.push_back(triShooterSprite);
+        enemySpriteList.push_back(triShooterSprite);
         Sprite doubleShooterSprite(t8);
         doubleShooterSprite.setScale(1.25, 1.25f);
-        spriteList.push_back(doubleShooterSprite);
+        enemySpriteList.push_back(doubleShooterSprite);
         Sprite darkBulletSprite(t6);
         bulletSpriteList.push_back(darkBulletSprite);
+        Sprite blueBulletSprite(t12);
+        bulletSpriteList.push_back(blueBulletSprite);
         
         Sprite shielderSprite(t9);
         shielderSprite.setScale(2.5, 2.5);
-        spriteList.push_back(shielderSprite); 
+        enemySpriteList.push_back(shielderSprite); 
         
         Sprite pirateLordSprite(t10);
-        spriteList.push_back(pirateLordSprite); 
+        enemySpriteList.push_back(pirateLordSprite); 
         
         Sprite pirateTurretSprite(t11);
-        spriteList.push_back(pirateTurretSprite); 
+        enemySpriteList.push_back(pirateTurretSprite); 
         
-        player->settings(playerShip,200,400,32,33,90,20);
-        player->createActor(100, 100, 5, 10, false, 50);
+        Actor *player = new Actor();
+        createPlayer(character->shipType, player);
         entities.push_back(player);
     
         Entity *topBar = new Entity();
@@ -307,7 +333,7 @@ class PlayState: public State
     
         std::cout << "\nScreen Width0: " + std::to_string(screenW);
         EnemySpawner *enemySpawner = new EnemySpawner;
-        enemySpawner->createSpawner(spriteList, bulletSpriteList, screenW, screenH);
+        enemySpawner->createSpawner(enemySpriteList, bulletSpriteList, screenW, screenH);
     
         float startGameSpeed = 3.5;
         float curGameSpeed = startGameSpeed;
@@ -318,15 +344,18 @@ class PlayState: public State
         int progressPercent = 0;
         int tick = 0;
         bool spawnedBoss = false;
+        bool bossDeath = false;
+        int numBossExplosions = 0;
     
         spawnBars(bar1, bar2);
         spawnCredit(credit);
         
         attachmentList = character->attachments;
         
-        ParticleSystem shipParticles(1000, 100, 5, 50, 1, Color::Red);
-        ParticleSystem hitParticles(1000, 50, 10, 50, 3, Color::White);
+        ParticleSystem shipParticles(1000, 100, 5, 50, 1, Color::Red, 180);
+        ParticleSystem hitParticles(1000, 50, 10, 50, 3, Color::White, 180);
         ParticleSystem explosionParticles(4000, 50, 10, 100, 2, Color(255, 165, 0));
+        ParticleSystem shipHitParticles(1000, 50, 10, 100, 3, Color::Yellow, 0);
         sf::Clock clock;
         
         sf::Music music;
@@ -346,8 +375,7 @@ class PlayState: public State
             }
             else if (bosses.size() > 0 and bosses[0]->health <= 0)
             {
-                progressPercent = 100;
-            
+                bossDeath = true;
             }
             Event event;
             while (app.pollEvent(event))
@@ -399,7 +427,7 @@ class PlayState: public State
             }
         
             //update is player hit
-            checkIfPlayerHit(player, collidableEntities, enemyBulletList);
+            checkIfPlayerHit(player, collidableEntities, enemyBulletList, &shipHitParticles);
         
             //update enemies
             for (auto i:miscEnemyList)
@@ -451,6 +479,30 @@ class PlayState: public State
                 
                 }
             }
+            
+            if (bossDeath == true)
+            {
+                if (numBossExplosions <= 20 and tick%20 == true)
+                {
+                    int randW = rand() % u_int(bosses[0]->w);
+                    int randH = rand() % u_int(bosses[0]->h);
+                    explosionParticles.setEmitter(sf::Vector2f(randW + bosses[0]->x/1.2, randH + bosses[0]->y/1.2));
+                    numBossExplosions++;
+                }
+                else if (numBossExplosions < 40 and numBossExplosions > 20 and tick%10 == true)
+                {
+                    int randW = rand() % u_int(bosses[0]->w);
+                    int randH = rand() % u_int(bosses[0]->h);
+                    explosionParticles.setEmitter(sf::Vector2f(randW + bosses[0]->x/1.2, randH + bosses[0]->y/1.2));
+                    numBossExplosions++;
+                }    
+                else if (numBossExplosions == 40)
+                {
+                    progressPercent = 100;
+                    bosses[0]->life=0;
+                }
+                
+            }
         
             if (tick == 1000)
             {
@@ -481,7 +533,7 @@ class PlayState: public State
                        hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
                        temp->onContact(player);
                        i -> takeDamage(temp->damage);
-                       if (i->health <= 0)
+                       if (i->health <= 0 and i!=bosses[0])
                            explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
                        temp -> life = 0;
                     }
@@ -501,10 +553,12 @@ class PlayState: public State
             shipParticles.update(elapsed);
             hitParticles.update(elapsed);
             explosionParticles.update(elapsed);
+            shipHitParticles.update(elapsed);
             
             app.draw(shipParticles);
             app.draw(hitParticles);
             app.draw(explosionParticles);
+            app.draw(shipHitParticles);
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);

@@ -17,11 +17,12 @@ using namespace std;
 class Character
 {
     public:
-    int credits = 9; //purchase in-run items
+    int credits = 50; //purchase in-run items
     int crewSlots = 1;
     int attachmentSlots = 3;
     int starCrystals = 0; //purchase items for next run
     int voidShards = 0; //unlock new ships or crew members
+    int shipType = 0; //fighter, tank, interceptor, smuggler, weaponsPlatform, commandShip, techShip
     
     std::vector<Attachment*> attachments;
     

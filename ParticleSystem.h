@@ -8,12 +8,13 @@ class ParticleSystem : public sf::Drawable, public sf::Transformable
 {
 public:
     float size;
-    int type; //0: spread out, 1: cone, 2: burst, 3: cone burst
+    int type; //0: spread out, 1: cone, 2: burst, 3: cone burst, 4: Background
     bool dontRespawn = false;
     int timeAlive = 0;
     float baseSpeed = 50.f;
+    float baseAngle;
     Color color;
-    ParticleSystem(unsigned int count, float Lifetime, float Size, float Speed, int Type, Color COLOR) :
+    ParticleSystem(unsigned int count, float Lifetime, float Size, float Speed, int Type, Color COLOR, float Angle = 90.f) :
     m_particles(count),
     m_vertices(sf::Quads, count),
     m_lifetime(sf::seconds(3.f)),
@@ -24,6 +25,7 @@ public:
         color = COLOR;
         timeAlive = Lifetime;
         baseSpeed = Speed;
+        baseAngle = Angle;
     }
 
     void setEmitter(sf::Vector2f position)
@@ -103,7 +105,7 @@ private:
         if (type == 0 or type == 2)
             angle = (std::rand() % 360) * 3.14f / 180.f;
         if (type == 1 or type == 3)
-            angle = (std::rand() % 90) * 3.14f / 180.f - 180;
+            angle = (std::rand() % 90) * 3.14f / 180.f - baseAngle;
         float speed = (std::rand() % 50) + baseSpeed;
         m_particles[index].velocity = sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
         m_particles[index].lifetime = sf::milliseconds((std::rand() % 1000) + timeAlive);
