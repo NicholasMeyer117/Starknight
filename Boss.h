@@ -23,7 +23,7 @@ class PirateLord: public Boss
     int volleyNum = 0;
     std::vector<ProgressBar> bars;
     
-    void takeDamage(int damage)
+    void takeDamage(float damage)
     {
         health = health - damage;
         if (phase == 1)
@@ -200,7 +200,7 @@ class PirateTurret: public Boss
     Sprite bulletSprite;
     int volleyNum = 0;
     
-    void takeDamage(int damage)
+    void takeDamage(float damage)
     {
         changeBar = true;
         health = health - damage;

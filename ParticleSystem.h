@@ -13,8 +13,13 @@ public:
     int timeAlive = 0;
     float baseSpeed = 50.f;
     float baseAngle;
+    float spawnSpeed;
+    int maxH, minH, maxW, minW;
+    int firsts;
+    int opacity;
     Color color;
-    ParticleSystem(unsigned int count, float Lifetime, float Size, float Speed, int Type, Color COLOR, float Angle = 90.f) :
+    ParticleSystem(unsigned int count, float Lifetime, float Size, float Speed, int Type, Color COLOR, float Angle = 90.f, 
+    int MaxH = 0, int MinH = 0, int MaxW = 0, int MinW = 0, int Opacity = 255) :
     m_particles(count),
     m_vertices(sf::Quads, count),
     m_lifetime(sf::seconds(3.f)),
@@ -26,13 +31,20 @@ public:
         timeAlive = Lifetime;
         baseSpeed = Speed;
         baseAngle = Angle;
+        maxW = MaxW;
+        minW = MinW;
+        maxH = MaxH;
+        minH = MinH;
+        firsts = count;
+        opacity = Opacity;
+        
     }
 
     void setEmitter(sf::Vector2f position)
     {
-        m_emitter = position;
         if (type == 2 or type == 3)
             dontRespawn = false;
+        m_emitter = position;
     }
 
     void update(sf::Time elapsed)
@@ -44,7 +56,7 @@ public:
             p.lifetime -= elapsed;
 
             // if the particle is dead, respawn it
-            if (p.lifetime <= sf::Time::Zero)
+            if (p.lifetime <= sf::Time::Zero or (type == 4 and m_vertices[i * 4].position.x <= 0))
             {
                 resetParticle(i * 4);
                 resetParticle(i * 4 + 1);
@@ -64,7 +76,7 @@ public:
             float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
             for (int j = i * 4; j < i * 4 + 4; j++)
             { 
-                m_vertices[j].color.a = static_cast<sf::Uint8>(255);
+                m_vertices[j].color.a = static_cast<sf::Uint8>(opacity);
                 m_vertices[j].color.r = static_cast<sf::Uint8>(color.r);
                 m_vertices[j].color.g = static_cast<sf::Uint8>(color.g);
                 m_vertices[j].color.b = static_cast<sf::Uint8>(color.b);
@@ -104,19 +116,43 @@ private:
         float angle;
         if (type == 0 or type == 2)
             angle = (std::rand() % 360) * 3.14f / 180.f;
-        if (type == 1 or type == 3)
+        else if (type == 1 or type == 3)
             angle = (std::rand() % 90) * 3.14f / 180.f - baseAngle;
         float speed = (std::rand() % 50) + baseSpeed;
-        m_particles[index].velocity = sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
+        if (type!=4)
+            m_particles[index].velocity = sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
+        else 
+        {
+            speed = baseSpeed;
+            m_particles[index].velocity = sf::Vector2f(-1 * speed, 0 * speed);
+        }
         m_particles[index].lifetime = sf::milliseconds((std::rand() % 1000) + timeAlive);
 
         // reset the position of the corresponding vertex
         if (dontRespawn == false)
         {
             m_vertices[index].position = m_emitter;
+            
+            if (type == 4)
+            {
+                m_emitter.y = (std::rand() % (maxH-minH));// + minH;
+                if (firsts > 0)
+                {
+                    firsts--;
+                    m_emitter.x = (std::rand() % (maxW-minW));
+                }
+                else
+                {
+                    m_emitter.x = maxW;
+                }
+                m_vertices[index].position = m_emitter;
+            }
         }
         else
+        {
             m_vertices[index].position = sf::Vector2f(-10000, -10000);
+            
+        }
     }
 
     std::vector<Particle> m_particles;

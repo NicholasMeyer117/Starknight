@@ -24,7 +24,7 @@ class Shielder: public Enemy
     int volleyNum = 0;
     std::vector<EnergyShield*> shieldList;
     
-    void takeDamage(int damage)
+    void takeDamage(float damage)
     {
         health = health - damage;
         if (health <= 0)
@@ -127,11 +127,14 @@ class Shielder: public Enemy
             shieldList.clear();
             for (auto i:enemyList)
             {
-                EnergyShield *energyShield = new EnergyShield;
-                energyShield->noSpriteSettings(i->x,i->y,i->w,i->h, Color::Black, 0,0);
-                energyShield->createActor(10, 0, 0, 0, true, 0);
-                energyShield->createShield(i->x, i->y, i->w, i);
-                shieldList.push_back(energyShield);
+                if (i->enemyType!=shielder)
+                {
+                    EnergyShield *energyShield = new EnergyShield;
+                    energyShield->noSpriteSettings(i->x,i->y,i->w,i->h, Color::Black, 0,0);
+                    energyShield->createActor(10, 0, 0, 0, true, 0);
+                    energyShield->createShield(i->x, i->y, i->w, i);
+                    shieldList.push_back(energyShield);
+                }
             }
             ticksSinceLastFire = 0;
         }

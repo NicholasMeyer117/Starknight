@@ -21,7 +21,7 @@ class DoubleShooter: public Enemy
     Sprite bulletSprite;
     int volleyNum = 0;
     
-    void takeDamage(int damage)
+    void takeDamage(float damage)
     {
         health = health - damage;
         if (health <= 0)

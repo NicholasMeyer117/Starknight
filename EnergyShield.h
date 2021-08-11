@@ -18,7 +18,7 @@ class EnergyShield: public Actor
     sf::CircleShape circle;
     Enemy *enemy;
     
-    void takeDamage(int damage)
+    void takeDamage(float damage)
     {
         health = health - damage;
         if (health <= 0)

@@ -214,7 +214,11 @@ class PlayState: public State
                 return;
             case 1:
                 player->settings(playerShipSpriteList[character->shipType],200,400,22,51,0,20);
-                player->createActor(200, 100, 4, 10, false, 50);
+                player->createActor(150, 100, 3, 10, false, 50, 1.25);
+                return;
+            case 2:
+                player->settings(playerShipSpriteList[character->shipType],200,400,35,21,0,20);
+                player->createActor(75, 100, 7, 10, false, 50, 1.25);
                 return;
         }
     
@@ -227,6 +231,7 @@ class PlayState: public State
 	Texture p1,p2,p3,p4,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12;
         p1.loadFromFile("images/triShip.png");
         p2.loadFromFile("images/batteringRam.png");
+        p3.loadFromFile("images/serpent.png");
         //t2.loadFromFile("images/background.jpg");
         t3.loadFromFile("images/cannonBullet.png");
         t4.loadFromFile("images/heart.png");
@@ -258,6 +263,8 @@ class PlayState: public State
         playerShipSpriteList.push_back(warhorse);
         Sprite batteringRam(p2);
         playerShipSpriteList.push_back(batteringRam);
+        Sprite serpent(p3);
+        playerShipSpriteList.push_back(serpent);
         
         Sprite bulletSprite(t3);
         bulletSpriteList.push_back(bulletSprite);
@@ -269,13 +276,13 @@ class PlayState: public State
         Sprite doubleShooterSprite(t8);
         doubleShooterSprite.setScale(1.25, 1.25f);
         enemySpriteList.push_back(doubleShooterSprite);
-        Sprite darkBulletSprite(t6);
+        Sprite darkBulletSprite(t12);
         bulletSpriteList.push_back(darkBulletSprite);
         Sprite blueBulletSprite(t12);
         bulletSpriteList.push_back(blueBulletSprite);
         
         Sprite shielderSprite(t9);
-        shielderSprite.setScale(2.5, 2.5);
+        //shielderSprite.setScale(2.5, 2.5);
         enemySpriteList.push_back(shielderSprite); 
         
         Sprite pirateLordSprite(t10);
@@ -340,7 +347,7 @@ class PlayState: public State
         bool secondBarsSpawned = false;
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
-        float maxLevelProgress = 2500; // level is over when levelProgress = maxLevelProgress
+        float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
         int progressPercent = 0;
         int tick = 0;
         bool spawnedBoss = false;
@@ -356,6 +363,10 @@ class PlayState: public State
         ParticleSystem hitParticles(1000, 50, 10, 50, 3, Color::White, 180);
         ParticleSystem explosionParticles(4000, 50, 10, 100, 2, Color(255, 165, 0));
         ParticleSystem shipHitParticles(1000, 50, 10, 100, 3, Color::Yellow, 0);
+        ParticleSystem backParticles1(400, 20000, 10, 100, 4, Color::White, 0, screenH/8, screenH, screenW, 0);
+        ParticleSystem backParticles2(800, 20000, 10, 150, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 200);
+        ParticleSystem backParticles3(400, 20000, 10, 200, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 100);
+        //backParticles.setEmitter(Vector2f(screenW, screenH/2));
         sf::Clock clock;
         
         sf::Music music;
@@ -517,7 +528,9 @@ class PlayState: public State
             }
         
             //draw
-          
+            app.draw(backParticles3);
+            app.draw(backParticles2);
+            app.draw(backParticles1);
             for(auto i:entities) i->draw(app);
             //for(auto i:shieldList) 
                 //app.draw(i->circle);
@@ -533,7 +546,9 @@ class PlayState: public State
                        hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
                        temp->onContact(player);
                        i -> takeDamage(temp->damage);
-                       if (i->health <= 0 and i!=bosses[0])
+                       cout <<"\nBullet Damage: " + to_string(temp->damage);
+                       cout << "\nEnemy Health: " + to_string(i->health) + "\n";
+                       if (i->health <= 0)
                            explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
                        temp -> life = 0;
                     }
@@ -554,6 +569,9 @@ class PlayState: public State
             hitParticles.update(elapsed);
             explosionParticles.update(elapsed);
             shipHitParticles.update(elapsed);
+            backParticles1.update(elapsed);
+            backParticles2.update(elapsed);
+            backParticles3.update(elapsed);
             
             app.draw(shipParticles);
             app.draw(hitParticles);
@@ -564,7 +582,11 @@ class PlayState: public State
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
             drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
             app.display();
-            app.clear(Color(56,10,56,255));
+            app.clear(Color::Black);
+            RectangleShape rectangle;
+            rectangle.setSize(Vector2f(screenW, screenH));
+            rectangle.setFillColor(Color(56,10,56,200));
+            app.draw(rectangle);
         }
     
     

@@ -22,7 +22,8 @@ class Actor: public Entity
     int iFrames;
     enum direction {up, down, left, right};
     
-    void createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames);
+    void createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames,
+    float damageMult = 1.0, float fireRateMult = 1.0, float bulletSpeedMult = 1.0, float speedMult = 1.0, float healthMult = 1.0);
 
     void moveActor(enum direction);
     

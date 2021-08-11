@@ -19,7 +19,7 @@ class TriShooter: public Enemy
     bool movingUp = true;
     Sprite bulletSprite;
     
-    void takeDamage(int damage)
+    void takeDamage(float damage)
     {
         health = health - damage;
         if (health <= 0)

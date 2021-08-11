@@ -180,7 +180,7 @@ class EnemySpawner
             enemy = new TriShooter();
             sprite = spriteList[1];
             enemy -> settings(sprite,screenW + 100,75,50,50);
-            enemy -> createActor(10, 0, 1, 80, true, 0);
+            enemy -> createActor(15, 0, 1, 80, true, 0);
             enemy->enemySpawn(bulletSpriteList[1], screenW, screenH);
         }
         else if (enemyType == 2)
@@ -197,7 +197,7 @@ class EnemySpawner
         {
             enemy = new Shielder();
             sprite = spriteList[3];
-            enemy -> settings(sprite,screenW + 100,75,17,71);
+            enemy -> settings(sprite,screenW + 100,75,43,173);
             enemy -> createActor(25, 0, 1, 240, true, 0);
             enemy->enemySpawn(bulletSpriteList[1], screenW, screenH);
         

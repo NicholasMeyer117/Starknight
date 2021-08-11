@@ -23,7 +23,7 @@ class Enemy: public Actor
     int screenH;
     int screenW;
     
-    virtual void takeDamage(int damage){}
+    virtual void takeDamage(float damage){}
     
     virtual void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH){}
     

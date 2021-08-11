@@ -17,7 +17,7 @@ class Attachment
 {
     public:
     int firerate; //ticks per activation
-    float damage;
+    float baseDamage, damage;
     bool passive; //true = provides passive effect, false = provides effect on tick
     int credits; //cost
     int num = 1; //number of attachments. 2 for level 2, 3 for level 3
@@ -49,7 +49,7 @@ class Cannon: public Attachment
         name = "Cannon";
         firerate = 60;
         credits = 5;
-        damage = 5;
+        baseDamage = 5;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
@@ -59,6 +59,7 @@ class Cannon: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
+        damage = baseDamage * player->damageMult;
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
@@ -78,7 +79,7 @@ class Cannon: public Attachment
         {
             level++;
             firerate = firerate/2;
-            damage = damage*2;
+            baseDamage = baseDamage*2;
         }
     }
 };
@@ -93,7 +94,7 @@ class MachineGun: public Attachment
         name = "Machine Gun";
         firerate = 15;
         credits = 5;
-        damage = 2;
+        baseDamage = 2;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
@@ -103,6 +104,7 @@ class MachineGun: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
+        damage = baseDamage * player->damageMult;
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
@@ -122,7 +124,7 @@ class MachineGun: public Attachment
         {
             level++;
             firerate = firerate/1.5;
-            damage = damage*1.5;
+            baseDamage = baseDamage*1.5;
         }
     }
 };
@@ -138,7 +140,7 @@ class Shotgun: public Attachment
         name = "Shotgun";
         firerate = 120;
         credits = 5;
-        damage = 5;
+        baseDamage = 5;
         
         
         soundBuffer.loadFromFile("sounds/laser.wav");
@@ -149,6 +151,7 @@ class Shotgun: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
+        damage = baseDamage * player->damageMult;
         if (tick%firerate == 0)
         {
             DiagonalBullet *b1 = new DiagonalBullet();
@@ -201,7 +204,7 @@ class Shotgun: public Attachment
         {
             level++;
             firerate = firerate/1.5;
-            damage = damage*2;
+            baseDamage = baseDamage*2;
             cone = cone*2;
         }
     }
@@ -262,7 +265,7 @@ class SiphonDroid: public Attachment
         classList.push_back(Repair);
         classList.push_back(Gun);
         firerate = 75;
-        damage = 5;
+        baseDamage = 5;
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
         bulletSprite = BulletSprite;
@@ -272,6 +275,7 @@ class SiphonDroid: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
+        damage = baseDamage * player->damageMult;
         if (tick%firerate == 0)
         {
             SiphonBullet *b = new SiphonBullet();
@@ -290,7 +294,7 @@ class SiphonDroid: public Attachment
         if ((level == 1 and num == 2) or (level == 2 and num == 3))
         {
             level++;
-            damage = damage*2;
+            baseDamage = baseDamage*2;
         }
     }
 

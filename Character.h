@@ -17,7 +17,7 @@ using namespace std;
 class Character
 {
     public:
-    int credits = 50; //purchase in-run items
+    int credits = 3; //purchase in-run items
     int crewSlots = 1;
     int attachmentSlots = 3;
     int starCrystals = 0; //purchase items for next run
