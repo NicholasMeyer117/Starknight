@@ -23,7 +23,7 @@ class Attachment
     int num = 1; //number of attachments. 2 for level 2, 3 for level 3
     int level = 1; //current level
     enum attachClass {Gun, Repair, Utility, Seeker, AOE, Support, Bleeder, Merchant, Orbital, Summoner, Chainer, Manipulator};
-    String name;
+    string name;
     std::vector<attachClass> classList;
     sf::Sound sound;
     sf::SoundBuffer soundBuffer;
@@ -221,6 +221,7 @@ class RepairDroid: public Attachment
         name = "Repair Droid";
         classList.push_back(Repair);
         firerate = 300;
+        credits = 5;
         damage = 5;
         soundBuffer.loadFromFile("sounds/heal.wav");
         sound.setBuffer(soundBuffer);
@@ -255,6 +256,56 @@ class RepairDroid: public Attachment
 
 };
 
+class TimeDilator: public Attachment
+{
+    public: 
+    
+    void createAttachment()
+    {
+        name = "Time Dilator";
+        classList.push_back(Manipulator);
+        credits = 5;
+        firerate = 0;
+        baseDamage = 0.1; //Base Damage in this case is time modifier. 0.2 damage = 20% slower
+    }
+    
+    void upgrade()
+    {
+        num++;
+        if ((level == 1 and num == 2) or (level == 2 and num == 3))
+        {
+            level++;
+            baseDamage = baseDamage*2;
+        }
+    }
+
+};
+
+class HullBooster: public Attachment
+{
+    public: 
+    
+    void createAttachment()
+    {
+        name = "Hull Booster";
+        classList.push_back(Utility);
+        credits = 5;
+        firerate = 0;
+        baseDamage = 0.25; //Base Damage in this case is added HP percentage. 0.25 damage = 25% extra HP
+    }
+    
+    void upgrade()
+    {
+        num++;
+        if ((level == 1 and num == 2) or (level == 2 and num == 3))
+        {
+            level++;
+            baseDamage = baseDamage*2;
+        }
+    }
+
+};
+
 class SiphonDroid: public Attachment
 {
     public:
@@ -264,6 +315,7 @@ class SiphonDroid: public Attachment
         name = "Siphon Droid";
         classList.push_back(Repair);
         classList.push_back(Gun);
+        credits = 10;
         firerate = 75;
         baseDamage = 5;
         soundBuffer.loadFromFile("sounds/laser.wav");

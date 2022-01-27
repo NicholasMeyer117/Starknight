@@ -223,8 +223,10 @@ class HubState: public State
                     {
                         if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                         {
-                            i->clicked = true;
-                            //cout << "\nclick!";
+                            if (Mouse::isButtonPressed(Mouse::Left))
+                                i->leftClicked = true;
+                            else if (Mouse::isButtonPressed(Mouse::Right))
+                                i->rightClicked = true; 
                         }
                     }   
                     
@@ -244,9 +246,9 @@ class HubState: public State
                 }
             }
             
-            if (buttonList[0]->clicked == true)
+            if (buttonList[0]->leftClicked == true)
             {
-                buttonList[0]->clicked = false;
+                buttonList[0]->leftClicked = false;
                 curChar->shipType = curShipNum;
                 return 3;
             

@@ -130,8 +130,8 @@ class PlayState: public State
     void spawnCredit(Entity *credit)
     {
     
-        int randY = rand() % 500 + 100;
-        int randX = rand() % 400 + 1200;
+        int randY = rand() % screenH/1.5 + screenH/6;
+        int randX = rand() % screenW/2 + screenW;
     
         credit->rectangle.setPosition(randX, randY);
         credit->setPosition(randX, randY);
@@ -341,6 +341,12 @@ class PlayState: public State
         std::cout << "\nScreen Width0: " + std::to_string(screenW);
         EnemySpawner *enemySpawner = new EnemySpawner;
         enemySpawner->createSpawner(enemySpriteList, bulletSpriteList, screenW, screenH);
+        
+        RectangleShape completeScreen;
+        completeScreen.setSize(sf::Vector2f(screenW, screenH));
+        completeScreen.setFillColor(Color(0,0,0, 0));
+        completeScreen.setOrigin(completeScreen.getSize().x/2, completeScreen.getSize().y/2);
+        completeScreen.setPosition(screenW/2, screenH/2);
     
         float startGameSpeed = 3.5;
         float curGameSpeed = startGameSpeed;
@@ -348,11 +354,18 @@ class PlayState: public State
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
         float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
+        float mapTimeDilationPercentage = 0; //percentage that game speed is slowed down
         int progressPercent = 0;
         int tick = 0;
+        int numCreditsCollectedRound = 0; //Number of credits collected in that round
+        int numEnemiesKilledRound = 0; //Number of enemies killed in that round
         bool spawnedBoss = false;
         bool bossDeath = false;
+        bool levelComplete= false;
         int numBossExplosions = 0;
+        int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = completeScreenDone, 3 = textDone, 4 = goldDone
+        int completeTick = 0; //used to determine some parts of completion stage
+        //int beginningGold = 0;
     
         spawnBars(bar1, bar2);
         spawnCredit(credit);
@@ -369,16 +382,42 @@ class PlayState: public State
         //backParticles.setEmitter(Vector2f(screenW, screenH/2));
         sf::Clock clock;
         
+        //Pre-round attachment check!
+        for (auto i:character->attachments)
+        {
+            cout << "\n" + i->name;
+            if (i->name == "Time Dilator")
+            {
+                cout << "\nSuccess!";
+                cout << "\n" + to_string(i->baseDamage) + "\n";
+                mapTimeDilationPercentage = i->baseDamage;
+            }
+            
+            else if (i->name == "Hull Booster")
+            {
+                player->maxHealth = player->maxHealth + (player->maxHealth * i->baseDamage);
+                player -> health = player -> maxHealth;
+            }
+        }
+        startGameSpeed = startGameSpeed * (1 - mapTimeDilationPercentage);
+        
+        
+        cout << "\ntime dilation %: " + to_string(mapTimeDilationPercentage) + "\n";
+        
         sf::Music music;
         if (!music.openFromFile("sounds/mawTheme.wav"))
             return -1; // error
         music.play();
-        //music.setPlayingOffset(sf::seconds(.2f));
         music.setLoop(true);
     
         while (app.isOpen())
         {
             tick++;
+            if (completeStage >= 2)
+            {
+                completeTick++;
+            }
+            
             if (curGame->level!=5)
             {
                 levelProgress++;
@@ -426,10 +465,24 @@ class PlayState: public State
             enemyList = removeDeadEntity(enemyList);
             bulletList = removeDeadEntity(bulletList);
         
-            gameProgress = moveBars(bar1, bar2, curGameSpeed, gameProgress);
-            gameProgress = moveBars(bar3, bar4, curGameSpeed, gameProgress);
-            curGameSpeed = startGameSpeed + gameProgress/2;
-            moveCredit(credit, curGameSpeed);
+        
+            if (!levelComplete)
+            {
+                gameProgress = moveBars(bar1, bar2, curGameSpeed, gameProgress);
+                gameProgress = moveBars(bar3, bar4, curGameSpeed, gameProgress);
+                curGameSpeed = (startGameSpeed + (gameProgress/2));// * (1 - mapTimeDilationPercentage);
+                moveCredit(credit, curGameSpeed);
+            }
+            else if (completeScreen.getFillColor().a != 200)
+            {
+                Color curCol = completeScreen.getFillColor();
+                completeScreen.setFillColor(Color(curCol.r, curCol.g, curCol.b, curCol.a + 2));
+            }
+            //Stage 2 of level complete
+            else if (completeScreen.getFillColor().a == 200 and completeStage == 1)
+            {
+                completeStage = 2;
+            }
         
             if (secondBarsSpawned == false and bar1->x <= screenW/2)
             {
@@ -440,7 +493,7 @@ class PlayState: public State
             //update is player hit
             checkIfPlayerHit(player, collidableEntities, enemyBulletList, &shipHitParticles);
         
-            //update enemies
+            //update misc enemies
             for (auto i:miscEnemyList)
             {
                 Bullet *temp = checkCollisions(i, bulletList);
@@ -457,6 +510,7 @@ class PlayState: public State
             if (temp != NULL)
             {
                 character->credits += 1;
+                numCreditsCollectedRound++;
                 temp->setPosition(0, 0);
             }
         
@@ -467,7 +521,7 @@ class PlayState: public State
             }
              
             //spawn enemies
-            if (tick%200 == 0)
+            if (tick%200 == 0 and !levelComplete)
             {
                 Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick, enemyList);
                 if (newEnemy != NULL)
@@ -486,24 +540,23 @@ class PlayState: public State
                         enemyList.push_back(i);
                         bosses.push_back(i);
                     }
-                
-                
                 }
             }
             
+            //Handles Boss Death
             if (bossDeath == true)
             {
                 if (numBossExplosions <= 20 and tick%20 == true)
                 {
-                    int randW = rand() % u_int(bosses[0]->w);
-                    int randH = rand() % u_int(bosses[0]->h);
+                    int randW = rand() % int(bosses[0]->w);
+                    int randH = rand() % int(bosses[0]->h);
                     explosionParticles.setEmitter(sf::Vector2f(randW + bosses[0]->x/1.2, randH + bosses[0]->y/1.2));
                     numBossExplosions++;
                 }
                 else if (numBossExplosions < 40 and numBossExplosions > 20 and tick%10 == true)
                 {
-                    int randW = rand() % u_int(bosses[0]->w);
-                    int randH = rand() % u_int(bosses[0]->h);
+                    int randW = rand() % int(bosses[0]->w);
+                    int randH = rand() % int(bosses[0]->h);
                     explosionParticles.setEmitter(sf::Vector2f(randW + bosses[0]->x/1.2, randH + bosses[0]->y/1.2));
                     numBossExplosions++;
                 }    
@@ -515,15 +568,29 @@ class PlayState: public State
                 
             }
         
+            //Restart Tick Counter
             if (tick == 1000)
             {
                 tick = 0;
             }
             
-            if (progressPercent >= 100)
+            //Stage 1 of level complete
+            if (progressPercent >= 100 and completeStage == 0)
             {
                 curGame->level++;
+                completeStage = 1;
+                levelComplete = true;
+                for (auto i:enemyList)
+                    i->health = 0;
                 emptyState();
+                //return 3;
+            }
+            
+            //Stage 4 of level complete
+            else if (completeTick == 300 and completeStage == 3)
+            {
+                cout << "\n Time Manip: " + to_string(mapTimeDilationPercentage) + "\n";
+                cout << "\nCurrent Speed: " + to_string(curGameSpeed) + "\n";
                 return 3;
             }
         
@@ -534,6 +601,8 @@ class PlayState: public State
             for(auto i:entities) i->draw(app);
             //for(auto i:shieldList) 
                 //app.draw(i->circle);
+                
+            //Update Conventional Enemies
             for (auto i:enemyList)
             {
                 i -> enemyMove();
@@ -549,7 +618,10 @@ class PlayState: public State
                        cout <<"\nBullet Damage: " + to_string(temp->damage);
                        cout << "\nEnemy Health: " + to_string(i->health) + "\n";
                        if (i->health <= 0)
+                       {
+                           numEnemiesKilledRound++;
                            explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
+                       }
                        temp -> life = 0;
                     }
                 }
@@ -581,6 +653,26 @@ class PlayState: public State
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
             drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
+            
+            app.draw(completeScreen);
+            cout << to_string(completeStage);
+            
+            //Stage 3 of complete Stage
+            if ((completeTick == 100 and completeStage == 2) or completeStage > 2)
+            {
+                drawText("Level Complete", 60, screenW/3, screenH - 16 * (screenH/20), app);
+                drawText("Credits Collected: " + to_string(numCreditsCollectedRound), 40, screenW/3, screenH - 13 * (screenH/20), app);
+                drawText("Enemies Killed: " + to_string(numEnemiesKilledRound), 40, screenW/3, screenH - 12 * (screenH/20), app);
+                if (completeStage == 2)
+                {
+                    completeStage = 3;
+                    completeTick = 0;
+                    cout << "\n Time Manip: " + to_string(mapTimeDilationPercentage) + "\n";
+                    cout << "\nCurrent Speed: " + to_string(curGameSpeed) + "\n";
+                }
+                
+            }
+            
             app.display();
             app.clear(Color::Black);
             RectangleShape rectangle;

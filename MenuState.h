@@ -11,6 +11,7 @@
 #include "Game.h"
 #include "State.h"
 #include "Button.h"
+#include "ParticleSystem.h"
 
 class MenuState: public State
 {
@@ -39,26 +40,39 @@ class MenuState: public State
         titleText.setFont(spaceFont);
         titleText.setString("STARKNIGHT");
         titleText.setCharacterSize(70);
-        titleText.setFillColor(sf::Color::Black);
+        titleText.setFillColor(sf::Color::White);
         sf::FloatRect textRect = titleText.getLocalBounds();
         titleText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
-        titleText.setPosition(screenW/2, screenH/8);
+        titleText.setPosition(screenW/1.5, screenH/8);
+        
+        RectangleShape buttonBacker;
+        buttonBacker.setSize(sf::Vector2f(400, screenH));
+        buttonBacker.setOutlineColor(sf::Color::Black);
+        buttonBacker.setFillColor(Color(105,105,105, 100));
+        buttonBacker.setOutlineThickness(1);
+        buttonBacker.setOrigin(buttonBacker.getSize().x/2, buttonBacker.getSize().y/2);
+        buttonBacker.setPosition(screenW/4, screenH/2);
         
         Button *startButton = new Button;
-        startButton->createButton(screenW/2, 350, 400, 100, &gameFont, "START", 20); 
+        startButton->createButton(screenW/4, 0 + screenH/6, 300, 75, &gameFont, "START", 20, Color(0, 0, 139, 100)); 
         buttonList.push_back(startButton);
         
         Button *settingsButton = new Button;
-        settingsButton->createButton(screenW/2, 500, 400, 100, &gameFont, "SETTINGS", 20); 
+        settingsButton->createButton(screenW/4, 0 + 2 * (screenH/6), 300, 75, &gameFont, "SETTINGS", 20, Color(0, 0, 139, 100)); 
         buttonList.push_back(settingsButton);
         
         Button *creditsButton = new Button;
-        creditsButton->createButton(screenW/2, 650, 400, 100, &gameFont, "CREDITS", 20); 
+        creditsButton->createButton(screenW/4, 0 + 3 * (screenH/6), 300, 75, &gameFont, "CREDITS", 20, Color(0, 0, 139, 100)); 
         buttonList.push_back(creditsButton);
         
         Button *quitButton = new Button;
-        quitButton->createButton(screenW/2, 800, 400, 100, &gameFont, "QUIT", 20); 
+        quitButton->createButton(screenW/4, 0 + 4 * (screenH/6), 300, 75, &gameFont, "QUIT", 20, Color(0, 0, 139, 100)); 
         buttonList.push_back(quitButton);
+        
+        ParticleSystem backParticles1(400, 20000, 10, 100, 4, Color::White, 0, screenH/8, screenH, screenW, 0);
+        ParticleSystem backParticles2(800, 20000, 10, 150, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 200);
+        ParticleSystem backParticles3(400, 20000, 10, 200, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 100);
+        sf::Clock clock;
         
         while (app.isOpen())
         {
@@ -76,27 +90,45 @@ class MenuState: public State
                     {
                         if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                         {
-                            i->clicked = true;
+                            if (Mouse::isButtonPressed(Mouse::Left))
+                                i->leftClicked = true;
+                            else if (Mouse::isButtonPressed(Mouse::Right))
+                                i->rightClicked = true; 
                             cout << "click!";
                         }
                     }   
                 }
             }
             
-            if (buttonList[0]->clicked == true)
+            if (buttonList[0]->leftClicked == true)
             {
-                buttonList[0]->clicked = false;
+                buttonList[0]->leftClicked = false;
                 return 1;
+            
+            }
+            if (buttonList[3]->leftClicked == true)
+            {
+                buttonList[3]->leftClicked = false;
+                return -1;
             
             }
 
             //draw
-            app.clear(Color(255,255,255,255));
+            app.clear(Color::Black);
+            sf::Time elapsed = clock.restart();
+            backParticles1.update(elapsed);
+            backParticles2.update(elapsed);
+            backParticles3.update(elapsed);
+            app.draw(backParticles3);
+            app.draw(backParticles2);
+            app.draw(backParticles1);
+            app.draw(buttonBacker);
             for(auto i:buttonList)
             {
                 app.draw(i->rectangle);
                 app.draw(i->buttonText);
             }
+            
             app.draw(titleText);
             app.display();
         }

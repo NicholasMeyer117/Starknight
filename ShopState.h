@@ -1,7 +1,7 @@
 #pragma once
+#include <string>
 #include <iostream>
 #include <array>
-#include <string>
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 #include <time.h>
@@ -14,18 +14,21 @@
 #include "Enemy.h"
 #include "Character.h"
 
+using namespace std;
+
 class ShopState: public State
 {
     public:
     std::vector<Entity*> entities;
-    std::vector<Button*> buttonList;
-    std::vector<ShopButton*> shopButtonList;
-    std::vector<Texture> textureList;
-    std::vector<Sprite> spriteList;
-    std::vector<Sprite> bulletSpriteList;
-    std::vector<Attachment*> shopAttachments;
-    std::vector<RectangleShape> slotRectangles;
-    std::vector<Sprite> attachmentSlotSprites;
+    std::vector<Button*> buttonList; //Vector of normal buttons
+    std::vector<ShopButton*> shopButtonList; //Vector of Attachments available to buy
+    std::vector<Texture> textureList; //Vector of used textures
+    std::vector<Sprite> spriteList; //Vector of sprites
+    std::vector<Sprite> bulletSpriteList; //Vector of bullet sprites?????
+    std::vector<Attachment*> shopAttachments; //vector of ?
+    std::vector<RectangleShape> slotRectangles; //Vector of black rect outlines for available attachments
+    //std::vector<Sprite> attachmentSlotSprites; // ??
+    std::vector<ImageButton*> attachmentSlotButtons; //Vector of buttons for equipped attachments
     Character *character = new Character;
     int screenW;
     int screenH;
@@ -40,7 +43,7 @@ class ShopState: public State
         gameFont = game->gameFont; 
         character = game->character;
         
-        Texture t1, t2, t3, t4, t5;
+        Texture t1, t2, t3, t4, t5, t6, t7;
         t1.loadFromFile("images/cannon.png");
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
@@ -51,6 +54,26 @@ class ShopState: public State
         textureList.push_back(t4);
         t5.loadFromFile("images/shotgun.png");
         textureList.push_back(t5);
+        t6.loadFromFile("images/timeDilator.png");
+        textureList.push_back(t6);
+        t7.loadFromFile("images/hullBooster.png");
+        textureList.push_back(t7);
+        
+        Texture i1, i2, i3, i4, i5, i6, i7;
+        i1.loadFromFile("images/cannon.png");
+        textureList.push_back(i1);
+        i2.loadFromFile("images/machineGun.png");
+        textureList.push_back(i2);
+        i3.loadFromFile("images/repairDroid.png");
+        textureList.push_back(i3);
+        i4.loadFromFile("images/siphonDroid.png");
+        textureList.push_back(i4);
+        i5.loadFromFile("images/shotgun.png");
+        textureList.push_back(i5);
+        i6.loadFromFile("images/timeDilator.png");
+        textureList.push_back(i6);
+        i7.loadFromFile("images/hullBooster.png");
+        textureList.push_back(i7);
         
         for (auto i:textureList)
         {
@@ -71,13 +94,14 @@ class ShopState: public State
     
     }
     
-    void createButton(ShopButton *button, int attachNum, int butNum )
+    //Generates Shop Button
+    void generateButton(ShopButton *button, int attachNum, int butNum )
     {
         switch(attachNum)
         {
             case 0:
             {
-                button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, "Cannon: 3 Cr", 20, 3);
+                button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, "Cannon: 5 Cr", 20, 5);
                 Cannon *cannon = new Cannon;
                 cannon->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(cannon);
@@ -85,7 +109,7 @@ class ShopState: public State
             } 
             case 1:
             {
-                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, "Machine Gun: 3 Cr", 20, 3);
+                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, "Machine Gun: 5 Cr", 20, 5);
                 MachineGun *machineGun = new MachineGun;
                 machineGun->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(machineGun);
@@ -93,7 +117,7 @@ class ShopState: public State
             }
             case 2:
             {
-                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Repair Droid: 3 Cr", 20, 3);
+                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Repair Droid: 5 Cr", 20, 5);
                 RepairDroid *repairDroid = new RepairDroid;
                 repairDroid->createAttachment();
                 shopAttachments.push_back(repairDroid);
@@ -101,7 +125,7 @@ class ShopState: public State
             }
             case 3:
             {
-                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, "Siphon Droid: 6 Cr", 20, 6);
+                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, "Siphon Droid: 10 Cr", 20, 10);
                 SiphonDroid *siphonDroid = new SiphonDroid;
                 siphonDroid->createAttachment(bulletSpriteList[1]);
                 shopAttachments.push_back(siphonDroid);
@@ -109,12 +133,29 @@ class ShopState: public State
             }
             case 4:
             {
-                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, "Shotgun: 3 Cr", 20, 3);
+                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, "Shotgun: 5 Cr", 20, 5);
                 Shotgun *shotgun = new Shotgun;
                 shotgun->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(shotgun);
                 return;
             }
+            case 5:
+            {
+                button->createIcon(textureList[5], spriteList[5], butNum, 250, 250, &gameFont, "Time Dilator: 5 Cr", 20, 5);
+                TimeDilator *timeDilator = new TimeDilator;
+                timeDilator->createAttachment();
+                shopAttachments.push_back(timeDilator);
+                return;
+            }
+            case 6:
+            {
+                button->createIcon(textureList[6], spriteList[6], butNum, 250, 250, &gameFont, "Hull Booster: 5 Cr", 20, 5);
+                HullBooster *hullBooster = new HullBooster;
+                hullBooster->createAttachment();
+                shopAttachments.push_back(hullBooster);
+                return;
+            }
+        
         
         }
         
@@ -124,20 +165,42 @@ class ShopState: public State
     {
         String name = character->attachments[attachNum]->name;
         Sprite sprite;
+        ImageButton *button = new ImageButton;
+        int textNum;
         if (name == "Cannon")
-            sprite.setTexture(textureList[0]);
+        {
+            textNum = 0;
+        }
         else if (name == "Machine Gun")
-            sprite.setTexture(textureList[1]);
+        {
+            textNum = 1;
+        }
         else if (name == "Repair Droid")
-            sprite.setTexture(textureList[2]);
+        {
+            textNum = 2;
+        }
         else if (name == "Siphon Droid")
-            sprite.setTexture(textureList[3]);
+        {
+            textNum = 3;
+        }
         else if (name == "Shotgun")
-            sprite.setTexture(textureList[4]);
+        {
+            textNum = 4;
+        }
+        else if (name == "Time Dilator")
+        {
+            textNum = 5;
+        }
+        else if (name == "Hull Booster")
+        {
+            textNum = 6;
+        }
             
         sprite.setScale(.4, .4);
         sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
-        attachmentSlotSprites.push_back(sprite);
+        //the [textNum + i] represents the offset from double textures at the beginning. i must be iterated each time a new attachment is added
+        button->createImageButton(textureList[textNum + 7], spriteList[textNum + 7], screenW - 400, 150 + (150 * attachNum), 100, 100);
+        attachmentSlotButtons.push_back(button);
     }
     
     String getDesc(Attachment attachment)
@@ -193,6 +256,24 @@ class ShopState: public State
             if (levelNum == 3)
                 return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/s\nSpeed: 15\nDamage: 20\nShots: 3\nAngle: 11.25";
         }
+        else if (name == "Time Dilator")
+        {
+            if (levelNum == 1)
+                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 10%";
+            if (levelNum == 2)
+                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 20%";
+            if (levelNum == 3)
+                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 40%";
+        }
+        else if (name == "Hull Booster")
+        {
+            if (levelNum == 1)
+                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 25%";
+            if (levelNum == 2)
+                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 50%";
+            if (levelNum == 3)
+                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 100%";
+        }
         return "No Name"; 
     }
     
@@ -227,23 +308,28 @@ class ShopState: public State
         rerollButton->createButton(screenW/2 - 57, screenH/8, 200, 50, &gameFont, "REROLL", 20); 
         buttonList.push_back(rerollButton);
         
+        Button *sellButton = new Button;
+        sellButton -> createButton (0, 0, 150, 50, &gameFont, "SELL", 20);
+        sellButton->visible = false;
+        buttonList.push_back(sellButton);
+        
         srand(time(NULL));
         
-        int randNum = rand() % 5;
+        int randNum = rand() % 7;
         ShopButton *button1 = new ShopButton;
-        createButton(button1, randNum, 1);
+        generateButton(button1, randNum, 1);
         //buttonList.push_back(button1);
         shopButtonList.push_back(button1);
         
-        randNum = rand() % 5;
+        randNum = rand() % 7;
         ShopButton *button2 = new ShopButton;
-        createButton(button2, randNum, 2);
+        generateButton(button2, randNum, 2);
         //buttonList.push_back(button2);
         shopButtonList.push_back(button2);
         
-        randNum = rand() % 5;
+        randNum = rand() % 7;
         ShopButton *button3 = new ShopButton;
-        createButton(button3, randNum, 3);
+        generateButton(button3, randNum, 3);
         //buttonList.push_back(button3);
         shopButtonList.push_back(button3);
         
@@ -273,7 +359,8 @@ class ShopState: public State
         music.play();
         //music.setPlayingOffset(sf::seconds(.2f));
         music.setLoop(true);
-           
+          
+        //Check for any buttons clicked 
         while (app.isOpen())
         {
             Event event;
@@ -285,21 +372,47 @@ class ShopState: public State
                 else if (event.type == sf::Event::MouseButtonPressed) 
                 {
                  
-                    std::cout << "Mouse Position on Screen: " + to_string(Mouse::getPosition(app).x) + " , " + to_string(Mouse::getPosition(app).y) << std::endl;
+                    //Check for regular buttons clicked
+                    //std::cout << "Mouse Position on Screen: " + to_string(Mouse::getPosition(app).x) + " , " + to_string(Mouse::getPosition(app).y) << std::endl;
                     for (auto i:buttonList)
                     {
                         if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                         {
-                            i->clicked = true;
+                            if (Mouse::isButtonPressed(Mouse::Left))
+                                i->leftClicked = true;
+                            else if (Mouse::isButtonPressed(Mouse::Right))
+                                i->rightClicked = true; 
                         }
-                    }   
+                    }  
+                    
+                    //Check for Shop Buttons Clicked 
                     for (auto i:shopButtonList)
                     {
                         if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                         {
-                            i->clicked = true;
+                            if (Mouse::isButtonPressed(Mouse::Left))
+                                i->leftClicked = true;
+                            else if (Mouse::isButtonPressed(Mouse::Right))
+                                i->rightClicked = true; 
                         }
                     }   
+                    
+                    //Check for attachment slot buttons clicked
+                    for (auto i:attachmentSlotButtons)
+                    {
+                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        {
+                            if (Mouse::isButtonPressed(Mouse::Left))
+                            {
+                                for (auto j:attachmentSlotButtons)
+                                    j -> leftClicked = false;
+                                i->leftClicked = true;
+                            }
+                            else if (Mouse::isButtonPressed(Mouse::Right))
+                                i->rightClicked = true; 
+                        }
+                    
+                    }
                 }
             }
             
@@ -312,7 +425,7 @@ class ShopState: public State
                 }
             }
             
-            FloatRect rect;
+           /* FloatRect rect;
             for (int i = 0; i < attachmentSlotSprites.size(); i++)
             {
                 rect = attachmentSlotSprites[i].getGlobalBounds();
@@ -321,59 +434,101 @@ class ShopState: public State
                     drawText(getDesc(*character->attachments[i]), 20, screenW/6, 600, app);
                     //cout<<to_string(i);
                 }
-            }
+            }*/
             
             //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))
 	         return -1;
             
-            if (buttonList[0]->clicked == true)
+            //Check if Buttons clicked
+            //Continue
+            if (buttonList[0]->leftClicked == true)
             {
-                buttonList[0]->clicked = false;
+                buttonList[0]->leftClicked = false;
                 buttonList.clear();
                 shopButtonList.clear();
                 shopAttachments.clear();
-                attachmentSlotSprites.clear();
+                attachmentSlotButtons.clear();
                 return 2;
             
             }
             
-            if (buttonList[1]->clicked == true)
+            //Reroll
+            if (buttonList[1]->leftClicked == true)
             {
-                buttonList[1]->clicked = false;
+                buttonList[1]->leftClicked = false;
                 shopAttachments.clear();
                 shopButtonList.clear();
-                int randNum = rand() % 5;
+                int randNum = rand() % 7;
                 ShopButton *button1 = new ShopButton;
-                createButton(button1, randNum, 1);
+                generateButton(button1, randNum, 1);
                 shopButtonList.push_back(button1);
         
-                randNum = rand() % 5;
+                randNum = rand() % 7;
                 ShopButton *button2 = new ShopButton;
-                createButton(button2, randNum, 2);
+                generateButton(button2, randNum, 2);
                 shopButtonList.push_back(button2);
         
-                randNum = rand() % 5;
+                randNum = rand() % 7;
                 ShopButton *button3 = new ShopButton;
-                createButton(button3, randNum, 3);
+                generateButton(button3, randNum, 3);
                 shopButtonList.push_back(button3);
+            }
+            
+            
+            //Sell
+            if (buttonList[2]->leftClicked == true)
+            {
+                buttonList[2]->leftClicked = false;
+                sellButton -> visible = false;
+                for (int i = 0; i < attachmentSlotButtons.size(); i++)
+                {
+                    if (attachmentSlotButtons[i]->leftClicked == true)
+                    {
+                        //character->attachments.erase(i);
+                        (character->credits) += (character->attachments[i])->credits;
+                        //string test = character->attachments[i]->name;
+                        cout << "\n" + character->attachments[i]->name + ": " + to_string(character->attachments[i]->credits) + "\n";
+                        character->attachments.erase(next(begin(character->attachments), + i));
+                        attachmentSlotButtons.clear();
+                        for (int j = 0; j < character->attachments.size(); j++)
+                        {
+                            createSlotButtons(j);
+                        }
+                    }
+                }
+            }
+            
+            
+            //check if any of the attachment buttons are clicked
+            for (int i = 0; i < attachmentSlotButtons.size(); i++)
+            {
+                if (attachmentSlotButtons[i]->leftClicked == true)
+                {
+                   
+                    attachmentSlotButtons[i]->leftClicked = true;
+                    //shopButtonList[i]->leftClicked = false;
+                    sellButton -> visible = true;
+                    sellButton -> moveTo(screenW - 200, 200 + (150 * i));
+                }
             }
             
             //check if any of the shop buttons are clicked
             for (int i = 0; i < 3; i++)
             {
-                if (shopButtonList[i]->clicked == true and character->credits >= shopButtonList[i]->cost 
+                if (shopButtonList[i]->leftClicked == true and character->credits >= shopButtonList[i]->cost 
                 && (character->attachments.size() < character->attachmentSlots or ifContains(shopAttachments[i])!=NULL))
                 {
                     Attachment *alreadyHas = ifContains(shopAttachments[i]);
-                    shopButtonList[i]->clicked = false;
+                    shopButtonList[i]->leftClicked = false;
                     shopButtonList[i]->visible = false;
                     character->credits -= shopButtonList[i]->cost;
                     
                     if (alreadyHas == NULL)
                     {
                         character->attachments.push_back(shopAttachments[i]);
-                        attachmentSlotSprites.clear();
+                        //attachmentSlotSprites.clear();
+                        attachmentSlotButtons.clear();
                         for (int j = 0; j < character->attachments.size(); j++)
                         {
                             createSlotButtons(j);
@@ -392,8 +547,10 @@ class ShopState: public State
                 i->draw(app);
             for(auto i:slotRectangles)
                 app.draw(i);
-            for(auto i:attachmentSlotSprites)
-                app.draw(i);
+           // for(auto i:attachmentSlotSprites)
+                //app.draw(i);
+            for (auto i:attachmentSlotButtons)
+            	app.draw(i->icon);
             for(auto i:buttonList)
             {
                    if (i->visible == true)
@@ -413,7 +570,7 @@ class ShopState: public State
             }
             drawText(": " + std::to_string(character->credits), 20, 95, 61, app);
             app.display();
-            app.clear(Color(255,255,255,255));
+            app.clear(Color(200,200,200,255));
         }
     
         return -1;
