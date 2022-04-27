@@ -28,7 +28,7 @@ class DoubleShooter: public Enemy
             life=0;
     }
     
-    void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
+    void enemySpawn(std::vector<Sprite> SpriteList, int ScreenW, int ScreenH)
     {
         screenH = ScreenH;
         screenW = ScreenW;
@@ -36,7 +36,7 @@ class DoubleShooter: public Enemy
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
         setActorPosition(screenW, randNum);
-        bulletSprite = BulletSprite;
+        bulletSprite = SpriteList[2];
         enemyType = doubleShooter;
 
     }

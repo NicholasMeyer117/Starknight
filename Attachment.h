@@ -154,17 +154,17 @@ class Shotgun: public Attachment
         damage = baseDamage * player->damageMult;
         if (tick%firerate == 0)
         {
-            DiagonalBullet *b1 = new DiagonalBullet();
+            DiagonalBullet *b1 = new DiagonalBullet(true, true, cone);
             b1->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
             b1->createBullet (damage, 3.75);
-            b1->direction (true, true, cone);
+            //b1->direction (true, true, cone);
             entities->push_back(b1);
             bulletList->push_back(b1);
             
-            DiagonalBullet *b2 = new DiagonalBullet();
+            DiagonalBullet *b2 = new DiagonalBullet(true, false, cone);
             b2->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
             b2->createBullet (damage, 3.75);
-            b2->direction (true, false, cone);
+            //b2->direction (true, false, cone);
             entities->push_back(b2);
             bulletList->push_back(b2);
             
@@ -177,17 +177,17 @@ class Shotgun: public Attachment
             
             if (level == 3)
             {
-                DiagonalBullet *b3 = new DiagonalBullet();
+                DiagonalBullet *b3 = new DiagonalBullet(true, true, cone/2);
                 b3->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
                 b3->createBullet (damage, 3.75);
-                b3->direction (true, true, cone/2);
+                //b3->direction (true, true, cone/2);
                 entities->push_back(b3);
                 bulletList->push_back(b3);
             
-                DiagonalBullet *b4 = new DiagonalBullet();
+                DiagonalBullet *b4 = new DiagonalBullet(true, false, cone/2);
                 b4->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
                 b4->createBullet (damage, 3.75);
-                b4->direction (true, false, cone/2);
+                //b4->direction (true, false, cone/2);
                 entities->push_back(b4);
                 bulletList->push_back(b4);
             

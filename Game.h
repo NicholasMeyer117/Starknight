@@ -20,8 +20,8 @@ class Game
     public:
     RenderWindow app;
     enum gameState {mainMenu, hub, game, shop, settings};
-    int area = 1; //each area consists of several levels and ends with a boss
-    int level = 1;
+    int area = 2; //each area consists of several levels and ends with a boss
+    int level = 2;
     int screenWidth;
     int screenHeight;
     sf::Text source;
@@ -44,6 +44,17 @@ class Game
         bulletTextureList[0] = b1;
         b2.loadFromFile("images/siphonBullet.png");
         bulletTextureList[1] = b2;
+    }
+    
+    void nextStage()
+    {
+        if (level%5 != 0)
+            level++;
+        else
+        {
+            level = 1;
+            area++;
+        }
     }
     
     void changeState();

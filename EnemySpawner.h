@@ -18,6 +18,8 @@
 #include "TriShooter.h"
 #include "DoubleShooter.h"
 #include "Shielder.h"
+#include "Swarmer.h"
+#include "SwarmSpitter.h"
 #include "Bullets.h"
 #include "Game.h"
 #include "Boss.h"
@@ -153,6 +155,17 @@ class EnemySpawner
                 } 
                 break;
             case 2 :
+                switch(level)
+                {
+                    case 1:
+                        return spawn(4);
+                    case 2:
+                        return spawn(5);
+                        
+                
+                
+                } 
+                break;
             case 3 :
                 cout << "Well done" << endl;
                 break;
@@ -161,18 +174,19 @@ class EnemySpawner
         return NULL;
     }
     
-    Enemy* spawn(int enemyType) // 0 = DarkFighter; 1=TriShooter; 2=doubleShooter
+    Enemy* spawn(int enemyType) // 0 = DarkFighter; 1=TriShooter; 2=doubleShooter, 3 = Shielder, 4 = Swarmer
     {
         std::cout << "\nScreen Width1: " + std::to_string(screenW);
         Enemy *enemy;
         Sprite sprite;
+        //createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames)
         if (enemyType == 0)
         {
             enemy = new DarkFighter();
             sprite = spriteList[0];
             enemy -> settings(sprite,screenW + 100,75,53,53);
             enemy -> createActor(10, 0, 2, 60, true, 0);
-            enemy->enemySpawn(bulletSpriteList[1], screenW, screenH);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
             
         }
         else if (enemyType == 1)
@@ -181,7 +195,7 @@ class EnemySpawner
             sprite = spriteList[1];
             enemy -> settings(sprite,screenW + 100,75,50,50);
             enemy -> createActor(15, 0, 1, 80, true, 0);
-            enemy->enemySpawn(bulletSpriteList[1], screenW, screenH);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         }
         else if (enemyType == 2)
         {
@@ -190,7 +204,7 @@ class EnemySpawner
             enemy -> settings(sprite,screenW + 100,75,50,50);
             enemy -> createActor(10, 0, 2.5, 70, true, 0);
             std::cout << "\nScreen Width1.5: " + std::to_string(screenW);
-            enemy->enemySpawn(bulletSpriteList[1], screenW, screenH);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }
         else if (enemyType == 3)
@@ -199,12 +213,25 @@ class EnemySpawner
             sprite = spriteList[3];
             enemy -> settings(sprite,screenW + 100,75,43,173);
             enemy -> createActor(25, 0, 1, 240, true, 0);
-            enemy->enemySpawn(bulletSpriteList[1], screenW, screenH);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }
         else if (enemyType == 4)
         {
-            
+            enemy = new Swarmer();
+            sprite = spriteList[6];
+            enemy -> settings(sprite,screenW + 100,75,60,60);
+            enemy -> createActor(20, 0, 3, 300, true, 0);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
+        
+        }
+        else if (enemyType == 5)
+        {
+            enemy = new SwarmSpitter();
+            sprite = spriteList[7];
+            enemy -> settings(sprite,screenW + 100,75,60,60);
+            enemy -> createActor(40, 0, 2, 200, true, 0);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }
         

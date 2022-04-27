@@ -31,7 +31,7 @@ class Shielder: public Enemy
             life=0;
     }
     
-    void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
+    void enemySpawn(std::vector<Sprite> SpriteList, int ScreenW, int ScreenH)
     {
         screenH = ScreenH;
         screenW = ScreenW;

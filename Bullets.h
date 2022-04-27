@@ -25,6 +25,11 @@ class Bullet: public Entity
        bulletSpeed = BulletSpeed;
    }
    
+   void checkIfDead()
+   {
+       if (x>2000 || x<-1000) life=0;
+   }
+   
    //special function in case bullet impact affects player
    virtual void onContact(Actor *player){}
 
@@ -39,7 +44,7 @@ class NormalBullet: public Bullet
     void update()
     {
         x += bulletSpeed;
-        if (x>2000 || x<-1000) life=0;
+        checkIfDead();
     
     }
 
@@ -53,7 +58,7 @@ class SiphonBullet: public Bullet
     void update()
     {
         x += bulletSpeed;
-        if (x>2000 || x<-1000) life=0;
+        checkIfDead();
     
     }
 
@@ -74,10 +79,37 @@ class DarkBullet: public Bullet
     
     void update()
     {
+        
         x -= bulletSpeed;
-    
+        checkIfDead();
     }
 
+};
+
+class OrdinalBullet: public Bullet
+{
+    public:
+    String dir;
+    OrdinalBullet(String direction)
+    {
+        dir = direction;
+    }
+    
+    void update()
+    {
+        if (dir=="right")
+            x+=bulletSpeed;
+        else if (dir=="left")
+            x-=bulletSpeed;
+        else if (dir=="up")
+            y-=bulletSpeed;
+        else if (dir=="down")
+            y+=bulletSpeed;
+            
+        checkIfDead();
+
+    }
+    
 };
 
 //used by tri-shooter
@@ -89,7 +121,7 @@ class DiagonalBullet: public Bullet
     float cone;
     //1, 1 = diaginol up and right
     
-    void direction(bool Right, bool Up, float Cone = 1)
+    DiagonalBullet(bool Right, bool Up, float Cone = 1)
     {
         right = Right;
         up = Up;
@@ -106,11 +138,31 @@ class DiagonalBullet: public Bullet
             y-=(bulletSpeed/cone);
         else
             y+=(bulletSpeed/cone);
-        
-    
+            
+        checkIfDead();
+
     }
     
-    
-    
+};
 
+class BombBullet: public Bullet
+{
+    public:
+    std::vector<Bullet*> subBulletList;
+    int progressCounter;
+    
+    BombBullet()
+    {
+        progressCounter = rand() % 100 + 50;
+    }
+    void update()
+    {
+        if (progressCounter > 0)
+        {
+            x -= bulletSpeed;
+            progressCounter--;
+        }
+        checkIfDead();
+    }
+    
 };

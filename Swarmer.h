@@ -13,11 +13,12 @@
 #include "Bullets.h"
 #define PI 3.14159265
 
-class DarkFighter: public Enemy //number one!
+class Swarmer: public Enemy //number one!
 {
     public:
     bool movingUp = true;
     Sprite bulletSprite;
+    int attackCounter= 0;
     
     void takeDamage(float damage)
     {
@@ -34,12 +35,31 @@ class DarkFighter: public Enemy //number one!
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
         setActorPosition(screenW, randNum);
-        bulletSprite = SpriteList[2];
-        enemyType = darkFighter;
+        enemyType = swarmer;
     }
     
     void enemyMove()
     {
+    
+        if (attackCounter > 0)
+        {
+            //std::cout << "ATTACKING";
+            if (attackCounter >= 150)
+            {
+            	moveActor(left);
+            	moveActor(left);
+            	moveActor(left);
+            	moveActor(left);
+            }
+            else
+            {
+            	moveActor(right);
+            	moveActor(right);
+            	moveActor(right);
+            	moveActor(right);
+            }
+            attackCounter--;
+        }
         if (!reachedBegin)
         {
             moveActor(left);
@@ -66,13 +86,12 @@ class DarkFighter: public Enemy //number one!
     
     void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
     {
+    
         if (ticksSinceLastFire == firerate)
         { 
-            DarkBullet *b = new DarkBullet();
-            b->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b->createBullet (5, 20);
-            entities->push_back(b);                
-            bulletList->push_back(b);  
+            std::cout << "ATTACK\n";
+            if (attackCounter == 0)
+                attackCounter = 300;
             ticksSinceLastFire = 0;  
         }
         else

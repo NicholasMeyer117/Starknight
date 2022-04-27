@@ -142,17 +142,17 @@ class PirateLord: public Boss
         if (ticksSinceLastFire == firerate && bulletsPassThrough == false)
         { 
         
-            DiagonalBullet *b1 = new DiagonalBullet();
+            DiagonalBullet *b1 = new DiagonalBullet(false, true);
             b1->settings(bulletSprite,x,y,5, 5, angle, 3);
             b1->createBullet (5, 2.5);
-            b1->direction (false, true);
+            //b1->direction (false, true);
             entities->push_back(b1);                
             bulletList->push_back(b1);   
         
-            DiagonalBullet *b2 = new DiagonalBullet();
+            DiagonalBullet *b2 = new DiagonalBullet(false, false);
             b2->settings(bulletSprite,x,y,5, 5, angle, 3);
             b2->createBullet (5, 2.5);
-            b2->direction (false, false);
+            //b2->direction (false, false);
             entities->push_back(b2);                
             bulletList->push_back(b2);
         
@@ -162,17 +162,17 @@ class PirateLord: public Boss
             entities->push_back(b3);                
             bulletList->push_back(b3); 
             
-            DiagonalBullet *b4 = new DiagonalBullet();
+            DiagonalBullet *b4 = new DiagonalBullet(false, true, 2);
             b4->settings(bulletSprite,x,y,5, 5, angle, 3);
             b4->createBullet (5, 2.5);
-            b4->direction (false, true, 2);
+            //b4->direction (false, true, 2);
             entities->push_back(b4);                
             bulletList->push_back(b4);   
         
-            DiagonalBullet *b5 = new DiagonalBullet();
+            DiagonalBullet *b5 = new DiagonalBullet(false, false, 2);
             b5->settings(bulletSprite,x,y,5, 5, angle, 3);
             b5->createBullet (5, 2.5);
-            b5->direction (false, false, 2);
+            //b5->direction (false, false, 2);
             entities->push_back(b5);                
             bulletList->push_back(b5);
             

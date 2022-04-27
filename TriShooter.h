@@ -26,7 +26,7 @@ class TriShooter: public Enemy
             life=0;
     }
     
-    void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
+    void enemySpawn(std::vector<Sprite> SpriteList, int ScreenW, int ScreenH)
     {
         screenH = ScreenH;
         screenW = ScreenW;
@@ -34,7 +34,7 @@ class TriShooter: public Enemy
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
         setActorPosition(screenW, randNum);
-        bulletSprite = BulletSprite;
+        bulletSprite = SpriteList[2];
         enemyType = triShooter;
     }
     
@@ -68,17 +68,17 @@ class TriShooter: public Enemy
     {
         if (ticksSinceLastFire == firerate)
         { 
-            DiagonalBullet *b1 = new DiagonalBullet();
+            DiagonalBullet *b1 = new DiagonalBullet(false, true);
             b1->settings(bulletSprite,x,y,5, 5, angle, 3);
             b1->createBullet (5, 2.5);
-            b1->direction (false, true);
+            //b1->direction (false, true);
             entities->push_back(b1);                
             bulletList->push_back(b1);   
         
-            DiagonalBullet *b2 = new DiagonalBullet();
+            DiagonalBullet *b2 = new DiagonalBullet(false, false);
             b2->settings(bulletSprite,x,y,5, 5, angle, 3);
             b2->createBullet (5, 2.5);
-            b2->direction (false, false);
+            //b2->direction (false, false);
             entities->push_back(b2);                
             bulletList->push_back(b2);
         

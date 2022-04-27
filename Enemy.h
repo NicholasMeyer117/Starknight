@@ -17,7 +17,7 @@ class Enemy: public Actor
     public:
     bool reachedBegin = false;
     int ticksSinceLastFire = 0;
-    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder, pirateLord, pirateTurret};
+    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder, pirateLord, pirateTurret, swarmer, swarmSpitter};
     EnemyType enemyType;
     int bulletsPassThrough = false;
     int screenH;
@@ -25,7 +25,7 @@ class Enemy: public Actor
     
     virtual void takeDamage(float damage){}
     
-    virtual void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH){}
+    virtual void enemySpawn(std::vector<Sprite> BulletSpriteList, int ScreenW, int ScreenH){}
     
     virtual void enemyMove(){}
     

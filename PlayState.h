@@ -161,6 +161,7 @@ class PlayState: public State
 
     }
 
+
     void moveCredit(Entity *credit, float speed)
     {
         credit->x = credit->x - 1 * speed;
@@ -199,6 +200,7 @@ class PlayState: public State
 	        temp -> life = 0;
 	        player -> ticksSinceLastHit = 0;
 	    }
+	    
 	}
 	
 	player -> ticksSinceLastHit++;
@@ -228,21 +230,25 @@ class PlayState: public State
     
     int Run(sf::RenderWindow &app)
     {
-	Texture p1,p2,p3,p4,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12;
+	Texture p1,p2,p3,p4,b1,b2,b3,b4,b5,e1,e2,e3,e4,e5,e6,e7,e8,t1;
         p1.loadFromFile("images/triShip.png");
         p2.loadFromFile("images/batteringRam.png");
         p3.loadFromFile("images/serpent.png");
+        t1.loadFromFile("images/heart.png");
         //t2.loadFromFile("images/background.jpg");
-        t3.loadFromFile("images/cannonBullet.png");
-        t4.loadFromFile("images/heart.png");
-        t5.loadFromFile("images/darkFighter.png");
-        t6.loadFromFile("images/darkBullet.png");
-        t7.loadFromFile("images/triShooter.png");
-        t8.loadFromFile("images/doubleShooter.png");
-        t9.loadFromFile("images/shielder.png");
-        t10.loadFromFile("images/pirateLordRobard.png");
-        t11.loadFromFile("images/pirateTurret.png");
-        t12.loadFromFile("images/blueBullet.png");
+        b1.loadFromFile("images/cannonBullet.png");
+        b2.loadFromFile("images/darkBullet.png");
+        b3.loadFromFile("images/blueBullet.png");
+        b4.loadFromFile("images/swarmBomb.png");
+        b5.loadFromFile("images/swarmBombNew.png"); //re-add siphon bullet
+        e1.loadFromFile("images/darkFighter.png");
+        e2.loadFromFile("images/triShooter.png");
+        e3.loadFromFile("images/doubleShooter.png");
+        e4.loadFromFile("images/shielder.png");
+        e5.loadFromFile("images/pirateLordRobard.png");
+        e6.loadFromFile("images/pirateTurret.png");
+        e7.loadFromFile("images/swarmer.png");
+        e8.loadFromFile("images/swarmSpitter.png");
 
         p1.setSmooth(true);
         //t2.setSmooth(true);
@@ -259,6 +265,7 @@ class PlayState: public State
         
         
         //Sprite background(t2);
+        //Player Ship Sprites
         Sprite warhorse(p1);
         playerShipSpriteList.push_back(warhorse);
         Sprite batteringRam(p2);
@@ -266,30 +273,53 @@ class PlayState: public State
         Sprite serpent(p3);
         playerShipSpriteList.push_back(serpent);
         
-        Sprite bulletSprite(t3);
+        Sprite heartSprite(t1);
+        
+        //Bullet Sprites
+        Sprite bulletSprite(b1);
         bulletSpriteList.push_back(bulletSprite);
-        Sprite heartSprite(t4);
-        Sprite darkFighterSprite(t5);
-        enemySpriteList.push_back(darkFighterSprite);
-        Sprite triShooterSprite(t7);
-        enemySpriteList.push_back(triShooterSprite);
-        Sprite doubleShooterSprite(t8);
-        doubleShooterSprite.setScale(1.25, 1.25f);
-        enemySpriteList.push_back(doubleShooterSprite);
-        Sprite darkBulletSprite(t12);
+        
+        Sprite darkBulletSprite(b2);
         bulletSpriteList.push_back(darkBulletSprite);
-        Sprite blueBulletSprite(t12);
+        
+        Sprite blueBulletSprite(b3);
+        blueBulletSprite.setScale(1.75, 1.75);
         bulletSpriteList.push_back(blueBulletSprite);
         
-        Sprite shielderSprite(t9);
+        Sprite swarmBombSprite(b4);
+        bulletSpriteList.push_back(swarmBombSprite);
+        
+        Sprite swarmBombNewSprite(b5);
+        swarmBombNewSprite.setScale(2, 2);
+        bulletSpriteList.push_back(swarmBombNewSprite);
+        
+        //Enemy ship sprites
+        Sprite darkFighterSprite(e1);
+        enemySpriteList.push_back(darkFighterSprite);
+        
+        Sprite triShooterSprite(e2);
+        enemySpriteList.push_back(triShooterSprite);
+        
+        Sprite doubleShooterSprite(e3);
+        doubleShooterSprite.setScale(1.25, 1.25f);
+        enemySpriteList.push_back(doubleShooterSprite);
+        
+        Sprite shielderSprite(e4);
         //shielderSprite.setScale(2.5, 2.5);
         enemySpriteList.push_back(shielderSprite); 
         
-        Sprite pirateLordSprite(t10);
+        Sprite pirateLordSprite(e5);
         enemySpriteList.push_back(pirateLordSprite); 
         
-        Sprite pirateTurretSprite(t11);
+        Sprite pirateTurretSprite(e6);
         enemySpriteList.push_back(pirateTurretSprite); 
+        
+        Sprite swarmer(e7);
+        enemySpriteList.push_back(swarmer); 
+        
+        Sprite swarmSpitter(e8);
+        swarmSpitter.setScale(1.5,1.5);
+        enemySpriteList.push_back(swarmSpitter);
         
         Actor *player = new Actor();
         createPlayer(character->shipType, player);
@@ -365,6 +395,7 @@ class PlayState: public State
         int numBossExplosions = 0;
         int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = completeScreenDone, 3 = textDone, 4 = goldDone
         int completeTick = 0; //used to determine some parts of completion stage
+        int ticksTillEnemySpawn = 200;
         //int beginningGold = 0;
     
         spawnBars(bar1, bar2);
@@ -464,6 +495,7 @@ class PlayState: public State
             entities = removeDeadEntity(entities);
             enemyList = removeDeadEntity(enemyList);
             bulletList = removeDeadEntity(bulletList);
+            enemyBulletList = removeDeadEntity(enemyBulletList);
         
         
             if (!levelComplete)
@@ -521,7 +553,7 @@ class PlayState: public State
             }
              
             //spawn enemies
-            if (tick%200 == 0 and !levelComplete)
+            if (tick%ticksTillEnemySpawn == 0 and !levelComplete)
             {
                 Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick, enemyList);
                 if (newEnemy != NULL)
@@ -541,6 +573,7 @@ class PlayState: public State
                         bosses.push_back(i);
                     }
                 }
+                ticksTillEnemySpawn = rand() % 200 + 150;
             }
             
             //Handles Boss Death
@@ -577,7 +610,7 @@ class PlayState: public State
             //Stage 1 of level complete
             if (progressPercent >= 100 and completeStage == 0)
             {
-                curGame->level++;
+                curGame->nextStage();
                 completeStage = 1;
                 levelComplete = true;
                 for (auto i:enemyList)
@@ -587,7 +620,7 @@ class PlayState: public State
             }
             
             //Stage 4 of level complete
-            else if (completeTick == 300 and completeStage == 3)
+            else if (completeTick == 100 and completeStage == 3)
             {
                 cout << "\n Time Manip: " + to_string(mapTimeDilationPercentage) + "\n";
                 cout << "\nCurrent Speed: " + to_string(curGameSpeed) + "\n";
@@ -677,7 +710,11 @@ class PlayState: public State
             app.clear(Color::Black);
             RectangleShape rectangle;
             rectangle.setSize(Vector2f(screenW, screenH));
-            rectangle.setFillColor(Color(56,10,56,200));
+            if (curGame -> area == 1)
+            	rectangle.setFillColor(Color(56,10,56,200));
+            else if (curGame -> area == 2)
+            	rectangle.setFillColor(Color(5, 73, 7, 200));
+            	
             app.draw(rectangle);
         }
     
