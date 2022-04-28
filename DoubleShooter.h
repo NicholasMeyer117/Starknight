@@ -46,7 +46,8 @@ class DoubleShooter: public Enemy
         if (!reachedBegin)
         {
             moveActor(left);
-            if (x <= screenW - screenW/10)
+            int spawnZone = (screenW - screenW/10) - rand() %  screenW/5;
+            if (x <= spawnZone)
                 reachedBegin = true;
         }
         else

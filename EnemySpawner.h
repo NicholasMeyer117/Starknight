@@ -160,7 +160,12 @@ class EnemySpawner
                     case 1:
                         return spawn(4);
                     case 2:
-                        return spawn(5);
+                        if (randNum > 33)
+                        {
+                            return spawn(4);
+                        }
+                        else
+                            return spawn(5);
                         
                 
                 

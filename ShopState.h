@@ -95,69 +95,129 @@ class ShopState: public State
     }
     
     //Generates Shop Button
-    void generateButton(ShopButton *button, int attachNum, int butNum )
+    bool generateButton(ShopButton *button, int attachNum, int butNum )
     {
+        int cost = 1;
+        Attachment *curAtc = new Attachment;
         switch(attachNum)
         {
             case 0:
             {
-                button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, "Cannon: 5 Cr", 20, 5);
-                Cannon *cannon = new Cannon;
-                cannon->createAttachment(bulletSpriteList[0]);
+                Cannon *cannon = new Cannon(bulletSpriteList[0]);
+                cost = cannon->credits;
+                curAtc = cannon;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
+                button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, ("Cannon: " + to_string(cost) + " Cr"), 20, cost);
+                //cannon->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(cannon);
-                return;     
+                return 0;     
             } 
             case 1:
             {
-                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, "Machine Gun: 5 Cr", 20, 5);
-                MachineGun *machineGun = new MachineGun;
-                machineGun->createAttachment(bulletSpriteList[0]);
+                MachineGun *machineGun = new MachineGun(bulletSpriteList[0]);
+                cost = machineGun->credits;
+                curAtc = machineGun;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
+                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, "Machine Gun: 5 Cr", 20, cost);
+                //machineGun->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(machineGun);
-                return;
+                return 0;
             }
             case 2:
             {
-                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Repair Droid: 5 Cr", 20, 5);
-                RepairDroid *repairDroid = new RepairDroid;
-                repairDroid->createAttachment();
+                RepairDroid *repairDroid = new RepairDroid();
+                cost = repairDroid->credits;
+                curAtc = repairDroid;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
+                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Repair Droid: 5 Cr", 20, cost);
+                //repairDroid->createAttachment();
                 shopAttachments.push_back(repairDroid);
-                return;
+                return 0;
             }
             case 3:
             {
-                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, "Siphon Droid: 10 Cr", 20, 10);
-                SiphonDroid *siphonDroid = new SiphonDroid;
-                siphonDroid->createAttachment(bulletSpriteList[1]);
+                SiphonDroid *siphonDroid = new SiphonDroid(bulletSpriteList[1]);
+                cost = siphonDroid->credits;
+                curAtc = siphonDroid;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
+                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, "Siphon Droid: 10 Cr", 20, cost);
+                //siphonDroid->createAttachment(bulletSpriteList[1]);
                 shopAttachments.push_back(siphonDroid);
-                return;
+                return 0;
             }
             case 4:
             {
-                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, "Shotgun: 5 Cr", 20, 5);
-                Shotgun *shotgun = new Shotgun;
-                shotgun->createAttachment(bulletSpriteList[0]);
+                Shotgun *shotgun = new Shotgun(bulletSpriteList[0]);
+                cost = shotgun->credits;
+                curAtc = shotgun;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
+                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, "Shotgun: 5 Cr", 20, cost);
+                //shotgun->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(shotgun);
-                return;
+                return 0;
             }
             case 5:
             {
+                TimeDilator *timeDilator = new TimeDilator();
+                cost = timeDilator->credits;
+                curAtc = timeDilator;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
                 button->createIcon(textureList[5], spriteList[5], butNum, 250, 250, &gameFont, "Time Dilator: 5 Cr", 20, 5);
-                TimeDilator *timeDilator = new TimeDilator;
-                timeDilator->createAttachment();
+                //timeDilator->createAttachment();
                 shopAttachments.push_back(timeDilator);
-                return;
+                return 0;
             }
             case 6:
             {
+                HullBooster *hullBooster = new HullBooster();
+                cost = hullBooster->credits;
+                curAtc = hullBooster;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
                 button->createIcon(textureList[6], spriteList[6], butNum, 250, 250, &gameFont, "Hull Booster: 5 Cr", 20, 5);
-                HullBooster *hullBooster = new HullBooster;
-                hullBooster->createAttachment();
+                //hullBooster->createAttachment();
                 shopAttachments.push_back(hullBooster);
-                return;
+                return 0;
             }
         
         
         }
+        
+        return 0;
         
     }
     
@@ -206,73 +266,77 @@ class ShopState: public State
     String getDesc(Attachment attachment)
     {
         String name = attachment.name;
-        int levelNum = 1;
+        int levelNum = 0;
         if (ifContains(&attachment) != NULL)
         {
             levelNum = ifContains(&attachment)->level;
         }
         if (name == "Cannon")
         {
-            if (levelNum == 1)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s  ->  2/s\nSpeed: 20\nDamage: 5    ->  10";
-            if (levelNum == 2)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 2/s  ->  4/s\nSpeed: 20\nDamage: 10   ->  20";
-            if (levelNum == 3)
+            if (levelNum == 0)
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s\nSpeed: 20\nDamage: 5";
+            else if (levelNum == 1)
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s  ->  2/s\nSpeed: 20\nDamage: 5  ->  10";
+            else if (levelNum == 2)
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 2/s  ->  4/s\nSpeed: 20\nDamage: 10  ->  20";
+            else if (levelNum == 3)
                 return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 4/s\nSpeed: 20\nDamage: 20";
         }
         else if (name == "Machine Gun")
         {
-            if (levelNum == 1)
+            if (levelNum == 0)
                 return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 4/s\nSpeed: 25\nDamage: 2";
-            if (levelNum == 2)
-                return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 6/s\nSpeed: 25\nDamage: 3";
-            if (levelNum == 3)
+            else if (levelNum == 1)
+                return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 4/s  ->  6/s\nSpeed: 25\nDamage: 2  ->  3";
+            else if (levelNum == 2)
+                return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 6/s  ->  9/s\nSpeed: 25\nDamage: 3  ->  4.5";
+            else if (levelNum == 3)
                 return "Machine Gun: Fires low damage bullets at a high rate of fire (Gun)\nFirerate: 9/s\nSpeed: 25\nDamage: 4.5";
         }
         else if (name == "Repair Droid")
         {
-            if (levelNum == 1)
+            if (levelNum == 0)
                 return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5";
+            if (levelNum == 1)
+                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5  ->  10";
             if (levelNum == 2)
-                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 10";
-            if (levelNum == 3)
-                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 20";
+                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 10  ->  20";
         }
         else if (name == "Siphon Droid")
         {
-            if (levelNum == 1)
+            if (levelNum == 0)
                 return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5";
+            if (levelNum == 1)
+                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5  ->  10";
             if (levelNum == 2)
-                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 10";
-            if (levelNum == 3)
-                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 20";
+                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 10  ->  20";
         }
         else if (name == "Shotgun")
         {
-            if (levelNum == 1)
+            if (levelNum == 0)
                 return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/2s\nSpeed: 15\nDamage: 5\nShots: 3\nAngle: 45";
+            if (levelNum == 1)
+                return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/1.5s\nSpeed: 15\nDamage: 5  ->  10\nShots: 3\nAngle: 45  ->  22.5";
             if (levelNum == 2)
-                return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/1.5s\nSpeed: 15\nDamage: 10\nShots: 3\nAngle: 22.5";
-            if (levelNum == 3)
-                return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/s\nSpeed: 15\nDamage: 20\nShots: 3\nAngle: 11.25";
+                return "Shotgun: Fires a spread of 5 medium damage projectiles (Gun)\nFirerate: 1/s\nSpeed: 15\nDamage: 10  ->  20\nShots: 3  ->  5\nAngle: 22.5  ->  11.25";
         }
         else if (name == "Time Dilator")
         {
-            if (levelNum == 1)
+            if (levelNum == 0)
                 return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 10%";
+            if (levelNum == 1)
+                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 10%  ->  20%";
             if (levelNum == 2)
-                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 20%";
-            if (levelNum == 3)
-                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 40%";
+                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 20%  ->  40%";
         }
         else if (name == "Hull Booster")
         {
-            if (levelNum == 1)
+            if (levelNum == 0)
                 return "Hull Booster: Increase Max Health (Utility)\nPercentage: 25%";
+            if (levelNum == 1)
+                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 25%  ->  50%";
             if (levelNum == 2)
-                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 50%";
-            if (levelNum == 3)
-                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 100%";
+                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 50%  ->  100%";
         }
         return "No Name"; 
     }
@@ -459,19 +523,30 @@ class ShopState: public State
                 buttonList[1]->leftClicked = false;
                 shopAttachments.clear();
                 shopButtonList.clear();
-                int randNum = rand() % 7;
+                
+                bool AtFullLevel = false;
                 ShopButton *button1 = new ShopButton;
-                generateButton(button1, randNum, 1);
+                do
+                {
+                    int randNum = rand() % 7;
+                    AtFullLevel = generateButton(button1, randNum, 1);
+                } while (AtFullLevel == true);
                 shopButtonList.push_back(button1);
         
-                randNum = rand() % 7;
                 ShopButton *button2 = new ShopButton;
-                generateButton(button2, randNum, 2);
+                do
+                {
+                    int randNum = rand() % 7;
+                    AtFullLevel = generateButton(button2, randNum, 2);
+                } while (AtFullLevel == true);
                 shopButtonList.push_back(button2);
         
-                randNum = rand() % 7;
                 ShopButton *button3 = new ShopButton;
-                generateButton(button3, randNum, 3);
+                do
+                {
+                    int randNum = rand() % 7;
+                    AtFullLevel = generateButton(button3, randNum, 3);
+                } while (AtFullLevel == true);
                 shopButtonList.push_back(button3);
             }
             
@@ -520,9 +595,6 @@ class ShopState: public State
                 && (character->attachments.size() < character->attachmentSlots or ifContains(shopAttachments[i])!=NULL))
                 {
                     Attachment *alreadyHas = ifContains(shopAttachments[i]);
-                    shopButtonList[i]->leftClicked = false;
-                    shopButtonList[i]->visible = false;
-                    character->credits -= shopButtonList[i]->cost;
                     
                     if (alreadyHas == NULL)
                     {
@@ -533,11 +605,23 @@ class ShopState: public State
                         {
                             createSlotButtons(j);
                         }
+                        shopAttachments[i]->credits = shopAttachments[i]->credits * 2;
+                    }
+                    else if (alreadyHas->level < 3)
+                    {
+                        cout << "LEVEL: " << alreadyHas -> level << "\n";
+                        alreadyHas->upgrade();
+                        cout << "LEVEL IS NOW: " << alreadyHas -> level << "\n";
                     }
                     else
                     {
-                        alreadyHas->upgrade();
+                        cout << "LEVEL: " << alreadyHas -> level << "\n";
+                        continue;
+                        
                     }
+                    shopButtonList[i]->leftClicked = false;
+                    shopButtonList[i]->visible = false;
+                    character->credits -= shopButtonList[i]->cost;
                 }
             }
 

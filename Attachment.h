@@ -29,8 +29,6 @@ class Attachment
     sf::SoundBuffer soundBuffer;
     Sprite bulletSprite;
     
-    virtual void createAttachment(){}
-    
     virtual void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player){}
     
     virtual void upgrade(){}
@@ -43,7 +41,7 @@ class Cannon: public Attachment
 {
     public:
     
-    void createAttachment(Sprite BulletSprite)
+    Cannon(Sprite BulletSprite)
     {
         classList.push_back(Gun);
         name = "Cannon";
@@ -54,8 +52,8 @@ class Cannon: public Attachment
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
         bulletSprite = BulletSprite;
-        
     }
+    
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
@@ -80,6 +78,7 @@ class Cannon: public Attachment
             level++;
             firerate = firerate/2;
             baseDamage = baseDamage*2;
+            credits = credits*2;
         }
     }
 };
@@ -88,7 +87,7 @@ class MachineGun: public Attachment
 {
     public:
     
-    void createAttachment(Sprite BulletSprite)
+    MachineGun(Sprite BulletSprite)
     {
         classList.push_back(Gun);
         name = "Machine Gun";
@@ -125,6 +124,7 @@ class MachineGun: public Attachment
             level++;
             firerate = firerate/1.5;
             baseDamage = baseDamage*1.5;
+            credits = credits*2;
         }
     }
 };
@@ -134,7 +134,7 @@ class Shotgun: public Attachment
     public:
     int cone = 1;
     
-    void createAttachment(Sprite BulletSprite)
+    Shotgun(Sprite BulletSprite)
     {
         classList.push_back(Gun);
         name = "Shotgun";
@@ -206,6 +206,7 @@ class Shotgun: public Attachment
             firerate = firerate/1.5;
             baseDamage = baseDamage*2;
             cone = cone*2;
+            credits = credits*2;
         }
     }
 };
@@ -216,7 +217,7 @@ class RepairDroid: public Attachment
 {
     public:
     
-    void createAttachment()
+    RepairDroid()
     {
         name = "Repair Droid";
         classList.push_back(Repair);
@@ -251,6 +252,7 @@ class RepairDroid: public Attachment
         {
             level++;
             damage = damage*2;
+            credits = credits*2;
         }
     }
 
@@ -260,7 +262,7 @@ class TimeDilator: public Attachment
 {
     public: 
     
-    void createAttachment()
+    TimeDilator()
     {
         name = "Time Dilator";
         classList.push_back(Manipulator);
@@ -276,6 +278,7 @@ class TimeDilator: public Attachment
         {
             level++;
             baseDamage = baseDamage*2;
+            credits = credits*2;
         }
     }
 
@@ -285,7 +288,7 @@ class HullBooster: public Attachment
 {
     public: 
     
-    void createAttachment()
+    HullBooster()
     {
         name = "Hull Booster";
         classList.push_back(Utility);
@@ -301,6 +304,7 @@ class HullBooster: public Attachment
         {
             level++;
             baseDamage = baseDamage*2;
+            credits = credits*2;
         }
     }
 
@@ -310,7 +314,7 @@ class SiphonDroid: public Attachment
 {
     public:
     
-    void createAttachment(Sprite BulletSprite)
+    SiphonDroid(Sprite BulletSprite)
     {
         name = "Siphon Droid";
         classList.push_back(Repair);
@@ -347,6 +351,7 @@ class SiphonDroid: public Attachment
         {
             level++;
             baseDamage = baseDamage*2;
+            credits = credits*2;
         }
     }
 

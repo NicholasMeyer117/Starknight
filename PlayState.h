@@ -180,7 +180,7 @@ class PlayState: public State
         window.draw(source);
     }
     
-    void checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, std::vector<Bullet*> enemyBulletList, ParticleSystem *particles)
+    void checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, std::vector<Enemy*> enemyList, std::vector<Bullet*> enemyBulletList, ParticleSystem *particles)
     {
         if (player -> ticksSinceLastHit > player -> iFrames)
         {
@@ -190,6 +190,15 @@ class PlayState: public State
 	        player->yPos = 400;
 	        player -> health = player->health - 10; 
 	        player -> ticksSinceLastHit = 0;
+	    }
+	    
+	    Enemy *enemy = checkCollisions(player, enemyList);
+	    if (enemy != NULL)
+	    {
+	        player -> health = player->health - 10; 
+	        enemy -> life = 0;
+	        player -> ticksSinceLastHit = 0;
+	        //explosionParticles.setEmitter(sf::Vector2f(enemy->x, enemy->y));
 	    }
 
 	    Bullet *temp = checkCollisions(player, enemyBulletList);
@@ -295,13 +304,15 @@ class PlayState: public State
         
         //Enemy ship sprites
         Sprite darkFighterSprite(e1);
+        darkFighterSprite.setScale(1.5, 1.5);
         enemySpriteList.push_back(darkFighterSprite);
         
         Sprite triShooterSprite(e2);
+        triShooterSprite.setScale(1.5, 1.5);
         enemySpriteList.push_back(triShooterSprite);
         
         Sprite doubleShooterSprite(e3);
-        doubleShooterSprite.setScale(1.25, 1.25f);
+        doubleShooterSprite.setScale(1.5, 1.5);
         enemySpriteList.push_back(doubleShooterSprite);
         
         Sprite shielderSprite(e4);
@@ -315,6 +326,7 @@ class PlayState: public State
         enemySpriteList.push_back(pirateTurretSprite); 
         
         Sprite swarmer(e7);
+        blueBulletSprite.setScale(1.5, 1.5);
         enemySpriteList.push_back(swarmer); 
         
         Sprite swarmSpitter(e8);
@@ -523,7 +535,7 @@ class PlayState: public State
             }
         
             //update is player hit
-            checkIfPlayerHit(player, collidableEntities, enemyBulletList, &shipHitParticles);
+            checkIfPlayerHit(player, collidableEntities, enemyList, enemyBulletList, &shipHitParticles);
         
             //update misc enemies
             for (auto i:miscEnemyList)
@@ -638,7 +650,13 @@ class PlayState: public State
             //Update Conventional Enemies
             for (auto i:enemyList)
             {
-                i -> enemyMove();
+                if (i->health <= 0 || i->life == 0)
+                {
+                   numEnemiesKilledRound++;
+                   explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
+                }
+                else
+                    i -> enemyMove();
                 
                 if (!(i->bulletsPassThrough))
                 {
@@ -650,11 +668,6 @@ class PlayState: public State
                        i -> takeDamage(temp->damage);
                        cout <<"\nBullet Damage: " + to_string(temp->damage);
                        cout << "\nEnemy Health: " + to_string(i->health) + "\n";
-                       if (i->health <= 0)
-                       {
-                           numEnemiesKilledRound++;
-                           explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
-                       }
                        temp -> life = 0;
                     }
                 }
