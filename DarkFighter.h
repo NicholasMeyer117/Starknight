@@ -40,6 +40,7 @@ class DarkFighter: public Enemy //number one!
     
     void enemyMove()
     {
+        
         if (!reachedBegin)
         {
             moveActor(left);

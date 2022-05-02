@@ -17,7 +17,8 @@ class Attachment
 {
     public:
     int firerate; //ticks per activation
-    float baseDamage, damage;
+    float baseDamage, baseShotSpeed;
+    float damage, shotSpeed;
     bool passive; //true = provides passive effect, false = provides effect on tick
     int credits; //cost
     int num = 1; //number of attachments. 2 for level 2, 3 for level 3
@@ -28,6 +29,7 @@ class Attachment
     sf::Sound sound;
     sf::SoundBuffer soundBuffer;
     Sprite bulletSprite;
+    
     
     virtual void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player){}
     
@@ -48,6 +50,7 @@ class Cannon: public Attachment
         firerate = 60;
         credits = 5;
         baseDamage = 5;
+        baseShotSpeed = 20;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
@@ -58,11 +61,12 @@ class Cannon: public Attachment
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
         damage = baseDamage * player->damageMult;
+        shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
-            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b->createBullet (damage, 20);
+            b->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+            b->createBullet (damage, shotSpeed);
             entities->push_back(b);
             bulletList->push_back(b);
             sound.play();
@@ -94,6 +98,7 @@ class MachineGun: public Attachment
         firerate = 15;
         credits = 5;
         baseDamage = 2;
+        baseShotSpeed = 25;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
@@ -104,11 +109,12 @@ class MachineGun: public Attachment
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
         damage = baseDamage * player->damageMult;
+        shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
-            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b->createBullet (damage, 25);
+            b->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+            b->createBullet (damage, shotSpeed);
             entities->push_back(b);
             bulletList->push_back(b);
             sound.play();
@@ -141,6 +147,7 @@ class Shotgun: public Attachment
         firerate = 120;
         credits = 5;
         baseDamage = 5;
+        baseShotSpeed = 15;
         
         
         soundBuffer.loadFromFile("sounds/laser.wav");
@@ -151,26 +158,28 @@ class Shotgun: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
+        float diagShotSpeed = 3.75 * player->bulletSpeedMult;
+        shotSpeed = baseShotSpeed * player->bulletSpeedMult;
         damage = baseDamage * player->damageMult;
         if (tick%firerate == 0)
         {
             DiagonalBullet *b1 = new DiagonalBullet(true, true, cone);
-            b1->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b1->createBullet (damage, 3.75);
+            b1->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+            b1->createBullet (damage, diagShotSpeed);
             //b1->direction (true, true, cone);
             entities->push_back(b1);
             bulletList->push_back(b1);
             
             DiagonalBullet *b2 = new DiagonalBullet(true, false, cone);
-            b2->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b2->createBullet (damage, 3.75);
+            b2->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+            b2->createBullet (damage, diagShotSpeed);
             //b2->direction (true, false, cone);
             entities->push_back(b2);
             bulletList->push_back(b2);
             
             NormalBullet *b3 = new NormalBullet();
-            b3->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b3->createBullet (damage, 15);
+            b3->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+            b3->createBullet (damage, shotSpeed);
             entities->push_back(b3);
             bulletList->push_back(b3);
             sound.play();
@@ -178,15 +187,15 @@ class Shotgun: public Attachment
             if (level == 3)
             {
                 DiagonalBullet *b3 = new DiagonalBullet(true, true, cone/2);
-                b3->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-                b3->createBullet (damage, 3.75);
+                b3->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+                b3->createBullet (damage, diagShotSpeed);
                 //b3->direction (true, true, cone/2);
                 entities->push_back(b3);
                 bulletList->push_back(b3);
             
                 DiagonalBullet *b4 = new DiagonalBullet(true, false, cone/2);
-                b4->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-                b4->createBullet (damage, 3.75);
+                b4->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+                b4->createBullet (damage, diagShotSpeed);
                 //b4->direction (true, false, cone/2);
                 entities->push_back(b4);
                 bulletList->push_back(b4);
@@ -223,7 +232,7 @@ class RepairDroid: public Attachment
         classList.push_back(Repair);
         firerate = 300;
         credits = 5;
-        damage = 5;
+        baseDamage = 5;
         soundBuffer.loadFromFile("sounds/heal.wav");
         sound.setBuffer(soundBuffer);
 
@@ -232,12 +241,13 @@ class RepairDroid: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
+        damage = baseDamage * player->healingMult;
         if (tick%firerate == 0)
         {
             cout << "check heal";
             if (player->health < player->maxHealth)
             {
-                cout << "Heal!";
+                cout << "\nHeal: " << damage << "\n";
                 player->health+=damage;
                 sound.play();
             }
@@ -310,6 +320,34 @@ class HullBooster: public Attachment
 
 };
 
+class SpeedBooster: public Attachment
+{
+    public: 
+    
+    SpeedBooster()
+    {
+        name = "Speed Booster";
+        classList.push_back(Utility);
+        credits = 5;
+        firerate = 0;
+        baseDamage = 0.25; //Base Damage in this case is added HP percentage. 0.25 damage = 25% extra HP
+    }
+    
+    void upgrade()
+    {
+        num++;
+        if ((level == 1 and num == 2) or (level == 2 and num == 3))
+        {
+            level++;
+            baseDamage = baseDamage*2;
+            credits = credits*2;
+        }
+    }
+
+};
+
+
+
 class SiphonDroid: public Attachment
 {
     public:
@@ -322,6 +360,7 @@ class SiphonDroid: public Attachment
         credits = 10;
         firerate = 75;
         baseDamage = 5;
+        baseShotSpeed = 20;
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
         bulletSprite = BulletSprite;
@@ -332,11 +371,12 @@ class SiphonDroid: public Attachment
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
         damage = baseDamage * player->damageMult;
+        shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         if (tick%firerate == 0)
         {
             SiphonBullet *b = new SiphonBullet();
-            b->settings(bulletSprite,player->x + 5,player->y,5, 5, 0, 5);
-            b->createBullet (damage, 20);
+            b->settings(bulletSprite,player->x + 5,player->y - 10,5, 5, 0, 5);
+            b->createBullet (damage, shotSpeed);
             entities->push_back(b);
             bulletList->push_back(b);
             sound.play();

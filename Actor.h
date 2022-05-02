@@ -16,14 +16,16 @@ class Actor: public Entity
     public:
     float maxHealth, health, shields;
     float speed, firerate, xPos, yPos;
-    float damageMult, fireRateMult, bulletSpeedMult, speedMult, healthMult; 
+    float damageMult, fireRateMult, bulletSpeedMult, speedMult, healthMult, healingMult, utilityMult; 
     bool isEnemy;
     int ticksSinceLastHit = 0;
     int iFrames;
     enum direction {up, down, left, right};
     
+    //health, shields, speed, firerate, is enemy, IFrames, damageMult, fireRateMult, bulletSpeedMult, SpeedMult, HealthMult, HealingMult, utilityMult
     void createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames,
-    float damageMult = 1.0, float fireRateMult = 1.0, float bulletSpeedMult = 1.0, float speedMult = 1.0, float healthMult = 1.0);
+    float DamageMult = 1.0, float FireRateMult = 1.0, float BulletSpeedMult = 1.0, float SpeedMult = 1.0, 
+    float HealthMult = 1.0, float HealingMult = 1.0, float UtilityMult = 1.0);
 
     void moveActor(enum direction);
     

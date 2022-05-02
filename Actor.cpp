@@ -1,7 +1,7 @@
 #include "Actor.h"
 
 void Actor::createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames, 
-float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, float HealthMult)
+float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, float HealthMult, float HealingMult, float UtilityMult)
 {
     health = Health;
     maxHealth = Health;
@@ -18,6 +18,8 @@ float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, fl
     bulletSpeedMult = BulletSpeedMult;
     speedMult = SpeedMult;
     healthMult = HealthMult;
+    healingMult = HealingMult;
+    utilityMult = UtilityMult;
 
 }
 
@@ -27,16 +29,16 @@ void Actor::moveActor(enum direction dir)
     switch(dir)
     {
         case up : 
-            yPos = yPos - speed;
+            yPos = yPos - (speed * speedMult);
             break;
         case down : 
-            yPos = yPos + speed;
+            yPos = yPos + (speed * speedMult);
             break;
         case right : 
-            xPos = xPos + speed;
+            xPos = xPos + (speed * speedMult);
             break;
         case left : 
-            xPos = xPos - speed;
+            xPos = xPos - (speed * speedMult);
             break;
         
     }

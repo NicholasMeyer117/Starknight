@@ -30,13 +30,13 @@ class PirateLord: public Boss
             bars[0].changePercentage(health/maxHealth);
     }
     
-    void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
+    void enemySpawn(std::vector<Sprite> bulletSpriteList, int ScreenW, int ScreenH)
     {
         screenH = ScreenH;
         screenW = ScreenW;
         sprite.setPosition(screenW, screenH/2);
         setActorPosition(screenW, screenH/2);
-        bulletSprite = BulletSprite;
+        bulletSprite = bulletSpriteList[2];
         enemyType = pirateLord;
         bulletsPassThrough = true;
         ProgressBar healthBar1(250, 800, 30, ScreenW/2 - 400, 0 + ScreenH/8);
@@ -209,11 +209,11 @@ class PirateTurret: public Boss
         
     }
 
-    void enemySpawn(Sprite BulletSprite, int ScreenW, int ScreenH)
+    void enemySpawn(std::vector<Sprite> bulletSpriteList, int ScreenW, int ScreenH)
     {
         screenH = ScreenH;
         screenW = ScreenW;
-        bulletSprite = BulletSprite;
+        bulletSprite = bulletSpriteList[2];
         enemyType = pirateTurret;
         bulletsPassThrough = false;
     }

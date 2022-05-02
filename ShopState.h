@@ -13,6 +13,7 @@
 #include "Attachment.h"
 #include "Enemy.h"
 #include "Character.h"
+//#include "SynergyHandler.h"
 
 using namespace std;
 
@@ -30,8 +31,11 @@ class ShopState: public State
     //std::vector<Sprite> attachmentSlotSprites; // ??
     std::vector<ImageButton*> attachmentSlotButtons; //Vector of buttons for equipped attachments
     Character *character = new Character;
+    SynergyHandler *synergyHandler = new SynergyHandler;
     int screenW;
     int screenH;
+    int relUnitX;
+    int relUnitY;
     sf::Font gameFont;
     sf::Text source;
     
@@ -39,11 +43,14 @@ class ShopState: public State
     {
         screenW = game->screenWidth;
         screenH = game->screenHeight;
+        relUnitX = game->relUnitX;
+        relUnitY = game->relUnitY;
         source = game->source;
         gameFont = game->gameFont; 
         character = game->character;
+        synergyHandler = game->synergyHandler;
         
-        Texture t1, t2, t3, t4, t5, t6, t7;
+        Texture t1, t2, t3, t4, t5, t6, t7, t8;
         t1.loadFromFile("images/cannon.png");
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
@@ -58,8 +65,10 @@ class ShopState: public State
         textureList.push_back(t6);
         t7.loadFromFile("images/hullBooster.png");
         textureList.push_back(t7);
+        t8.loadFromFile("images/speedBooster.png");
+        textureList.push_back(t8);
         
-        Texture i1, i2, i3, i4, i5, i6, i7;
+        Texture i1, i2, i3, i4, i5, i6, i7, i8;
         i1.loadFromFile("images/cannon.png");
         textureList.push_back(i1);
         i2.loadFromFile("images/machineGun.png");
@@ -74,6 +83,8 @@ class ShopState: public State
         textureList.push_back(i6);
         i7.loadFromFile("images/hullBooster.png");
         textureList.push_back(i7);
+        i8.loadFromFile("images/speedBooster.png");
+        textureList.push_back(i8);
         
         for (auto i:textureList)
         {
@@ -90,8 +101,35 @@ class ShopState: public State
             bulletSpriteList.push_back(sprite);
             
         }
-        
+
+    }
     
+    
+    //Check is any synergys can be displayed and if so create the synergyBoxes to be displayed on screen
+    void displaySynergies()
+    {
+        synergyHandler->synergyBoxes.clear();
+        synergyHandler->checkSynergies(character->attachments);
+        int synergyCounterRow = 0;
+        int synergyCounterCol = 0;
+        for (int i = 0; i < sizeof(synergyHandler->synergies)/sizeof(synergyHandler->synergies[0]); i++)
+        {
+            cout<<"\nLevel: " << synergyHandler->synergies[i].level << "\n";
+            if (synergyHandler->synergies[i].level >= 2)
+            {
+                synergyHandler->addSynergyBox(relUnitX * 5 + (10 * relUnitX * synergyCounterCol), 
+                relUnitY * 22 + (30 * relUnitY * synergyCounterRow), 
+                synergyHandler->synergies[i].name, &gameFont, synergyHandler->synergies[i].color);
+                if (synergyCounterCol == 0)
+                    synergyCounterCol++;
+                else
+                {
+                    synergyCounterRow++;
+                    synergyCounterCol = 0;
+                }
+            }
+        }
+        
     }
     
     //Generates Shop Button
@@ -113,7 +151,6 @@ class ShopState: public State
                          return 1;
                 }
                 button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, ("Cannon: " + to_string(cost) + " Cr"), 20, cost);
-                //cannon->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(cannon);
                 return 0;     
             } 
@@ -128,8 +165,7 @@ class ShopState: public State
                      if (ifContains(curAtc)->level == 3)
                          return 1;
                 }
-                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, "Machine Gun: 5 Cr", 20, cost);
-                //machineGun->createAttachment(bulletSpriteList[0]);
+                button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, ("Machine Gun: " + to_string(cost) + " Cr"), 20, cost);
                 shopAttachments.push_back(machineGun);
                 return 0;
             }
@@ -144,8 +180,7 @@ class ShopState: public State
                      if (ifContains(curAtc)->level == 3)
                          return 1;
                 }
-                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, "Repair Droid: 5 Cr", 20, cost);
-                //repairDroid->createAttachment();
+                button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, ("Repair Droid: " + to_string(cost) + " Cr"), 20, cost);
                 shopAttachments.push_back(repairDroid);
                 return 0;
             }
@@ -160,7 +195,7 @@ class ShopState: public State
                      if (ifContains(curAtc)->level == 3)
                          return 1;
                 }
-                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, "Siphon Droid: 10 Cr", 20, cost);
+                button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, ("Siphon Droid: " + to_string(cost) + " Cr"), 20, cost);
                 //siphonDroid->createAttachment(bulletSpriteList[1]);
                 shopAttachments.push_back(siphonDroid);
                 return 0;
@@ -176,7 +211,7 @@ class ShopState: public State
                      if (ifContains(curAtc)->level == 3)
                          return 1;
                 }
-                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, "Shotgun: 5 Cr", 20, cost);
+                button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, ("Shotgun: " + to_string(cost) + " Cr"), 20, cost);
                 //shotgun->createAttachment(bulletSpriteList[0]);
                 shopAttachments.push_back(shotgun);
                 return 0;
@@ -192,7 +227,7 @@ class ShopState: public State
                      if (ifContains(curAtc)->level == 3)
                          return 1;
                 }
-                button->createIcon(textureList[5], spriteList[5], butNum, 250, 250, &gameFont, "Time Dilator: 5 Cr", 20, 5);
+                button->createIcon(textureList[5], spriteList[5], butNum, 250, 250, &gameFont, ("Time Dilator: " + to_string(cost) + " Cr"), 20, cost);
                 //timeDilator->createAttachment();
                 shopAttachments.push_back(timeDilator);
                 return 0;
@@ -208,9 +243,25 @@ class ShopState: public State
                      if (ifContains(curAtc)->level == 3)
                          return 1;
                 }
-                button->createIcon(textureList[6], spriteList[6], butNum, 250, 250, &gameFont, "Hull Booster: 5 Cr", 20, 5);
+                button->createIcon(textureList[6], spriteList[6], butNum, 250, 250, &gameFont, ("Hull Booster: " + to_string(cost) + " Cr"), 20, cost);
                 //hullBooster->createAttachment();
                 shopAttachments.push_back(hullBooster);
+                return 0;
+            }
+            case 7:
+            {
+                SpeedBooster *speedBooster = new SpeedBooster();
+                cost = speedBooster->credits;
+                curAtc = speedBooster;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3)
+                         return 1;
+                }
+                button->createIcon(textureList[7], spriteList[7], butNum, 250, 250, &gameFont, ("Speed Booster: " + to_string(cost) + " Cr"), 20, cost);
+                //hullBooster->createAttachment();
+                shopAttachments.push_back(speedBooster);
                 return 0;
             }
         
@@ -255,12 +306,28 @@ class ShopState: public State
         {
             textNum = 6;
         }
+        else if (name == "Speed Booster")
+        {
+            textNum = 7;
+        }
             
         sprite.setScale(.4, .4);
         sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
         //the [textNum + i] represents the offset from double textures at the beginning. i must be iterated each time a new attachment is added
-        button->createImageButton(textureList[textNum + 7], spriteList[textNum + 7], screenW - 400, 150 + (150 * attachNum), 100, 100);
+        button->createImageButton(textureList[textNum + 8], spriteList[textNum + 8], screenW - 400, 150 + (150 * attachNum), 100, 100);
         attachmentSlotButtons.push_back(button);
+    }
+    
+    String getSynDesc(String name)
+    {
+        if (name == "Gun")
+            return "Gun Synergy: Shot speed increased by 100% for all guns";
+        else if (name == "Repair")
+            return "Repair Synergy: Healing effectiveness increased by 50% for all repair attachments";
+        else if (name == "Utility")
+            return "Utility Synergy: Effectiveness increased by 50% for all utility attachments";
+            
+        return "Nothing";
     }
     
     String getDesc(Attachment attachment)
@@ -297,37 +364,45 @@ class ShopState: public State
         {
             if (levelNum == 0)
                 return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5";
-            if (levelNum == 1)
+            else if (levelNum == 1)
                 return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 5  ->  10";
-            if (levelNum == 2)
+            else if (levelNum == 2)
                 return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 10  ->  20";
+            else if (levelNum == 3)
+                return "Repair Droid: Repairs your ship over time (Repair)\nFirerate: 1/5s\nHealth: 20";
         }
         else if (name == "Siphon Droid")
         {
             if (levelNum == 0)
                 return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5";
-            if (levelNum == 1)
+            else if (levelNum == 1)
                 return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 5  ->  10";
-            if (levelNum == 2)
+            else if (levelNum == 2)
                 return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 10  ->  20";
+            else if (levelNum == 3)
+                return "Siphon Droid: Fires a projectile that repairs ship equal to damage dealt (Gun) (Repair)\nFirerate: 1/1.25s\nSpeed: 20\nDamage: 20";
         }
         else if (name == "Shotgun")
         {
             if (levelNum == 0)
                 return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/2s\nSpeed: 15\nDamage: 5\nShots: 3\nAngle: 45";
-            if (levelNum == 1)
+            else if (levelNum == 1)
                 return "Shotgun: Fires a spread of 3 medium damage projectiles (Gun)\nFirerate: 1/1.5s\nSpeed: 15\nDamage: 5  ->  10\nShots: 3\nAngle: 45  ->  22.5";
-            if (levelNum == 2)
+            else if (levelNum == 2)
                 return "Shotgun: Fires a spread of 5 medium damage projectiles (Gun)\nFirerate: 1/s\nSpeed: 15\nDamage: 10  ->  20\nShots: 3  ->  5\nAngle: 22.5  ->  11.25";
+            else if (levelNum == 3)
+                return "Shotgun: Fires a spread of 5 medium damage projectiles (Gun)\nFirerate: 1/s\nSpeed: 15\nDamage: 20\nShots: 5\nAngle: 11.25";
         }
         else if (name == "Time Dilator")
         {
             if (levelNum == 0)
                 return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 10%";
-            if (levelNum == 1)
+            else if (levelNum == 1)
                 return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 10%  ->  20%";
-            if (levelNum == 2)
+            else if (levelNum == 2)
                 return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 20%  ->  40%";
+            else if (levelNum == 3)
+                return "Time Dilator: Slows starting map speed (Manipulator)\nPercentage: 40%";
         }
         else if (name == "Hull Booster")
         {
@@ -337,8 +412,34 @@ class ShopState: public State
                 return "Hull Booster: Increase Max Health (Utility)\nPercentage: 25%  ->  50%";
             if (levelNum == 2)
                 return "Hull Booster: Increase Max Health (Utility)\nPercentage: 50%  ->  100%";
+            if (levelNum == 3)
+                return "Hull Booster: Increase Max Health (Utility)\nPercentage: 100%";
+        }
+        else if (name == "Speed Booster")
+        {
+            if (levelNum == 0)
+                return "Speed Booster: Increase Speed (Utility)\nPercentage: 25%";
+            if (levelNum == 1)
+                return "Speed Booster: Increase Speed (Utility)\nPercentage: 25%  ->  50%";
+            if (levelNum == 2)
+                return "Speed Booster: Increase Speed (Utility)\nPercentage: 50%  ->  100%";
+            if (levelNum == 3)
+                return "Speed Booster: Increase Speed (Utility)\nPercentage: 100%";
         }
         return "No Name"; 
+    }
+    
+    void rollShop(int pos)
+    {
+        bool AtFullLevel = false;
+        ShopButton *button = new ShopButton;
+        do
+        {
+            int randNum = rand() % 8;
+            AtFullLevel = generateButton(button, randNum, pos);
+        } while (AtFullLevel == true);
+        shopButtonList.push_back(button);
+    
     }
     
     //checks if the player already has a given attachment
@@ -379,27 +480,15 @@ class ShopState: public State
         
         srand(time(NULL));
         
-        int randNum = rand() % 7;
-        ShopButton *button1 = new ShopButton;
-        generateButton(button1, randNum, 1);
-        //buttonList.push_back(button1);
-        shopButtonList.push_back(button1);
-        
-        randNum = rand() % 7;
-        ShopButton *button2 = new ShopButton;
-        generateButton(button2, randNum, 2);
-        //buttonList.push_back(button2);
-        shopButtonList.push_back(button2);
-        
-        randNum = rand() % 7;
-        ShopButton *button3 = new ShopButton;
-        generateButton(button3, randNum, 3);
-        //buttonList.push_back(button3);
-        shopButtonList.push_back(button3);
+        rollShop(1);
+        rollShop(2);
+        rollShop(3);
         
         Entity *creditImage = new Entity();
         creditImage -> noSpriteSettings(75, 75, 25, 25, Color::Yellow);
         entities.push_back(creditImage);
+        
+        displaySynergies();
         
        for (int i = 0; i < character->attachmentSlots; i++)
        {
@@ -480,6 +569,7 @@ class ShopState: public State
                 }
             }
             
+            //Check if mouse is over shopButtonList
             for (int i = 0; i < shopButtonList.size(); i++)
             {
                 if (shopButtonList[i] -> visible == true and shopButtonList[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
@@ -489,16 +579,26 @@ class ShopState: public State
                 }
             }
             
-           /* FloatRect rect;
-            for (int i = 0; i < attachmentSlotSprites.size(); i++)
+            //check if mouse is over attachmentSlotButtons
+            for (int i = 0; i < attachmentSlotButtons.size(); i++)
             {
-                rect = attachmentSlotSprites[i].getGlobalBounds();
-                if (rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                if (attachmentSlotButtons[i] -> visible == true and attachmentSlotButtons[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
                 {
                     drawText(getDesc(*character->attachments[i]), 20, screenW/6, 600, app);
-                    //cout<<to_string(i);
+                    
                 }
-            }*/
+            }
+            
+            //check is mouse is over synergy boxes
+            for (int i = 0; i < synergyHandler->synergyBoxes.size(); i++)
+            {
+                if (synergyHandler->synergyBoxes[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                {
+                    drawText(getSynDesc(synergyHandler->synergyBoxes[i]->name), 20, screenW/6, 600, app);
+                    
+                }
+            }
+            
             
             //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))
@@ -524,30 +624,9 @@ class ShopState: public State
                 shopAttachments.clear();
                 shopButtonList.clear();
                 
-                bool AtFullLevel = false;
-                ShopButton *button1 = new ShopButton;
-                do
-                {
-                    int randNum = rand() % 7;
-                    AtFullLevel = generateButton(button1, randNum, 1);
-                } while (AtFullLevel == true);
-                shopButtonList.push_back(button1);
-        
-                ShopButton *button2 = new ShopButton;
-                do
-                {
-                    int randNum = rand() % 7;
-                    AtFullLevel = generateButton(button2, randNum, 2);
-                } while (AtFullLevel == true);
-                shopButtonList.push_back(button2);
-        
-                ShopButton *button3 = new ShopButton;
-                do
-                {
-                    int randNum = rand() % 7;
-                    AtFullLevel = generateButton(button3, randNum, 3);
-                } while (AtFullLevel == true);
-                shopButtonList.push_back(button3);
+                rollShop(1);
+                rollShop(2);
+                rollShop(3);
             }
             
             
@@ -622,6 +701,7 @@ class ShopState: public State
                     shopButtonList[i]->leftClicked = false;
                     shopButtonList[i]->visible = false;
                     character->credits -= shopButtonList[i]->cost;
+                    displaySynergies();
                 }
             }
 
@@ -631,6 +711,11 @@ class ShopState: public State
                 i->draw(app);
             for(auto i:slotRectangles)
                 app.draw(i);
+            for(auto i:synergyHandler->synergyBoxes)
+            {
+                app.draw(i->synRec);
+                app.draw(i->synText);
+            }
            // for(auto i:attachmentSlotSprites)
                 //app.draw(i);
             for (auto i:attachmentSlotButtons)
@@ -654,7 +739,7 @@ class ShopState: public State
             }
             drawText(": " + std::to_string(character->credits), 20, 95, 61, app);
             app.display();
-            app.clear(Color(200,200,200,255));
+            app.clear(Color(100,100,100,255));
         }
     
         return -1;

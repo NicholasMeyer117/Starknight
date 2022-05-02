@@ -22,7 +22,7 @@ class Entity
    bool life = 1;
    std::string name;
    Sprite sprite;
-   sf::IntRect rect;
+   sf::FloatRect boundingBox;
    sf::RectangleShape rectangle;
    
    //sets up an object
@@ -37,7 +37,10 @@ class Entity
    //self explanatory
    float getAngle();
    
-   //checks if entity overlaps with Entity a
+   //checks if entities with sprites overlap
+   bool isCollideWithSprite(Entity *a);
+   
+   //checks if entity with no sprite overlaps with Entity a
    bool isCollide(Entity *a);
    
    virtual void update();

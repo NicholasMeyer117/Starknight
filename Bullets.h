@@ -66,7 +66,7 @@ class SiphonBullet: public Bullet
     {
         if(player->health < player->maxHealth)
         {
-            player->health+=damage;
+            player->health+=(damage);// * player->healingMult);
         }
     }
 };

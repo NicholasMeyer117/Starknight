@@ -133,7 +133,9 @@ class Shielder: public Enemy
                     EnergyShield *energyShield = new EnergyShield;
                     energyShield->noSpriteSettings(i->x,i->y,i->w,i->h, Color::Black, 0,0);
                     energyShield->createActor(10, 0, 0, 0, true, 0);
-                    energyShield->createShield(i->x, i->y, i->w, i);
+                    float xCoord = i->x;// - (i->w - (i->w/1.5));
+                    float yCoord = i->y;// - (i->h- (i->h/1.5));
+                    energyShield->createShield(xCoord, yCoord, i->w, i);
                     shieldList.push_back(energyShield);
                 }
             }

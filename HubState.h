@@ -19,6 +19,8 @@ class HubState: public State
     std::vector<Sprite> shipSprites;
     int screenW;
     int screenH;
+    int relUnitX;
+    int relUnitY;
     int curShipNum = 0;
     sf::Font gameFont;
     sf::Text source;
@@ -28,6 +30,8 @@ class HubState: public State
     {
         screenW = game->screenWidth;
         screenH = game->screenHeight;
+        relUnitX = game->relUnitX;
+        relUnitY = game->relUnitY;
         source = game->source;
         gameFont = game->gameFont;
         curChar = game->character;
@@ -149,12 +153,12 @@ class HubState: public State
             case 1:
             {
                 curChar->attachmentSlots = 4;
-                return "Health: 150\nSpeed: 3\nShields: 0\nDamage: (x1.25)\nAttachments: 4";
+                return "Health: 150\nSpeed: (x0.75)\nShields: 0\nDamage: (x1.25)\nAttachments: 4";
             }
             case 2:
             {
                 curChar->attachmentSlots = 2;
-                return "Health: 75\nSpeed: 7\nShields: 0\nDamage: (x1.25)\nAttachments: 2";
+                return "Health: 75\nSpeed: (x1.25)\nShields: 0\nDamage: (x1.25)\nAttachments: 2";
             }
         }
         
@@ -164,7 +168,7 @@ class HubState: public State
     int Run(sf::RenderWindow &app)
     {
         Texture t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12;
-        t1.loadFromFile("images/triShip.png");
+        t1.loadFromFile("images/warhorse.png");
         t2.loadFromFile("images/batteringRam.png");
         t3.loadFromFile("images/serpent.png");
         
@@ -175,12 +179,12 @@ class HubState: public State
         sf::CircleShape upArrow(80.f, 3);
         upArrow.setFillColor(Color::Black);
         upArrow.setOrigin(sf::Vector2f(upArrow.getRadius(), upArrow.getRadius()));
-        upArrow.setPosition(screenW/8, screenH/4 - screenH/8);
+        upArrow.setPosition(relUnitX * 10, relUnitY * 10);
         
         sf::CircleShape downArrow(80.f, 3);
         downArrow.setFillColor(Color::Black);
         downArrow.setOrigin(sf::Vector2f(downArrow.getRadius(), downArrow.getRadius()));
-        downArrow.setPosition(screenW/8, screenH/4 + screenH/8);
+        downArrow.setPosition(relUnitX * 10, relUnitY * 50);
         downArrow.rotate(180);
     
         Button *playButton = new Button;
@@ -188,22 +192,22 @@ class HubState: public State
         buttonList.push_back(playButton);
         
         Sprite triSprite(t1);
-        triSprite.rotate(90);
-        triSprite.setOrigin(sf::Vector2f(16, 16));
+        //triSprite.rotate(90);
+        triSprite.setOrigin(sf::Vector2f(26, 38));
         shipSprites.push_back(triSprite);
         
         Sprite battSprite(t2);
-        battSprite.setOrigin(sf::Vector2f(12, 20));
+        battSprite.setOrigin(sf::Vector2f(38, 45));
         shipSprites.push_back(battSprite);
         
         Sprite serpSprite(t3);
-        serpSprite.setOrigin(sf::Vector2f(17, 10));
+        serpSprite.setOrigin(sf::Vector2f(25, 25));
         shipSprites.push_back(serpSprite);
         
         for (int i = 0; i < shipSprites.size(); i++)
         {
-            shipSprites[i].setPosition(screenW/8, screenH/4);
-            shipSprites[i].setScale(3, 3);
+            shipSprites[i].setPosition(relUnitX * 10, relUnitY * 30);
+            shipSprites[i].setScale(2, 2);
         }
         
         
@@ -256,7 +260,7 @@ class HubState: public State
             
 
             //draw
-            app.clear(Color(255,255,255,255));
+            app.clear(Color(100,100,100,255));
             drawText(getName(curShipNum), 30, screenW/5, screenH/8, app);
             drawText(getDesc(curShipNum), 20, screenW/5, screenH/6, app);
             app.draw(upArrow);

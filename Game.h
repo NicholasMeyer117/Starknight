@@ -12,6 +12,7 @@
 #include "Actor.h"
 #include "Enemy.h"
 #include "State.h"
+#include "SynergyHandler.h"
 #define PI 3.14159265
 
 class Game
@@ -24,11 +25,16 @@ class Game
     int level = 2;
     int screenWidth;
     int screenHeight;
+    int relUnitX;
+    int relUnitY;
     sf::Text source;
     sf::Font gameFont;
     Character *character = new Character;
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
     std::array<Texture, 2> bulletTextureList;
+    SynergyHandler *synergyHandler = new SynergyHandler;
+    
+    bool showHitBoxes = false;
     
     void resizeWindow();
     
@@ -38,9 +44,11 @@ class Game
         gameFont = font;
         screenWidth = W;
         screenHeight = H;
+        relUnitX = screenWidth/100;
+        relUnitY = screenHeight/100;
         
         Texture b1, b2, b3, b4;
-        b1.loadFromFile("images/cannonBullet.png");
+        b1.loadFromFile("images/newBullet.png");
         bulletTextureList[0] = b1;
         b2.loadFromFile("images/siphonBullet.png");
         bulletTextureList[1] = b2;

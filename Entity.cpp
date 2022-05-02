@@ -3,10 +3,11 @@
    void Entity::settings(Sprite &a,float X,float Y, float W, float H, float Angle,int radius)
    {
      sprite = a;
+     boundingBox=sprite.getGlobalBounds();
      x=X; y=Y; //current ever-changing position relative to window
      angle = Angle;
      R = radius;
-     w = W; h = H;
+     w = boundingBox.width; h = boundingBox.height;
      xPos = X, yPos = Y; //static original position on the map
      sprite.setOrigin(w/2,h/2);
    }
@@ -38,10 +39,17 @@
    {
        return absAngle;
    }
+   
+   bool Entity::isCollideWithSprite(Entity *a)
+   {
+       boundingBox = sprite.getGlobalBounds();
+       a->boundingBox = a->sprite.getGlobalBounds();
+       return boundingBox.intersects(a->boundingBox);
+   
+   }
 
    bool Entity::isCollide(Entity *a)
    {
-
    //dimensions of 
 
       Vector2f al, ar, bl, br;
@@ -74,7 +82,7 @@
      if (sprite.getTexture() != NULL)
      {
          sprite.setOrigin(w/2,h/2);
-         sprite.setPosition(x,y);
+         sprite.setPosition(x, y);
          sprite.setRotation(angle);
          app.draw(sprite);
          absAngle = sprite.getRotation();
