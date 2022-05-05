@@ -7,18 +7,19 @@
 #include <list>
 #include <math.h>
 #include <cstring>
+#include <unistd.h>
 #include "Entity.h"
 #include "Actor.h"
 #include "Enemy.h"
-#include "Bullets.h"
 #define PI 3.14159265
 
-class Swarmer: public Enemy //number one!
+class DoubleShooter: public Enemy
 {
+
     public:
     bool movingUp = true;
     Sprite bulletSprite;
-    int attackCounter= 0;
+    int volleyNum = 0;
     
     void takeDamage(float damage)
     {
@@ -31,41 +32,21 @@ class Swarmer: public Enemy //number one!
     {
         screenH = ScreenH;
         screenW = ScreenW;
-        relUnitX = screenW/100;
-        relUnitY = screenH/100;
         srand(time(NULL));
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
         setActorPosition(screenW, randNum);
-        enemyType = swarmer;
+        bulletSprite = SpriteList[2];
+        enemyType = doubleShooter;
+
     }
     
     void enemyMove()
     {
-    
-        if (attackCounter > 0)
-        {
-            //std::cout << "ATTACKING";
-            if (attackCounter >= 150)
-            {
-            	moveActor(left);
-            	moveActor(left);
-            	moveActor(left);
-            	moveActor(left);
-            }
-            else
-            {
-            	moveActor(right);
-            	moveActor(right);
-            	moveActor(right);
-            	moveActor(right);
-            }
-            attackCounter--;
-        }
         if (!reachedBegin)
         {
             moveActor(left);
-            int spawnZone = screenW - (relUnitX * 5) - (rand() % (relUnitX * 100));
+            int spawnZone = (screenW - screenW/10) - rand() %  screenW/5;
             if (x <= spawnZone)
                 reachedBegin = true;
         }
@@ -74,13 +55,13 @@ class Swarmer: public Enemy //number one!
             if (movingUp)
             {
                 moveActor(up);
-                if (y <= relUnitY * 17)
+                if (y <= screenH/10)
                     movingUp = false;
             }
             else
             {
                 moveActor(down);
-                if (y >= relUnitY * 90)
+                if (y >= screenH - screenH/10)
                     movingUp = true;
             }
 
@@ -89,16 +70,34 @@ class Swarmer: public Enemy //number one!
     
     void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
     {
-    
         if (ticksSinceLastFire == firerate)
         { 
-            std::cout << "ATTACK\n";
-            if (attackCounter == 0)
-                attackCounter = 300;
-            ticksSinceLastFire = 0;  
+            DarkBullet *b1 = new DarkBullet();
+            b1->settings(bulletSprite,x,y + 13,5, 5, angle, 3);
+            b1->createBullet (2, 25);
+            entities->push_back(b1);                
+            bulletList->push_back(b1);   
+        
+            DarkBullet *b2 = new DarkBullet();
+            b2->settings(bulletSprite,x,y - 13,5, 5, angle, 3);
+            b2->createBullet (2, 25);
+            entities->push_back(b2);                
+            bulletList->push_back(b2); 
+        
+            if (volleyNum < 1)
+            {
+                volleyNum++;
+                ticksSinceLastFire = firerate - 10;
+            }
+            else
+            {
+                ticksSinceLastFire = 0;
+                volleyNum = 0;
+            }
         }
         else
-            ticksSinceLastFire++;                   
+            ticksSinceLastFire++;  
+                    
     }
-    
+
 };

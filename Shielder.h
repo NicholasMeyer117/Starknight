@@ -35,6 +35,8 @@ class Shielder: public Enemy
     {
         screenH = ScreenH;
         screenW = ScreenW;
+        relUnitX = screenW/100;
+        relUnitY = screenH/100;
         srand(time(NULL));
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
@@ -47,7 +49,7 @@ class Shielder: public Enemy
         if (!reachedBegin)
         {
             moveActor(left);
-            int spawnZone = (screenW - screenW/6) - rand() % screenW/5;
+            int spawnZone = screenW - (relUnitX * 5) - (rand() % (relUnitX * 100));
             if (x <= spawnZone)
                 reachedBegin = true;
         }
@@ -56,13 +58,13 @@ class Shielder: public Enemy
             if (movingUp)
             {
                 moveActor(up);
-                if (y <= screenH/10)
+                if (y <= relUnitY * 17)
                     movingUp = false;
             }
             else
             {
                 moveActor(down);
-                if (y >= screenH - screenH/10)
+                if (y >= relUnitY * 90)
                     movingUp = true;
             }
 
@@ -88,8 +90,8 @@ class Shielder: public Enemy
         int dx = entity.x - shield.x;
         int dy = entity.y - shield.y;
         int distance = sqrt((dx * dx) + (dy * dy));
-        cout << "\nDistance: " + std::to_string(distance);
-        cout << "\nmust be less than: " + std::to_string(shield.circle.getRadius() * 1 + entity.R * 1) + "\n";
+        //cout << "\nDistance: " + std::to_string(distance);
+        //cout << "\nmust be less than: " + std::to_string(shield.circle.getRadius() * 1 + entity.R * 1) + "\n";
         if (distance < shield.circle.getRadius() * 1 + entity.R * 1)
             return true;
         return false;
@@ -154,9 +156,9 @@ class Shielder: public Enemy
             {
                 if (shieldCollision(*bulletList->at(j), *shieldList.at(i)))
                 {
-                    cout << "\nbullet hit\n";
-                    cout << "\nBullet Pos: " + std::to_string(bulletList->at(j)->x) + " , " + std::to_string(bulletList->at(j)->y);
-                    cout << "\nShield Pos: " + std::to_string(shieldList.at(i)->x) + " , " + std::to_string(shieldList.at(i)->y) + "\n";
+                    //cout << "\nbullet hit\n";
+                    //cout << "\nBullet Pos: " + std::to_string(bulletList->at(j)->x) + " , " + std::to_string(bulletList->at(j)->y);
+                    //cout << "\nShield Pos: " + std::to_string(shieldList.at(i)->x) + " , " + std::to_string(shieldList.at(i)->y) + "\n";
                     shieldList[i] -> takeDamage(bulletList->at(j)->damage);
                     updateShield(shieldList[i]);
                     bulletList->at(j) -> life = 0;

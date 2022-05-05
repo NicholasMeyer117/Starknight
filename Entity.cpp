@@ -76,7 +76,7 @@
 }
 
    void Entity::update(){}
-
+   
    void Entity::draw(RenderWindow &app)
    {
      if (sprite.getTexture() != NULL)
@@ -92,6 +92,33 @@
          app.draw(rectangle);
      }
 
+     CircleShape circle(R);
+     circle.setFillColor(Color(255,0,0,170));
+     circle.setPosition(x,y);
+     circle.setOrigin(R,R);
+     //app.draw(circle);
+     
+   }
+
+   void Entity::draw(RenderWindow &app, sf::Shader *shader)
+   {
+     if (sprite.getTexture() != NULL)
+     {
+         sprite.setOrigin(w/2,h/2);
+         sprite.setPosition(x, y);
+         sprite.setRotation(angle);
+         if (isHit == true)
+             app.draw(sprite, shader);
+         else
+             app.draw(sprite);
+         absAngle = sprite.getRotation();
+     }
+     else
+     {
+         app.draw(rectangle);
+     }
+
+     isHit = false;
      CircleShape circle(R);
      circle.setFillColor(Color(255,0,0,170));
      circle.setPosition(x,y);

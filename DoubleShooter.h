@@ -32,6 +32,8 @@ class DoubleShooter: public Enemy
     {
         screenH = ScreenH;
         screenW = ScreenW;
+        relUnitX = screenW/100;
+        relUnitY = screenH/100;
         srand(time(NULL));
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
@@ -46,7 +48,7 @@ class DoubleShooter: public Enemy
         if (!reachedBegin)
         {
             moveActor(left);
-            int spawnZone = (screenW - screenW/10) - rand() %  screenW/5;
+            int spawnZone = screenW - (relUnitX * 5) - (rand() % (relUnitX * 100));
             if (x <= spawnZone)
                 reachedBegin = true;
         }
@@ -55,13 +57,13 @@ class DoubleShooter: public Enemy
             if (movingUp)
             {
                 moveActor(up);
-                if (y <= screenH/10)
+                if (y <= relUnitY * 17)
                     movingUp = false;
             }
             else
             {
                 moveActor(down);
-                if (y >= screenH - screenH/10)
+                if (y >= relUnitY * 90)
                     movingUp = true;
             }
 
@@ -74,13 +76,13 @@ class DoubleShooter: public Enemy
         { 
             DarkBullet *b1 = new DarkBullet();
             b1->settings(bulletSprite,x,y + 13,5, 5, angle, 3);
-            b1->createBullet (2, 25);
+            b1->createBullet (5, 15);
             entities->push_back(b1);                
             bulletList->push_back(b1);   
         
             DarkBullet *b2 = new DarkBullet();
             b2->settings(bulletSprite,x,y - 13,5, 5, angle, 3);
-            b2->createBullet (2, 25);
+            b2->createBullet (5, 15);
             entities->push_back(b2);                
             bulletList->push_back(b2); 
         

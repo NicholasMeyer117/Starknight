@@ -17,11 +17,13 @@ class Enemy: public Actor
     public:
     bool reachedBegin = false;
     int ticksSinceLastFire = 0;
-    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder, pirateLord, pirateTurret, swarmer, swarmSpitter};
+    enum EnemyType {darkFighter, triShooter, doubleShooter, shielder, pirateLord, pirateTurret, pirateTurret2, swarmer, swarmSpitter, machineGunner};
     EnemyType enemyType;
     int bulletsPassThrough = false;
     int screenH;
     int screenW;
+    int relUnitX;
+    int relUnitY;
     
     virtual void takeDamage(float damage){}
     

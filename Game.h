@@ -21,8 +21,8 @@ class Game
     public:
     RenderWindow app;
     enum gameState {mainMenu, hub, game, shop, settings};
-    int area = 2; //each area consists of several levels and ends with a boss
-    int level = 2;
+    int area = 1; //each area consists of several levels and ends with a boss
+    int level = 1;
     int screenWidth;
     int screenHeight;
     int relUnitX;
@@ -32,7 +32,7 @@ class Game
     Character *character = new Character;
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
     std::array<Texture, 2> bulletTextureList;
-    SynergyHandler *synergyHandler = new SynergyHandler;
+    SynergyHandler *synergyHandler = new SynergyHandler();
     
     bool showHitBoxes = false;
     
@@ -48,7 +48,7 @@ class Game
         relUnitY = screenHeight/100;
         
         Texture b1, b2, b3, b4;
-        b1.loadFromFile("images/newBullet.png");
+        b1.loadFromFile("images/bullet.png");
         bulletTextureList[0] = b1;
         b2.loadFromFile("images/siphonBullet.png");
         bulletTextureList[1] = b2;

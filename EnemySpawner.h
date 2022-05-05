@@ -20,6 +20,7 @@
 #include "Shielder.h"
 #include "Swarmer.h"
 #include "SwarmSpitter.h"
+#include "MachineGunner.h"
 #include "Bullets.h"
 #include "Game.h"
 #include "Boss.h"
@@ -77,13 +78,15 @@ class EnemySpawner
                         turret1 -> settings(turretSprite,500,500,51,51);
                         turret1 -> createActor(100, 0, 1, 60, true, 0);
                         turret1 -> enemySpawn(bulletSpriteList, screenW, screenH);
+                        turret1 -> setTop(true);
             
                         pirateLord -> Parts.push_back(turret1);
                         bosses.push_back(turret1);
             
-                        PirateTurret *turret2 = new PirateTurret();
-                        turret2 -> settings(turretSprite,500,500,51,51);
-                        turret2 -> createActor(100, 0, 1, 60, true, 0);
+                        PirateTurret2 *turret2 = new PirateTurret2();
+                        Sprite turret2Sprite = spriteList[8];
+                        turret2 -> settings(turret2Sprite,500,500,51,51);
+                        turret2 -> createActor(100, 0, 1, 150, true, 0);
                         turret2 -> enemySpawn(bulletSpriteList, screenW, screenH);
             
                         pirateLord -> Parts.push_back(turret2);
@@ -93,6 +96,7 @@ class EnemySpawner
                         turret3 -> settings(turretSprite,500,500,51,51);
                         turret3 -> createActor(100, 0, 1, 60, true, 0);
                         turret3 -> enemySpawn(bulletSpriteList, screenW, screenH);
+                        turret3 -> setTop(false);
             
                         pirateLord -> Parts.push_back(turret3);
                         bosses.push_back(turret3);
@@ -119,37 +123,41 @@ class EnemySpawner
                 switch(level)
                 {
                     case 1:
-                        return spawn(0);
-                        break;
-                    case 2:
-                        if (randNum > 66)
-                        {
-                            return spawn(1);
-                        }
-                        else
-                            return spawn(0);
-                    case 3:
                         if (randNum <= 33)
                         {
-                            return spawn(2);
+                            return spawn(0);
                         }
                         else if (randNum > 33 and randNum <=66)
                             return spawn(1);
                         else
-                            return spawn(0);
-                    case 4: 
+                            return spawn(2);
+                    case 2:
                         if (randNum <= 25)
                         {
                             return spawn(0);
                         }
-                        else if (randNum > 26 and randNum <=50)
+                        else if (randNum > 25 and randNum <=50)
                             return spawn(1);
-                        else if (randNum > 51 and randNum <=75)
-                            return spawn(2);
-                        else if (!contains(enemyList, Enemy::EnemyType::shielder))
-                            return spawn(3);
                         else
-                            return spawn(0);
+                            return spawn(2);
+                    case 3:
+                        if (randNum <= 33)
+                        {
+                            return spawn(1);
+                        }
+                        else if (randNum > 33 and randNum <=66)
+                            return spawn(2);
+                        else
+                            return spawn(6);
+                    case 4: 
+                        if (!contains(enemyList, Enemy::EnemyType::shielder))
+                            return spawn(3);
+                        else if (randNum <= 25)
+                            return spawn(1);
+                        else if (randNum > 25 and randNum <=65)
+                            return spawn(2);
+                        else
+                            return spawn(6);
                 
                 
                 } 
@@ -236,6 +244,15 @@ class EnemySpawner
             sprite = spriteList[7];
             enemy -> settings(sprite,screenW + 100,75,90,90);
             enemy -> createActor(40, 0, 2, 200, true, 0);
+            enemy->enemySpawn(bulletSpriteList, screenW, screenH);
+        
+        }
+        else if (enemyType == 6)
+        {
+            enemy = new MachineGunner();
+            sprite = spriteList[9];
+            enemy -> settings(sprite,screenW + 100,75,80,84);
+            enemy -> createActor(15, 0, 2, 70, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }

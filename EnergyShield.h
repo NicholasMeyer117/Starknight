@@ -27,7 +27,6 @@ class EnergyShield: public Actor
 
     void createShield(int x, int y, int r, Enemy *newEnemy)
     {
-        cout << "Shield Created";
         enemy = newEnemy;
         circle.setPosition(x, y);
         circle.setRadius(r);

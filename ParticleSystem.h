@@ -48,7 +48,7 @@ public:
         m_emitter = position;
     }
 
-    void update(sf::Time elapsed)
+    void update(sf::Time elapsed, bool activate)
     {
         for (std::size_t i = 0; i < m_particles.size()/4; ++i)
         {
@@ -57,12 +57,23 @@ public:
             p.lifetime -= elapsed;
 
             // if the particle is dead, respawn it
-            if (p.lifetime <= sf::Time::Zero or (type == 4 and m_vertices[i * 4].position.x <= 0))
+            if (p.lifetime <= sf::Time::Zero or (type == 4 and m_vertices[i * 4].position.x <= 0))//
             {
-                resetParticle(i * 4);
-                resetParticle(i * 4 + 1);
-                resetParticle(i * 4 + 2);
-                resetParticle(i * 4 + 3);
+                if (activate == true)
+                {
+                    for (int j = i * 4; j < i * 4 + 4; j++)
+                        m_vertices[j].color.a = static_cast<sf::Uint8>(255);
+                    resetParticle(i * 4);
+                    resetParticle(i * 4 + 1);
+                    resetParticle(i * 4 + 2);
+                    resetParticle(i * 4 + 3);
+                }
+                else 
+                {
+                    p.velocity = sf::Vector2f(0,0);
+                    for (int j = i * 4; j < i * 4 + 4; j++)
+                        m_vertices[j].color.a = static_cast<sf::Uint8>(0);
+                }
             }
             
 
@@ -77,7 +88,8 @@ public:
             float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
             for (int j = i * 4; j < i * 4 + 4; j++)
             { 
-                m_vertices[j].color.a = static_cast<sf::Uint8>(opacity);
+                if (type == 4)
+                    m_vertices[j].color.a = static_cast<sf::Uint8>(opacity);
                 m_vertices[j].color.r = static_cast<sf::Uint8>(color.r);
                 m_vertices[j].color.g = static_cast<sf::Uint8>(color.g);
                 m_vertices[j].color.b = static_cast<sf::Uint8>(color.b);
@@ -151,7 +163,7 @@ private:
         }
         else
         {
-            m_vertices[index].position = sf::Vector2f(-10000, -10000);
+            m_vertices[index].position = sf::Vector2f(-20, -20);
             
         }
     }

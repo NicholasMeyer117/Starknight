@@ -11,6 +11,7 @@ class Boss: public Enemy
     public:
     std::vector<Boss*> Parts;
     bool changeBar = false;
+    int attackPattern = 0;
     int phase = 0;
     
 };
@@ -49,12 +50,12 @@ class PirateLord: public Boss
     
     void setTurretPositions()
     {
-        Parts[0]->xPos = x;
-        Parts[0]->yPos = y;
+        Parts[0]->xPos = x - 20;
+        Parts[0]->yPos = y - 150;
         Parts[1]->xPos = x;
-        Parts[1]->yPos = y + 140;
-        Parts[2]->xPos = x;
-        Parts[2]->yPos = y - 135;
+        Parts[1]->yPos = y;
+        Parts[2]->xPos = x - 20;
+        Parts[2]->yPos = y + 150;
     }
     
     void enemyMove()
@@ -139,7 +140,7 @@ class PirateLord: public Boss
     
     void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
     {
-        if (ticksSinceLastFire == firerate && bulletsPassThrough == false)
+        if (ticksSinceLastFire == firerate && bulletsPassThrough == false && health > 0)
         { 
         
             DiagonalBullet *b1 = new DiagonalBullet(false, true);
@@ -199,6 +200,7 @@ class PirateTurret: public Boss
     bool movingUp = true;
     Sprite bulletSprite;
     int volleyNum = 0;
+    bool top;
     
     void takeDamage(float damage)
     {
@@ -218,42 +220,168 @@ class PirateTurret: public Boss
         bulletsPassThrough = false;
     }
     
+    void setTop (bool Top)
+    {
+        top = Top;
+    }
+    
+    Bullet* enemyFire(int type, int X, int Y, bool right = false, bool up = true, float cone = 1)
+    {
+        if (type == 1)
+        {
+            DarkBullet *b1 = new DarkBullet();
+            b1->settings(bulletSprite,X,Y,15, 15, angle, 3);
+            b1->createBullet (10, 20); 
+            return b1;
+        }
+        else if (type == 2)
+        {
+            DiagonalBullet *b1 = new DiagonalBullet(right, up, cone);
+            b1->settings(bulletSprite,X, Y,5, 5, angle, 3);
+            b1->createBullet (10, 5);
+            return b1;  
+                           
+        }
+        return NULL;
+        
+    }
+    
     void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
     {
+        
         if (ticksSinceLastFire == firerate)
         { 
-        
-            DarkBullet *b1 = new DarkBullet();
-            b1->settings(bulletSprite,x,y,15, 15, angle, 3);
-            b1->createBullet (10, 20);
-            entities->push_back(b1);                
-            bulletList->push_back(b1);  
-            ticksSinceLastFire = 0; 
-            
-            DarkBullet *b2 = new DarkBullet();
-            b2->settings(bulletSprite,x,y + 5,15, 15, angle, 3);
-            b2->createBullet (10, 20);
-            entities->push_back(b2);                
-            bulletList->push_back(b2);  
-            ticksSinceLastFire = 0;  
-            
-            DarkBullet *b3 = new DarkBullet();
-            b3->settings(bulletSprite,x,y - 5,15, 15, angle, 3);
-            b3->createBullet (10, 20);
-            entities->push_back(b3);                
-            bulletList->push_back(b3);  
-            ticksSinceLastFire = 0; 
-            
-            if (volleyNum < 2)
+            Bullet *b1;
+            Bullet *b2;
+            if (attackPattern <= 1)
             {
-                volleyNum++;
-                ticksSinceLastFire = firerate - 10;
+                b1 = enemyFire(1, x, y - 10);
+                b2 = enemyFire(1, x, y + 15);
+                entities->push_back(b1);                
+                bulletList->push_back(b1); 
+                entities->push_back(b2);                
+                bulletList->push_back(b2); 
+                ticksSinceLastFire = 0; 
+
+                if (volleyNum < 4)
+                {
+                    volleyNum++;
+                    ticksSinceLastFire = firerate - 10;
+                }
+                else
+                {
+                    ticksSinceLastFire = 0;
+                    attackPattern++;
+                    volleyNum = 0;
+                }
             }
             else
-            {
-                ticksSinceLastFire = 0;
-                volleyNum = 0;
+            { 
+                if (volleyNum == 0){
+                    b1 = enemyFire(2, x, y - 10, false, top, 0.5);
+                    b2 = enemyFire(2, x, y + 15, false, top, 0.5);}
+                else if (volleyNum == 1){
+                    b1 = enemyFire(2, x, y - 10, false, top);
+                    b2 = enemyFire(2, x, y + 15, false, top);}
+                else if (volleyNum == 2){
+                    b1 = enemyFire(2, x, y - 10, false, top, 2);
+                    b2 = enemyFire(2, x, y + 15, false, top, 2);}
+                else if (volleyNum == 2){
+                    b1 = enemyFire(1, x, y - 10);
+                    b2 = enemyFire(1, x, y + 15);}
+                else if (volleyNum == 3){
+                    b1 = enemyFire(2, x, y - 10, false, !top);
+                    b2 = enemyFire(2, x, y + 15, false, !top);}
+                else if (volleyNum == 4){
+                    b1 = enemyFire(2, x, y - 10, false, !top, 0.5);
+                    b2 = enemyFire(2, x, y + 15, false, !top, 0.5);}
+                else if (volleyNum == 5){
+                    b1 = enemyFire(2, x, y - 10, false, !top, 0.25);
+                    b2 = enemyFire(2, x, y + 15, false, !top, 0.25);}
+                    
+                entities->push_back(b1);                
+                bulletList->push_back(b1); 
+                entities->push_back(b2);                
+                bulletList->push_back(b2); 
+                    
+                ticksSinceLastFire = 0; 
+                if (volleyNum < 5)
+                {
+                    volleyNum++;
+                    ticksSinceLastFire = firerate - 10;
+                }
+                else
+                {
+                    ticksSinceLastFire = 0;
+                    attackPattern = 0;
+                    volleyNum = 0;
+                }
+        
+     
+            
             }
+        }
+        else
+            ticksSinceLastFire++;                   
+    }
+    
+
+};
+
+class PirateTurret2: public Boss
+{
+    public:
+    bool movingUp = true;
+    Sprite bulletSprite;
+    int volleyNum = 0;
+    
+    void takeDamage(float damage)
+    {
+        changeBar = true;
+        health = health - damage;
+        if (health <= 0)
+            life=0;
+        
+    }
+
+    void enemySpawn(std::vector<Sprite> bulletSpriteList, int ScreenW, int ScreenH)
+    {
+        screenH = ScreenH;
+        screenW = ScreenW;
+        bulletSprite = bulletSpriteList[5];
+        enemyType = pirateTurret2;
+        bulletsPassThrough = false;
+    }
+    
+    Bullet* enemyFire(int type, int X, int Y, bool right = false, bool up = true, int cone = 1)
+    {
+        if (type == 1)
+        {
+            DarkBullet *b1 = new DarkBullet();
+            b1->settings(bulletSprite,X,Y,45, 135, angle, 3);
+            b1->createBullet (20, 10); 
+            return b1;
+        }
+        return NULL;
+        
+    }
+    
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    {
+        
+        if (ticksSinceLastFire == firerate)
+        { 
+            Bullet *b1;
+            if (attackPattern <= 1)
+            {
+                b1 = enemyFire(1, x, y);
+                entities->push_back(b1);                
+                bulletList->push_back(b1); 
+                ticksSinceLastFire = 0; 
+
+                    ticksSinceLastFire = 0;
+            }
+            
         }
         else
             ticksSinceLastFire++;                   

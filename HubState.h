@@ -167,6 +167,9 @@ class HubState: public State
     
     int Run(sf::RenderWindow &app)
     {
+        sf::Vector2i pixelPos = sf::Mouse::getPosition(app);
+        sf::Vector2f worldPos = app.mapPixelToCoords(pixelPos);
+        
         Texture t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12;
         t1.loadFromFile("images/warhorse.png");
         t2.loadFromFile("images/batteringRam.png");
@@ -188,7 +191,7 @@ class HubState: public State
         downArrow.rotate(180);
     
         Button *playButton = new Button;
-        playButton->createButton(1000, 700, 200, 50, &gameFont, "PLAY", 20); 
+        playButton->createButton(relUnitX * 70, relUnitY * 70, 200, 50, &gameFont, "PLAY", 20); 
         buttonList.push_back(playButton);
         
         Sprite triSprite(t1);
@@ -213,6 +216,10 @@ class HubState: public State
         
         while (app.isOpen())
         {
+        
+            pixelPos = sf::Mouse::getPosition(app);
+            worldPos = app.mapPixelToCoords(pixelPos);
+        
             Event event;
             while (app.pollEvent(event))
             {
@@ -225,8 +232,10 @@ class HubState: public State
                     std::cout << "Mouse Position on Screen: " + to_string(Mouse::getPosition(app).x) + " , " + to_string(Mouse::getPosition(app).y) << std::endl;
                     for (auto i:buttonList)
                     {
-                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        cout << "\nButton: (" << i->rect.left << "," << i->rect.top << ") and " << i->rect.width << " x " << i->rect.height << "\n"; 
+                        if (i -> visible == true and i->rect.contains(worldPos.x, worldPos.y) == true)
                         {
+                            cout << "BUTTON CLICKED";
                             if (Mouse::isButtonPressed(Mouse::Left))
                                 i->leftClicked = true;
                             else if (Mouse::isButtonPressed(Mouse::Right))
@@ -234,14 +243,14 @@ class HubState: public State
                         }
                     }   
                     
-                    if (triangleClicked(upArrow, 0, Vector2f(Mouse::getPosition(app))) == true)
+                    if (triangleClicked(upArrow, 0, Vector2f(worldPos)) == true)
                     {
                         //cout << "Up arrow pressed!";
                         curShipNum--;
                         if (curShipNum == -1)
                             curShipNum = shipSprites.size() - 1;
                     }
-                    else if (triangleClicked(downArrow, 180, Vector2f(Mouse::getPosition(app))) == true)
+                    else if (triangleClicked(downArrow, 180, Vector2f(worldPos)) == true)
                     {
                         curShipNum++;
                         if (curShipNum == shipSprites.size())

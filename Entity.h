@@ -20,6 +20,7 @@ class Entity
    float x,y,xPos,yPos,w,h,dx,dy,R,angle;
    float absAngle;
    bool life = 1;
+   bool isHit = false;
    std::string name;
    Sprite sprite;
    sf::FloatRect boundingBox;
@@ -47,6 +48,7 @@ class Entity
 
    //displays to RenderWindow
    void draw(RenderWindow &app);
+   void draw(RenderWindow &app, sf::Shader *shader);
 
    virtual ~Entity();
 };

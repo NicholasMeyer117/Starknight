@@ -40,7 +40,6 @@ void ImageButton::createImageButton(Texture tex, Sprite sprite, int x, int y, do
     icon.setTexture(texture);
     //icon.setOrigin(w/2, h/2);
     double test = w/tex.getSize().x;
-    //std::cout << "Bruh" + std::to_string(test);
     icon.setScale(w/tex.getSize().x, h/tex.getSize().y);
     icon.setPosition(sf::Vector2f(x, y)); 
     rect = icon.getGlobalBounds();

@@ -30,6 +30,8 @@ class DarkFighter: public Enemy //number one!
     {
         screenH = ScreenH;
         screenW = ScreenW;
+        relUnitX = screenW/100;
+        relUnitY = screenH/100;
         srand(time(NULL));
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
@@ -44,7 +46,7 @@ class DarkFighter: public Enemy //number one!
         if (!reachedBegin)
         {
             moveActor(left);
-            int spawnZone = (screenW - screenW/10) - rand() %  screenW/5;
+            int spawnZone = screenW - (relUnitX * 5) - (rand() % (relUnitX * 100));
             if (x <= spawnZone)
                 reachedBegin = true;
         }
@@ -53,13 +55,13 @@ class DarkFighter: public Enemy //number one!
             if (movingUp)
             {
                 moveActor(up);
-                if (y <= screenH/10)
+                if (y <= relUnitY * 17)
                     movingUp = false;
             }
             else
             {
                 moveActor(down);
-                if (y >= screenH - screenH/10)
+                if (y >= relUnitY * 90)
                     movingUp = true;
             }
 
@@ -72,7 +74,7 @@ class DarkFighter: public Enemy //number one!
         { 
             DarkBullet *b = new DarkBullet();
             b->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b->createBullet (5, 20);
+            b->createBullet (5, 15);
             entities->push_back(b);                
             bulletList->push_back(b);  
             ticksSinceLastFire = 0;  

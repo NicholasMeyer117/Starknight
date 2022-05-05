@@ -7,18 +7,19 @@
 #include <list>
 #include <math.h>
 #include <cstring>
+#include <unistd.h>
 #include "Entity.h"
 #include "Actor.h"
 #include "Enemy.h"
-#include "Bullets.h"
 #define PI 3.14159265
 
-class Swarmer: public Enemy //number one!
+class MachineGunner: public Enemy
 {
+
     public:
     bool movingUp = true;
     Sprite bulletSprite;
-    int attackCounter= 0;
+    int volleyNum = 0;
     
     void takeDamage(float damage)
     {
@@ -37,31 +38,13 @@ class Swarmer: public Enemy //number one!
         int randNum = rand() % screenH/2 + 200;
         sprite.setPosition(screenW, randNum);
         setActorPosition(screenW, randNum);
-        enemyType = swarmer;
+        bulletSprite = SpriteList[2];
+        enemyType = machineGunner;
+
     }
     
     void enemyMove()
     {
-    
-        if (attackCounter > 0)
-        {
-            //std::cout << "ATTACKING";
-            if (attackCounter >= 150)
-            {
-            	moveActor(left);
-            	moveActor(left);
-            	moveActor(left);
-            	moveActor(left);
-            }
-            else
-            {
-            	moveActor(right);
-            	moveActor(right);
-            	moveActor(right);
-            	moveActor(right);
-            }
-            attackCounter--;
-        }
         if (!reachedBegin)
         {
             moveActor(left);
@@ -89,16 +72,29 @@ class Swarmer: public Enemy //number one!
     
     void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
     {
-    
         if (ticksSinceLastFire == firerate)
         { 
-            std::cout << "ATTACK\n";
-            if (attackCounter == 0)
-                attackCounter = 300;
-            ticksSinceLastFire = 0;  
+            DarkBullet *b1 = new DarkBullet();
+            b1->settings(bulletSprite,x,y,5, 5, angle, 3);
+            b1->createBullet (5, 15);
+            entities->push_back(b1);                
+            bulletList->push_back(b1);   
+
+        
+            if (volleyNum < 4)
+            {
+                volleyNum++;
+                ticksSinceLastFire = firerate - 2;
+            }
+            else
+            {
+                ticksSinceLastFire = 0;
+                volleyNum = 0;
+            }
         }
         else
-            ticksSinceLastFire++;                   
+            ticksSinceLastFire++;  
+                    
     }
-    
+
 };

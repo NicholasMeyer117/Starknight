@@ -85,6 +85,7 @@ class ShopState: public State
         textureList.push_back(i7);
         i8.loadFromFile("images/speedBooster.png");
         textureList.push_back(i8);
+
         
         for (auto i:textureList)
         {
@@ -119,7 +120,7 @@ class ShopState: public State
             {
                 synergyHandler->addSynergyBox(relUnitX * 5 + (10 * relUnitX * synergyCounterCol), 
                 relUnitY * 22 + (30 * relUnitY * synergyCounterRow), 
-                synergyHandler->synergies[i].name, &gameFont, synergyHandler->synergies[i].color);
+                synergyHandler->synergies[i].name, &gameFont, synergyHandler->synergies[i].color, synergyHandler->synergies[i].num);
                 if (synergyCounterCol == 0)
                     synergyCounterCol++;
                 else
@@ -133,7 +134,7 @@ class ShopState: public State
     }
     
     //Generates Shop Button
-    bool generateButton(ShopButton *button, int attachNum, int butNum )
+    bool generateButton(ShopButton *button, int attachNum, int butNum, bool isReroll)
     {
         int cost = 1;
         Attachment *curAtc = new Attachment;
@@ -147,8 +148,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[0], spriteList[0], butNum, 250, 250, &gameFont, ("Cannon: " + to_string(cost) + " Cr"), 20, cost);
                 shopAttachments.push_back(cannon);
@@ -162,8 +165,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[1], spriteList[1], butNum, 250, 250, &gameFont, ("Machine Gun: " + to_string(cost) + " Cr"), 20, cost);
                 shopAttachments.push_back(machineGun);
@@ -177,8 +182,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[2], spriteList[2], butNum, 250, 250, &gameFont, ("Repair Droid: " + to_string(cost) + " Cr"), 20, cost);
                 shopAttachments.push_back(repairDroid);
@@ -192,8 +199,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[3], spriteList[3], butNum, 250, 250, &gameFont, ("Siphon Droid: " + to_string(cost) + " Cr"), 20, cost);
                 //siphonDroid->createAttachment(bulletSpriteList[1]);
@@ -208,8 +217,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[4], spriteList[4], butNum, 250, 250, &gameFont, ("Shotgun: " + to_string(cost) + " Cr"), 20, cost);
                 //shotgun->createAttachment(bulletSpriteList[0]);
@@ -224,8 +235,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[5], spriteList[5], butNum, 250, 250, &gameFont, ("Time Dilator: " + to_string(cost) + " Cr"), 20, cost);
                 //timeDilator->createAttachment();
@@ -240,8 +253,10 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[6], spriteList[6], butNum, 250, 250, &gameFont, ("Hull Booster: " + to_string(cost) + " Cr"), 20, cost);
                 //hullBooster->createAttachment();
@@ -256,20 +271,18 @@ class ShopState: public State
                 if (ifContains(curAtc) != NULL)
                 {
                      cost = ifContains(curAtc)->credits;
-                     if (ifContains(curAtc)->level == 3)
+                     if (ifContains(curAtc)->level == 3 and isReroll)
                          return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
                 }
                 button->createIcon(textureList[7], spriteList[7], butNum, 250, 250, &gameFont, ("Speed Booster: " + to_string(cost) + " Cr"), 20, cost);
                 //hullBooster->createAttachment();
                 shopAttachments.push_back(speedBooster);
                 return 0;
             }
-        
-        
         }
-        
         return 0;
-        
     }
     
     void createSlotButtons(int attachNum)
@@ -436,10 +449,34 @@ class ShopState: public State
         do
         {
             int randNum = rand() % 8;
-            AtFullLevel = generateButton(button, randNum, pos);
+            AtFullLevel = generateButton(button, randNum, pos, true);
         } while (AtFullLevel == true);
         shopButtonList.push_back(button);
     
+    }
+    
+    void regenerateShop(int num1, int num2, int num3, bool visArray[3])
+    {
+        shopButtonList.clear();
+        shopAttachments.clear();
+        
+            ShopButton *button1 = new ShopButton;
+            generateButton(button1, num1, 1, false);
+            shopButtonList.push_back(button1);
+
+            ShopButton *button2 = new ShopButton;
+            generateButton(button2, num2, 2, false);
+            shopButtonList.push_back(button2);
+            
+            ShopButton *button3 = new ShopButton;
+            generateButton(button3, num3, 3, false);
+            shopButtonList.push_back(button3);
+            
+        for (int i = 0; i < 3; i ++)
+        {
+            shopButtonList[i]->visible = visArray[i];
+        }
+ 
     }
     
     //checks if the player already has a given attachment
@@ -465,6 +502,9 @@ class ShopState: public State
     
     int Run(sf::RenderWindow &app)
     {
+        sf::Vector2i pixelPos = sf::Mouse::getPosition(app);
+        sf::Vector2f worldPos = app.mapPixelToCoords(pixelPos);
+        
         Button *continueButton = new Button;
         continueButton->createButton(screenW - screenW/4, screenH - screenH/4, 200, 50, &gameFont, "CONTINUE", 20); 
         buttonList.push_back(continueButton);
@@ -516,6 +556,9 @@ class ShopState: public State
         //Check for any buttons clicked 
         while (app.isOpen())
         {
+            pixelPos = sf::Mouse::getPosition(app);
+            worldPos = app.mapPixelToCoords(pixelPos);
+        
             Event event;
             while (app.pollEvent(event))
             {
@@ -527,9 +570,11 @@ class ShopState: public State
                  
                     //Check for regular buttons clicked
                     //std::cout << "Mouse Position on Screen: " + to_string(Mouse::getPosition(app).x) + " , " + to_string(Mouse::getPosition(app).y) << std::endl;
+                    //sf::Vector2i pixelPos = sf::Mouse::getPosition(app);
+                    //sf::Vector2f worldPos = app.mapPixelToCoords(pixelPos);
                     for (auto i:buttonList)
                     {
-                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        if (i -> visible == true and i->rect.contains(worldPos.x, worldPos.y) == true)
                         {
                             if (Mouse::isButtonPressed(Mouse::Left))
                                 i->leftClicked = true;
@@ -541,7 +586,7 @@ class ShopState: public State
                     //Check for Shop Buttons Clicked 
                     for (auto i:shopButtonList)
                     {
-                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        if (i -> visible == true and i->rect.contains(worldPos.x, worldPos.y) == true)
                         {
                             if (Mouse::isButtonPressed(Mouse::Left))
                                 i->leftClicked = true;
@@ -553,7 +598,7 @@ class ShopState: public State
                     //Check for attachment slot buttons clicked
                     for (auto i:attachmentSlotButtons)
                     {
-                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        if (i -> visible == true and i->rect.contains(worldPos.x, worldPos.y) == true)
                         {
                             if (Mouse::isButtonPressed(Mouse::Left))
                             {
@@ -572,7 +617,8 @@ class ShopState: public State
             //Check if mouse is over shopButtonList
             for (int i = 0; i < shopButtonList.size(); i++)
             {
-                if (shopButtonList[i] -> visible == true and shopButtonList[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+
+                if (shopButtonList[i] -> visible == true and shopButtonList[i]->rect.contains(worldPos.x, worldPos.y) == true)
                 {
                     drawText(getDesc(*shopAttachments[i]), 20, screenW/6, 600, app);
                     
@@ -582,7 +628,7 @@ class ShopState: public State
             //check if mouse is over attachmentSlotButtons
             for (int i = 0; i < attachmentSlotButtons.size(); i++)
             {
-                if (attachmentSlotButtons[i] -> visible == true and attachmentSlotButtons[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                if (attachmentSlotButtons[i] -> visible == true and attachmentSlotButtons[i]->rect.contains(worldPos.x, worldPos.y) == true)
                 {
                     drawText(getDesc(*character->attachments[i]), 20, screenW/6, 600, app);
                     
@@ -592,7 +638,7 @@ class ShopState: public State
             //check is mouse is over synergy boxes
             for (int i = 0; i < synergyHandler->synergyBoxes.size(); i++)
             {
-                if (synergyHandler->synergyBoxes[i]->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                if (synergyHandler->synergyBoxes[i]->rect.contains(worldPos.x, worldPos.y) == true)
                 {
                     drawText(getSynDesc(synergyHandler->synergyBoxes[i]->name), 20, screenW/6, 600, app);
                     
@@ -651,6 +697,7 @@ class ShopState: public State
                         }
                     }
                 }
+                displaySynergies();
             }
             
             
@@ -700,9 +747,16 @@ class ShopState: public State
                     }
                     shopButtonList[i]->leftClicked = false;
                     shopButtonList[i]->visible = false;
+                    bool visArray[3] = { false };
+                    for (int j = 0; j < 3; j++)
+                    {
+                        visArray[j] = shopButtonList[j]->visible;
+                    }
                     character->credits -= shopButtonList[i]->cost;
+                    regenerateShop(shopAttachments[0]->attachNum, shopAttachments[1]->attachNum, shopAttachments[2]->attachNum, visArray);
                     displaySynergies();
                 }
+                shopButtonList[i]->leftClicked = false;
             }
 
             //draw
@@ -714,7 +768,7 @@ class ShopState: public State
             for(auto i:synergyHandler->synergyBoxes)
             {
                 app.draw(i->synRec);
-                app.draw(i->synText);
+                app.draw(i->sprite);
             }
            // for(auto i:attachmentSlotSprites)
                 //app.draw(i);

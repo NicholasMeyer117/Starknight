@@ -37,6 +37,9 @@ class MenuState: public State
     
     int Run(sf::RenderWindow &app)
     {
+        sf::Vector2i pixelPos = sf::Mouse::getPosition(app);
+        sf::Vector2f worldPos = app.mapPixelToCoords(pixelPos);
+        
         titleText.setFont(spaceFont);
         titleText.setString("STARKNIGHT");
         titleText.setCharacterSize(70);
@@ -76,6 +79,9 @@ class MenuState: public State
         
         while (app.isOpen())
         {
+            pixelPos = sf::Mouse::getPosition(app);
+            worldPos = app.mapPixelToCoords(pixelPos);
+        
             Event event;
             while (app.pollEvent(event))
             {
@@ -88,7 +94,9 @@ class MenuState: public State
                     std::cout << "Mouse Position on Screen: " + to_string(Mouse::getPosition(app).x) + " , " + to_string(Mouse::getPosition(app).y) << std::endl;
                     for (auto i:buttonList)
                     {
-                        if (i -> visible == true and i->rect.contains(Mouse::getPosition(app).x, Mouse::getPosition(app).y) == true)
+                        sf::Vector2i pixelPos = sf::Mouse::getPosition(app);
+                        sf::Vector2f worldPos = app.mapPixelToCoords(pixelPos);
+                        if (i -> visible == true and i->rect.contains(worldPos.x, worldPos.y) == true)
                         {
                             if (Mouse::isButtonPressed(Mouse::Left))
                                 i->leftClicked = true;
@@ -116,9 +124,9 @@ class MenuState: public State
             //draw
             app.clear(Color::Black);
             sf::Time elapsed = clock.restart();
-            backParticles1.update(elapsed);
-            backParticles2.update(elapsed);
-            backParticles3.update(elapsed);
+            backParticles1.update(elapsed, true);
+            backParticles2.update(elapsed, true);
+            backParticles3.update(elapsed, true);
             app.draw(backParticles3);
             app.draw(backParticles2);
             app.draw(backParticles1);
