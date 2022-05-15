@@ -21,6 +21,7 @@ class Entity
    float absAngle;
    bool life = 1;
    bool isHit = false;
+   bool isActor = false;
    std::string name;
    Sprite sprite;
    sf::FloatRect boundingBox;

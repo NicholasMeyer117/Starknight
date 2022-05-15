@@ -20,6 +20,8 @@ float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, fl
     healthMult = HealthMult;
     healingMult = HealingMult;
     utilityMult = UtilityMult;
+    
+    isActor = true;
 
 }
 

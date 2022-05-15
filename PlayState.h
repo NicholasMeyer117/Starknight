@@ -122,21 +122,23 @@ class PlayState: public State
 
     void spawnAsteroids(Entity *asteroid)
     {
-        int randNum = rand() % (relUnitY * 80);
+        int randNum = rand() % (relUnitY * 70);
     
         //move rectangle
-        asteroid->rectangle.setPosition(screenW + 600, (relUnitY * 30) + randNum);
+        asteroid->rectangle.setPosition(screenW + 600, (relUnitY * 10) + randNum);
     
         //move hitbox
-        asteroid->setPosition(screenW + 600, (relUnitY * 30) + randNum);
+        asteroid->setPosition(screenW + 600, (relUnitY * 10) + randNum);
     }
     
     int moveAsteroids(Entity *asteroid, float speed, int progress)
     {
         asteroid->x = asteroid->x - 1 * speed;
+        asteroid->angle = asteroid->angle + 1;
         asteroid->rectangle.setPosition(asteroid->x, asteroid->y);
+        
     
-        if (asteroid->x <= 0)
+        if (asteroid->x <= (-relUnitX * 20))
         {
             spawnAsteroids(asteroid);
             progress++;
@@ -305,7 +307,7 @@ class PlayState: public State
         p2.loadFromFile("images/batteringRam.png");
         p3.loadFromFile("images/serpent.png");
         t1.loadFromFile("images/heart.png");
-        t2.loadFromFile("images/asteroid.png");
+        t2.loadFromFile("images/asteroid1.png");
         t3.loadFromFile("images/asteroid2.png");
         t4.loadFromFile("images/credit.png");
         b1.loadFromFile("images/bullet.png");
@@ -360,9 +362,9 @@ class PlayState: public State
         
         Sprite heartSprite(t1);
         Sprite asteroid1Sprite(t2);
-        asteroid1Sprite.setScale(4, 4);
+        //asteroid1Sprite.setScale(4, 4);
         Sprite asteroid2Sprite(t3);
-        asteroid2Sprite.setScale(4, 4);
+        //asteroid2Sprite.setScale(4, 4);
         Sprite creditSprite(t4);
         Sprite creditImageSprite(t4);
         creditImageSprite.setScale(1.25, 1.25);
@@ -439,7 +441,7 @@ class PlayState: public State
         //collidableEntities.push_back(asteroid1);
     
         Entity *asteroid2 = new Entity();
-        asteroid2->settings(asteroid2Sprite, screenW + 600, screenH, 50, 50);
+        asteroid2->settings(asteroid2Sprite, screenW + 600, screenH/2, 50, 50);
         entities.push_back(asteroid2);
         //collidableEntities.push_back(asteroid2);
         
@@ -498,9 +500,9 @@ class PlayState: public State
         ParticleSystem hitParticles(50, 50, 10, 50, 3, Color::White, 180);
         ParticleSystem explosionParticles(200, 50, 10, 100, 2, Color(255, 165, 0));
         ParticleSystem shipHitParticles(50, 50, 10, 100, 3, Color::Yellow, 0);
-        ParticleSystem backParticles1(400, 20000, 10, 100, 4, Color::White, 0, screenH/8, screenH, screenW, 0);
-        ParticleSystem backParticles2(800, 20000, 10, 150, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 200);
-        ParticleSystem backParticles3(400, 20000, 10, 200, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 100);
+        ParticleSystem backParticles1(400, 20000, 2, 100, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 150);
+        ParticleSystem backParticles2(800, 20000, 2, 150, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 100);
+        ParticleSystem backParticles3(400, 20000, 2, 200, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 50);
         bool shipHit, enemyHit, enemyKilled = false; //used to control particles
         //backParticles.setEmitter(Vector2f(screenW, screenH/2));
         sf::Clock clock;
@@ -593,7 +595,7 @@ class PlayState: public State
         
             if (!levelComplete)
             {
-                if (asteroid->x <= curGameSpeed)
+                if (asteroid->x <= (-relUnitX * 15))
                 {
                    int randNum = rand() % 2;
                    cout << "\nasteroid: " << randNum << "\n";
@@ -625,11 +627,17 @@ class PlayState: public State
         
             //update is player hit
             shipHit = false;
-            if(checkIfPlayerHit(player, collidableEntities, asteroid, enemyList, enemyBulletList, &shipHitParticles) == 3)
+            switch(checkIfPlayerHit(player, collidableEntities, asteroid, enemyList, enemyBulletList, &shipHitParticles))
             {
-                shipHit = true;
-                player -> isHit = true;
+                case 3:
+                    shipHit = true;
+                    player -> isHit = true;
+                case 2:
+                    shipHit = true;
+                case 1:
+                    shipHit = true;
             }
+
             screenShake(app, shipHit);
         
             //update misc enemies
@@ -641,8 +649,31 @@ class PlayState: public State
                    hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
                    i -> takeDamage(temp->damage);
                    temp -> life = 0;
+                   enemyHit = true;
                 }
             } 
+            
+            for (int i = 0; i < enemyBulletList.size(); i++)
+            {
+                Bullet *temp = checkSpriteCollisions(asteroid, enemyBulletList);
+                if (temp != NULL)
+                {
+                    temp->life = 0;
+                    enemyHit = true;
+                    hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
+                }
+            }
+            
+            for (int i = 0; i < bulletList.size(); i++)
+            {
+                Bullet *temp = checkSpriteCollisions(asteroid, bulletList);
+                if (temp != NULL)
+                {
+                    temp->life = 0;
+                    enemyHit = true;
+                    hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
+                }
+            }
         
             //check if picked up gold
             Entity* temp = checkSpriteCollisions(player, creditList);
@@ -741,11 +772,13 @@ class PlayState: public State
             //for(auto i:shieldList) 
                 //app.draw(i->circle);
                 
+            
+                
             //Update Conventional Enemies
             for (auto i:enemyList)
             {
             
-                if (curGame->showHitBoxes)
+                /*if (curGame->showHitBoxes)
                 {
                     
                     sf::RectangleShape hitBox;
@@ -775,7 +808,7 @@ class PlayState: public State
                     app.draw(circle);
                     app.draw(circle2);
                 }
-                
+                */
                 if (!(i->bulletsPassThrough))
                 {
                     Bullet *temp = checkSpriteCollisions(i, bulletList);
@@ -823,6 +856,38 @@ class PlayState: public State
             app.draw(explosionParticles);
             app.draw(shipHitParticles);
             for(auto i:entities) i->draw(app, &shader);
+            for (auto i:entities)
+            {
+                if(curGame->showHitBoxes and i->sprite.getTexture()!=NULL)
+                {
+                    sf::RectangleShape hitBox;
+                    i->boundingBox=i->sprite.getGlobalBounds();
+                    hitBox.setSize(sf::Vector2f(i->boundingBox.width, i->boundingBox.height));
+                    hitBox.setFillColor(sf::Color::Transparent);
+                    hitBox.setOutlineColor(sf::Color::Red);
+                    hitBox.setOutlineThickness(5);
+                    //hitBox2.setOrigin(i->rect->width/2, i->rect->height/2);
+                    hitBox.setPosition(i->boundingBox.left, i->boundingBox.top);
+                    
+                    sf::CircleShape circle;
+                    circle.setRadius(5);
+                    circle.setOutlineColor(sf::Color::Red);
+                    circle.setOutlineThickness(5);
+                    circle.setOrigin(5, 5);
+                    circle.setPosition(i->sprite.getPosition().x, i->sprite.getPosition().y);
+                    
+                    sf::CircleShape circle2;
+                    circle2.setRadius(5);
+                    circle2.setOutlineColor(sf::Color::Blue);
+                    circle2.setOutlineThickness(5);
+                    circle2.setOrigin(5, 5);
+                    circle2.setPosition(i->x, i->y);
+                    
+                    app.draw(hitBox);
+                    app.draw(circle);
+                    app.draw(circle2);
+                }
+            }
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);

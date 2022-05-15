@@ -402,6 +402,68 @@ class SpeedBooster: public Attachment
 
 };
 
+class SeekerDart: public Attachment
+{
+    public:
+    
+    SeekerDart(Sprite BulletSprite)
+    {
+        name = "Seeker Dart";
+        classList.push_back(Seeker);
+        credits = 5;
+        firerate = 60;
+        baseDamage = 2;
+        baseShotSpeed = 15;
+        attachNum = 8;
+        
+        bulletSprite = BulletSprite;
+    
+    
+    }
+    
+    void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
+    {
+        std::vector<Entity*> enemies;
+        for (int i = 0; i < entities->size(); i++)
+        {
+            Entity *curEntity = entities->at(i);
+            if (curEntity->isActor and curEntity != player)
+                enemies.push_back(curEntity);
+        }
+        
+        shotSpeed = baseShotSpeed * player->bulletSpeedMult;
+        damage = baseDamage * player->damageMult;
+        if (tick%firerate == 0)
+        {
+    
+            SeekerBullet *b = new SeekerBullet(enemies);
+            b->settings(bulletSprite,player->x + 15,player->y,5, 5, 0, 5);
+            b->createBullet (damage, shotSpeed);
+            entities->push_back(b);
+            bulletList->push_back(b);
+            sound.play();
+        
+            enemies.clear();
+        }
+    
+    
+    }
+    
+    void upgrade()
+    {
+        num++;
+        if ((level == 1 and num == 2) or (level == 2 and num == 3))
+        {
+            level++;
+            firerate = firerate/1.5;
+            baseDamage = baseDamage + 2;
+            credits = credits*2;
+        }
+    }
+    
+
+};
+
 
 
 

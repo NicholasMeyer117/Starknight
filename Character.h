@@ -17,7 +17,7 @@ using namespace std;
 class Character
 {
     public:
-    int credits = 5; //purchase in-run items
+    int credits = 100; //purchase in-run items
     int crewSlots = 1;
     int attachmentSlots = 3;
     int starCrystals = 0; //purchase items for next run
@@ -25,6 +25,7 @@ class Character
     int shipType = 0; //fighter, tank, interceptor, smuggler, weaponsPlatform, commandShip, techShip
     
     std::vector<Attachment*> attachments;
+    std::array<bool, 3> crewUnlocks; //element corresponds to crew ID, to check if members are unlocked across a save file
     
     void resetCredits();
 

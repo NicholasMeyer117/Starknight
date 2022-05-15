@@ -36,6 +36,71 @@ class Bullet: public Entity
 
 };
 
+class SeekerBullet: public Bullet
+{
+
+    public:
+    std::vector<Entity*> enemyList;
+    
+    SeekerBullet(std::vector<Entity*> enemies)
+    {
+        enemyList = enemies;
+    }
+    
+    void update()
+    {
+        Entity* enemy = getClosestEnemy();
+        if (enemy != NULL)
+        {
+            cout << "\nentity x: " << enemy->x << " entity y: " << enemy->y << "\n";
+            Vector2f direction = normalize(Vector2f(enemy->x - x, enemy->y - y));
+            cout << "direction vector: " << direction.x << " , " << direction.y;
+            x += (bulletSpeed * direction.x);
+            y += (bulletSpeed * direction.y);
+        }
+        else
+            x += bulletSpeed;
+    
+    }
+    
+    Vector2f normalize(const Vector2f source)
+    {
+        cout << "\nsource: " << source.x << " , " << source.y;
+        float length = sqrt((source.x * source.x) + (source.y * source.y));
+        cout << "\nlength: " << length;
+        if (length != 0)
+            return Vector2f(source.x / length, source.y / length);
+        else
+            return source;
+    }
+    
+    Entity* getClosestEnemy()
+    {
+        if (enemyList.size() == 0)
+            return NULL;
+        
+        float shortestDistance = 4000;
+        int closestEntity = 0;
+        
+        for (int i = 0; i < enemyList.size(); i++)
+        {
+            cout << enemyList.size() << "\n";
+            float curDist = sqrt(pow(enemyList.at(i)->x - x, 2) + pow(enemyList.at(i)->y - y, 2) * 1.0);
+            if (curDist < shortestDistance)
+            {
+                closestEntity = i;
+                shortestDistance = curDist;
+            }
+        }
+        return enemyList.at(closestEntity);
+    }
+
+
+
+
+
+};
+
 //Bullet used by cannon and machine gun
 class NormalBullet: public Bullet
 {

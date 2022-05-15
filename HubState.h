@@ -11,12 +11,14 @@
 #include "Game.h"
 #include "State.h"
 #include "Button.h"
+#include "Crew.h"
 
 class HubState: public State
 {
     public:
     std::vector<Button*> buttonList;
     std::vector<Sprite> shipSprites;
+    std::vector<RectangleShape> slotDiamonds;
     int screenW;
     int screenH;
     int relUnitX;
@@ -120,6 +122,27 @@ class HubState: public State
         window.draw(source);
     }
     
+    void createCrewSlots()
+    {
+       slotDiamonds.clear();
+       cout <<"\nCrew Slots: "<< curChar -> crewSlots << "\n";
+       for (int i = 0; i < curChar -> crewSlots; i++)
+       {
+           cout <<"\nSLOT CREATED\n";
+           sf::RectangleShape slot;
+           slot.setSize(sf::Vector2f(100, 100));
+           slot.setOutlineColor(sf::Color::Black);
+           slot.setFillColor(Color(150,150,150,255));
+           slot.setOutlineThickness(5);
+           //slot.setPosition();
+           slot.setPosition(relUnitX * 90, relUnitY * 5 + ((relUnitY * 20) * i));
+           slot.setRotation(45);
+           slotDiamonds.push_back(slot);
+          
+       
+       }
+    }
+    
     String getName(int num)
     {
         switch(num)
@@ -148,20 +171,22 @@ class HubState: public State
             case 0:
             {
                 curChar->attachmentSlots = 3;
+                curChar->crewSlots = 1;
                 return "Health: 100\nSpeed: 5\nShields: 0\nDamage: (x1.0)\nAttachments: 3";
             }
             case 1:
             {
                 curChar->attachmentSlots = 4;
+                curChar->crewSlots = 2;
                 return "Health: 150\nSpeed: (x0.75)\nShields: 0\nDamage: (x1.25)\nAttachments: 4";
             }
             case 2:
             {
                 curChar->attachmentSlots = 2;
+                curChar->crewSlots = 0;
                 return "Health: 75\nSpeed: (x1.25)\nShields: 0\nDamage: (x1.25)\nAttachments: 2";
             }
         }
-        
         return "Bruh";
     } 
     
@@ -189,13 +214,23 @@ class HubState: public State
         downArrow.setOrigin(sf::Vector2f(downArrow.getRadius(), downArrow.getRadius()));
         downArrow.setPosition(relUnitX * 10, relUnitY * 50);
         downArrow.rotate(180);
+        
+        sf::CircleShape upArrow2(80.f, 3);
+        upArrow2.setFillColor(Color::Black);
+        upArrow2.setOrigin(sf::Vector2f(upArrow2.getRadius(), upArrow2.getRadius()));
+        upArrow2.setPosition(relUnitX * 75, relUnitY * 10);
+        
+        sf::CircleShape downArrow2(80.f, 3);
+        downArrow2.setFillColor(Color::Black);
+        downArrow2.setOrigin(sf::Vector2f(downArrow2.getRadius(), downArrow2.getRadius()));
+        downArrow2.setPosition(relUnitX * 75, relUnitY * 50);
+        downArrow2.rotate(180);
     
         Button *playButton = new Button;
-        playButton->createButton(relUnitX * 70, relUnitY * 70, 200, 50, &gameFont, "PLAY", 20); 
+        playButton->createButton(relUnitX * 90, relUnitY * 90, 200, 50, &gameFont, "PLAY", 20); 
         buttonList.push_back(playButton);
         
         Sprite triSprite(t1);
-        //triSprite.rotate(90);
         triSprite.setOrigin(sf::Vector2f(26, 38));
         shipSprites.push_back(triSprite);
         
@@ -259,6 +294,8 @@ class HubState: public State
                 }
             }
             
+            
+            
             if (buttonList[0]->leftClicked == true)
             {
                 buttonList[0]->leftClicked = false;
@@ -272,9 +309,14 @@ class HubState: public State
             app.clear(Color(100,100,100,255));
             drawText(getName(curShipNum), 30, screenW/5, screenH/8, app);
             drawText(getDesc(curShipNum), 20, screenW/5, screenH/6, app);
+            createCrewSlots();
             app.draw(upArrow);
             app.draw(downArrow);
+            app.draw(upArrow2);
+            app.draw(downArrow2);
             app.draw(shipSprites[curShipNum]);
+            for(auto i:slotDiamonds)
+                app.draw(i);
             for(auto i:buttonList)
             {
                 app.draw(i->rectangle);

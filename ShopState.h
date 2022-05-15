@@ -36,6 +36,7 @@ class ShopState: public State
     int screenH;
     int relUnitX;
     int relUnitY;
+    int numOfAttachments = 9; //total number of different attachments
     sf::Font gameFont;
     sf::Text source;
     
@@ -50,7 +51,7 @@ class ShopState: public State
         character = game->character;
         synergyHandler = game->synergyHandler;
         
-        Texture t1, t2, t3, t4, t5, t6, t7, t8;
+        Texture t1, t2, t3, t4, t5, t6, t7, t8, t9;
         t1.loadFromFile("images/cannon.png");
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
@@ -67,8 +68,10 @@ class ShopState: public State
         textureList.push_back(t7);
         t8.loadFromFile("images/speedBooster.png");
         textureList.push_back(t8);
+        t9.loadFromFile("images/seekerDart.png");
+        textureList.push_back(t9);
         
-        Texture i1, i2, i3, i4, i5, i6, i7, i8;
+        Texture i1, i2, i3, i4, i5, i6, i7, i8, i9;
         i1.loadFromFile("images/cannon.png");
         textureList.push_back(i1);
         i2.loadFromFile("images/machineGun.png");
@@ -85,6 +88,8 @@ class ShopState: public State
         textureList.push_back(i7);
         i8.loadFromFile("images/speedBooster.png");
         textureList.push_back(i8);
+        i9.loadFromFile("images/seekerDart.png");
+        textureList.push_back(i9);
 
         
         for (auto i:textureList)
@@ -159,7 +164,7 @@ class ShopState: public State
             } 
             case 1:
             {
-                MachineGun *machineGun = new MachineGun(bulletSpriteList[0]);
+                MachineGun *machineGun = new MachineGun(bulletSpriteList[3]);
                 cost = machineGun->credits;
                 curAtc = machineGun;
                 if (ifContains(curAtc) != NULL)
@@ -211,7 +216,7 @@ class ShopState: public State
             }
             case 4:
             {
-                Shotgun *shotgun = new Shotgun(bulletSpriteList[0]);
+                Shotgun *shotgun = new Shotgun(bulletSpriteList[2]);
                 cost = shotgun->credits;
                 curAtc = shotgun;
                 if (ifContains(curAtc) != NULL)
@@ -281,53 +286,43 @@ class ShopState: public State
                 shopAttachments.push_back(speedBooster);
                 return 0;
             }
+            case 8:
+            {
+                SeekerDart *seekerDart = new SeekerDart(bulletSpriteList[4]);
+                cost = seekerDart->credits;
+                curAtc = seekerDart;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3 and isReroll)
+                         return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
+                }
+                button->createIcon(textureList[8], spriteList[8], butNum, 250, 250, &gameFont, ("Seeker Dart: " + to_string(cost) + " Cr"), 20, cost);
+                //hullBooster->createAttachment();
+                shopAttachments.push_back(seekerDart);
+                return 0;
+            
+            
+            
+            
+            }
         }
         return 0;
     }
     
-    void createSlotButtons(int attachNum)
+    void createSlotButtons(int slotNum)
     {
-        String name = character->attachments[attachNum]->name;
+        //String name = character->attachments[attachNum]->name;
         Sprite sprite;
         ImageButton *button = new ImageButton;
-        int textNum;
-        if (name == "Cannon")
-        {
-            textNum = 0;
-        }
-        else if (name == "Machine Gun")
-        {
-            textNum = 1;
-        }
-        else if (name == "Repair Droid")
-        {
-            textNum = 2;
-        }
-        else if (name == "Siphon Droid")
-        {
-            textNum = 3;
-        }
-        else if (name == "Shotgun")
-        {
-            textNum = 4;
-        }
-        else if (name == "Time Dilator")
-        {
-            textNum = 5;
-        }
-        else if (name == "Hull Booster")
-        {
-            textNum = 6;
-        }
-        else if (name == "Speed Booster")
-        {
-            textNum = 7;
-        }
+        int textNum = character->attachments[slotNum]->attachNum;
             
         sprite.setScale(.4, .4);
-        sprite.setPosition(screenW - 400, 150 + (150 * attachNum));
+        sprite.setPosition(screenW - 400, 150 + (150 * slotNum));
         //the [textNum + i] represents the offset from double textures at the beginning. i must be iterated each time a new attachment is added
-        button->createImageButton(textureList[textNum + 8], spriteList[textNum + 8], screenW - 400, 150 + (150 * attachNum), 100, 100);
+        button->createImageButton(textureList[textNum + numOfAttachments], spriteList[textNum + numOfAttachments], screenW - 400, 150 + (150 * slotNum), 100, 100);
         attachmentSlotButtons.push_back(button);
     }
     
@@ -439,6 +434,20 @@ class ShopState: public State
             if (levelNum == 3)
                 return "Speed Booster: Increase Speed (Utility)\nPercentage: 100%";
         }
+        else if (name == "Seeker Dart")
+        {
+            if (levelNum == 0)
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 1/s\nSpeed: 15\nDamage: 2\n";
+            else if (levelNum == 1)
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 1/s -> 1.5/s\nSpeed: 15\nDamage: 2 -> 4\n";
+            else if (levelNum == 2)
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 1.5/s -> 2.25/s\nSpeed: 15\nDamage: 4 -> 6\n";
+            else if (levelNum == 3)
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 2.25/s\nSpeed: 15\nDamage: 6\n";
+        
+        
+        
+        }
         return "No Name"; 
     }
     
@@ -448,7 +457,7 @@ class ShopState: public State
         ShopButton *button = new ShopButton;
         do
         {
-            int randNum = rand() % 8;
+            int randNum = rand() % numOfAttachments;
             AtFullLevel = generateButton(button, randNum, pos, true);
         } while (AtFullLevel == true);
         shopButtonList.push_back(button);
