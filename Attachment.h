@@ -51,7 +51,7 @@ class Cannon: public Attachment
         baseFirerate = 60;
         credits = 5;
         baseDamage = 5;
-        baseShotSpeed = 20;
+        baseShotSpeed = 1000;
         attachNum = 0;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
@@ -101,7 +101,7 @@ class MachineGun: public Attachment
         baseFirerate = 15;
         credits = 5;
         baseDamage = 2;
-        baseShotSpeed = 25;
+        baseShotSpeed = 1250;
         attachNum = 1;
         
         soundBuffer.loadFromFile("sounds/laser.wav");
@@ -198,7 +198,7 @@ class SiphonDroid: public Attachment
         credits = 10;
         baseFirerate = 75;
         baseDamage = 5;
-        baseShotSpeed = 20;
+        baseShotSpeed = 1000;
         soundBuffer.loadFromFile("sounds/laser.wav");
         sound.setBuffer(soundBuffer);
         bulletSprite = BulletSprite;
@@ -250,7 +250,7 @@ class Shotgun: public Attachment
         baseFirerate = 120;
         credits = 5;
         baseDamage = 5;
-        baseShotSpeed = 15;
+        baseShotSpeed = 750;
         attachNum = 4;
         
         
@@ -262,7 +262,7 @@ class Shotgun: public Attachment
     
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
-        float diagShotSpeed = 3.75 * player->bulletSpeedMult;
+        float diagShotSpeed = 187.5 * player->bulletSpeedMult;
         shotSpeed = baseShotSpeed * player->bulletSpeedMult;
         damage = baseDamage * player->damageMult;
         firerate = baseFirerate / player->fireRateMult;
@@ -418,7 +418,7 @@ class SeekerDart: public Attachment
         credits = 5;
         baseFirerate = 60;
         baseDamage = 2;
-        baseShotSpeed = 15;
+        baseShotSpeed = 750;
         attachNum = 8;
         
         bulletSprite = BulletSprite;

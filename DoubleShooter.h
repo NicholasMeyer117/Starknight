@@ -76,13 +76,13 @@ class DoubleShooter: public Enemy
         { 
             DarkBullet *b1 = new DarkBullet();
             b1->settings(bulletSprite,x,y + 13,5, 5, angle, 3);
-            b1->createBullet (5, 15);
+            b1->createBullet (5, 750);
             entities->push_back(b1);                
             bulletList->push_back(b1);   
         
             DarkBullet *b2 = new DarkBullet();
             b2->settings(bulletSprite,x,y - 13,5, 5, angle, 3);
-            b2->createBullet (5, 15);
+            b2->createBullet (5, 750);
             entities->push_back(b2);                
             bulletList->push_back(b2); 
         

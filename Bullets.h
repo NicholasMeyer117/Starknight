@@ -32,6 +32,7 @@ class Bullet: public Entity
    
    //special function in case bullet impact affects player
    virtual void onContact(Actor *player){}
+   virtual void update(float elapsed){}
 
 
 };
@@ -47,7 +48,7 @@ class SeekerBullet: public Bullet
         enemyList = enemies;
     }
     
-    void update()
+    void update(float elapsed)
     {
         Entity* enemy = getClosestEnemy();
         if (enemy != NULL)
@@ -55,8 +56,8 @@ class SeekerBullet: public Bullet
             cout << "\nentity x: " << enemy->x << " entity y: " << enemy->y << "\n";
             Vector2f direction = normalize(Vector2f(enemy->x - x, enemy->y - y));
             cout << "direction vector: " << direction.x << " , " << direction.y;
-            x += (bulletSpeed * direction.x);
-            y += (bulletSpeed * direction.y);
+            x += (bulletSpeed * direction.x) * elapsed;
+            y += (bulletSpeed * direction.y) * elapsed;
         }
         else
             x += bulletSpeed;
@@ -106,9 +107,9 @@ class NormalBullet: public Bullet
 {
     public:
     
-    void update()
+    void update(float elapsed)
     {
-        x += bulletSpeed;
+        x += bulletSpeed * elapsed;
         checkIfDead();
     
     }
@@ -120,9 +121,9 @@ class SiphonBullet: public Bullet
     
     public:
     
-    void update()
+    void update(float elapsed)
     {
-        x += bulletSpeed;
+        x += bulletSpeed * elapsed;
         checkIfDead();
     
     }
@@ -142,10 +143,10 @@ class DarkBullet: public Bullet
 
     public:
     
-    void update()
+    void update(float elapsed)
     {
         
-        x -= bulletSpeed;
+        x -= bulletSpeed * elapsed;
         checkIfDead();
     }
 
@@ -160,16 +161,16 @@ class OrdinalBullet: public Bullet
         dir = direction;
     }
     
-    void update()
+    void update(float elapsed)
     {
         if (dir=="right")
-            x+=bulletSpeed;
+            x+=bulletSpeed * elapsed;
         else if (dir=="left")
-            x-=bulletSpeed;
+            x-=bulletSpeed * elapsed;
         else if (dir=="up")
-            y-=bulletSpeed;
+            y-=bulletSpeed * elapsed;
         else if (dir=="down")
-            y+=bulletSpeed;
+            y+=bulletSpeed * elapsed;
             
         checkIfDead();
 
@@ -193,16 +194,16 @@ class DiagonalBullet: public Bullet
         cone = Cone;
     }
     
-    void update()
+    void update(float elapsed)
     {
         if (right)
-            x+=(bulletSpeed*4);
+            x+=(bulletSpeed*4) * elapsed;
         else
-            x-=(bulletSpeed*4);
+            x-=(bulletSpeed*4) * elapsed;
         if (up)
-            y-=(bulletSpeed/cone);
+            y-=(bulletSpeed/cone) * elapsed;
         else
-            y+=(bulletSpeed/cone);
+            y+=(bulletSpeed/cone) * elapsed;
             
         checkIfDead();
 
@@ -220,11 +221,11 @@ class BombBullet: public Bullet
     {
         progressCounter = rand() % 100 + 50;
     }
-    void update()
+    void update(float elapsed)
     {
         if (progressCounter > 0)
         {
-            x -= bulletSpeed;
+            x -= bulletSpeed * elapsed;
             progressCounter--;
         }
         checkIfDead();

@@ -74,7 +74,7 @@ class DarkFighter: public Enemy //number one!
         { 
             DarkBullet *b = new DarkBullet();
             b->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b->createBullet (5, 15);
+            b->createBullet (5, 750);
             entities->push_back(b);                
             bulletList->push_back(b);  
             ticksSinceLastFire = 0;  

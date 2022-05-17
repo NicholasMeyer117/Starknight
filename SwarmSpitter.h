@@ -99,9 +99,9 @@ class SwarmSpitter: public Enemy //number one!
 	            
 	            b->settings(subBulletSprite,bombBulletList[i]->x,bombBulletList[i]->y,10, 10, angle, 3);
 	            if (j < 4)
-                        b->createBullet (10, 10);
+                        b->createBullet (10, 500);
                     else 
-                        b->createBullet (10, 2.5);
+                        b->createBullet (10, 125);
 	            bulletList->push_back(b);
 	            entities->push_back(b);  
 	        }
@@ -115,7 +115,7 @@ class SwarmSpitter: public Enemy //number one!
         { 
             BombBullet *b = new BombBullet();
             b->settings(bulletSprite,x,y,10, 10, angle, 3);
-            b->createBullet (20, 10);
+            b->createBullet (20, 500);
             entities->push_back(b);                
             bulletList->push_back(b); 
             bombBulletList.push_back(b); 

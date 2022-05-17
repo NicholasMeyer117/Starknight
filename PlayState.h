@@ -580,6 +580,16 @@ class PlayState: public State
             //set particle emmitter bools to false
             enemyHit = false;
             enemyKilled = false;
+            
+            //update entities
+            for (int i = 0; i < bulletList.size(); i++)
+            {
+                bulletList.at(i)->update(elapsedTime);
+            }
+            for (int i = 0; i < enemyBulletList.size(); i++)
+            {
+                enemyBulletList.at(i)->update(elapsedTime);
+            }
         
             //remove dead entities
             entities = removeDeadEntity(entities);

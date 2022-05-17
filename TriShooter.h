@@ -73,21 +73,21 @@ class TriShooter: public Enemy
         { 
             DiagonalBullet *b1 = new DiagonalBullet(false, true);
             b1->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b1->createBullet (5, 2.5);
+            b1->createBullet (5, 125);
             //b1->direction (false, true);
             entities->push_back(b1);                
             bulletList->push_back(b1);   
         
             DiagonalBullet *b2 = new DiagonalBullet(false, false);
             b2->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b2->createBullet (5, 2.5);
+            b2->createBullet (5, 125);
             //b2->direction (false, false);
             entities->push_back(b2);                
             bulletList->push_back(b2);
         
             DarkBullet *b3 = new DarkBullet();
             b3->settings(bulletSprite,x,y,5, 5, angle, 3);
-            b3->createBullet (5, 10);
+            b3->createBullet (5, 500);
             entities->push_back(b3);                
             bulletList->push_back(b3); 
         
