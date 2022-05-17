@@ -25,7 +25,7 @@ class Character
     int shipType = 0; //fighter, tank, interceptor, smuggler, weaponsPlatform, commandShip, techShip
     
     std::vector<Attachment*> attachments;
-    std::array<bool, 3> crewUnlocks; //element corresponds to crew ID, to check if members are unlocked across a save file
+    std::array<bool, 4> crewUnlocks; //element corresponds to crew ID, to check if members are unlocked across a save file
     
     void resetCredits();
 

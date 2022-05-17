@@ -67,7 +67,7 @@ class EnemySpawner
                         PirateLord *pirateLord = new PirateLord();
                         sprite = spriteList[4];
                         pirateLord -> settings(sprite,screenW + 100,75,485,402);
-                        pirateLord -> createActor(500, 0, 1, 120, true, 0);
+                        pirateLord -> createActor(500, 0, 50, 120, true, 0);
                         pirateLord -> enemySpawn(bulletSpriteList, screenW, screenH);
                         bosses.push_back(pirateLord);
             
@@ -76,7 +76,7 @@ class EnemySpawner
                         PirateTurret *turret1 = new PirateTurret();
                         Sprite turretSprite = spriteList[5];
                         turret1 -> settings(turretSprite,500,500,51,51);
-                        turret1 -> createActor(100, 0, 1, 60, true, 0);
+                        turret1 -> createActor(100, 0, 50, 60, true, 0);
                         turret1 -> enemySpawn(bulletSpriteList, screenW, screenH);
                         turret1 -> setTop(true);
             
@@ -86,7 +86,7 @@ class EnemySpawner
                         PirateTurret2 *turret2 = new PirateTurret2();
                         Sprite turret2Sprite = spriteList[8];
                         turret2 -> settings(turret2Sprite,500,500,51,51);
-                        turret2 -> createActor(100, 0, 1, 150, true, 0);
+                        turret2 -> createActor(100, 0, 50, 150, true, 0);
                         turret2 -> enemySpawn(bulletSpriteList, screenW, screenH);
             
                         pirateLord -> Parts.push_back(turret2);
@@ -94,7 +94,7 @@ class EnemySpawner
             
                         PirateTurret *turret3 = new PirateTurret();
                         turret3 -> settings(turretSprite,500,500,51,51);
-                        turret3 -> createActor(100, 0, 1, 60, true, 0);
+                        turret3 -> createActor(100, 0, 50, 60, true, 0);
                         turret3 -> enemySpawn(bulletSpriteList, screenW, screenH);
                         turret3 -> setTop(false);
             
@@ -198,7 +198,7 @@ class EnemySpawner
             enemy = new DarkFighter();
             sprite = spriteList[0];
             enemy -> settings(sprite,screenW + 100,75,80,80);
-            enemy -> createActor(10, 0, 2, 60, true, 0);
+            enemy -> createActor(10, 0, 100, 60, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
             
         }
@@ -207,7 +207,7 @@ class EnemySpawner
             enemy = new TriShooter();
             sprite = spriteList[1];
             enemy -> settings(sprite,screenW + 100,75,72,90);
-            enemy -> createActor(15, 0, 1, 80, true, 0);
+            enemy -> createActor(15, 0, 50, 80, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         }
         else if (enemyType == 2)
@@ -215,7 +215,7 @@ class EnemySpawner
             enemy = new DoubleShooter();
             sprite = spriteList[2];
             enemy -> settings(sprite,screenW + 100,75,68,75);
-            enemy -> createActor(10, 0, 2.5, 70, true, 0);
+            enemy -> createActor(10, 0, 125, 70, true, 0);
             std::cout << "\nScreen Width1.5: " + std::to_string(screenW);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
@@ -225,7 +225,7 @@ class EnemySpawner
             enemy = new Shielder();
             sprite = spriteList[3];
             enemy -> settings(sprite,screenW + 100,75,43,173);
-            enemy -> createActor(25, 0, 1, 240, true, 0);
+            enemy -> createActor(25, 0, 50, 240, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }
@@ -234,7 +234,7 @@ class EnemySpawner
             enemy = new Swarmer();
             sprite = spriteList[6];
             enemy -> settings(sprite,screenW + 100,75,80,60);
-            enemy -> createActor(20, 0, 3, 300, true, 0);
+            enemy -> createActor(20, 0, 150, 300, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }
@@ -243,7 +243,7 @@ class EnemySpawner
             enemy = new SwarmSpitter();
             sprite = spriteList[7];
             enemy -> settings(sprite,screenW + 100,75,90,90);
-            enemy -> createActor(40, 0, 2, 200, true, 0);
+            enemy -> createActor(40, 0, 100, 200, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }
@@ -252,7 +252,7 @@ class EnemySpawner
             enemy = new MachineGunner();
             sprite = spriteList[9];
             enemy -> settings(sprite,screenW + 100,75,80,84);
-            enemy -> createActor(15, 0, 2, 70, true, 0);
+            enemy -> createActor(15, 0, 100, 70, true, 0);
             enemy->enemySpawn(bulletSpriteList, screenW, screenH);
         
         }

@@ -13,6 +13,7 @@
 #include "Enemy.h"
 #include "State.h"
 #include "SynergyHandler.h"
+#include "CrewHandler.h"
 #define PI 3.14159265
 
 class Game
@@ -33,6 +34,7 @@ class Game
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
     std::array<Texture, 5> bulletTextureList;
     SynergyHandler *synergyHandler = new SynergyHandler();
+    CrewHandler *crewHandler = new CrewHandler();
     
     bool showHitBoxes = false;
     

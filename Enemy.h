@@ -29,7 +29,7 @@ class Enemy: public Actor
     
     virtual void enemySpawn(std::vector<Sprite> BulletSpriteList, int ScreenW, int ScreenH){}
     
-    virtual void enemyMove(){}
+    virtual void enemyMove(float elapsed){}
     
     virtual void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities){}
     

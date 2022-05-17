@@ -27,7 +27,7 @@ class Actor: public Entity
     float DamageMult = 1.0, float FireRateMult = 1.0, float BulletSpeedMult = 1.0, float SpeedMult = 1.0, 
     float HealthMult = 1.0, float HealingMult = 1.0, float UtilityMult = 1.0);
 
-    void moveActor(enum direction);
+    void moveActor(enum direction, float elapsed);
     
     void setActorPosition(float X, float Y);
     

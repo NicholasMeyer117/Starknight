@@ -284,15 +284,15 @@ class PlayState: public State
             case 0:
                 player->settings(playerShipSpriteList[character->shipType],200,400,52,75,0,20);
                 //health, shields, speed, firerate, is enemy, IFrames, damageMult, fireRateMult, bulletSpeedMult, SpeedMult, HealthMult, HealingMult, utilityMult
-                player->createActor(100, 100, 5, 10, false, 50, 1, 1, 1, 1, 1, 1, 1);
+                player->createActor(100, 100, 250, 10, false, 50, 1, 1, 1, 1, 1, 1, 1);
                 return;
             case 1:
                 player->settings(playerShipSpriteList[character->shipType],200,400,75,91,0,20);
-                player->createActor(150, 100, 5, 10, false, 50, 1.25, 1, 1, 0.75, 1, 1, 1);
+                player->createActor(125, 100, 250, 10, false, 50, 1.25, 1, 1, 0.75, 1, 1, 1);
                 return;
             case 2:
                 player->settings(playerShipSpriteList[character->shipType],200,400,50,50,0,20);
-                player->createActor(75, 100, 5, 10, false, 50, 1.25, 1, 1, 1.25, 1, 1, 1);
+                player->createActor(75, 100, 250, 10, false, 50, 1.25, 1, 1, 1.25, 1, 1, 1);
                 return;
         }
     
@@ -487,7 +487,7 @@ class PlayState: public State
         int numBossExplosions = 0;
         int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = completeScreenDone, 3 = textDone, 4 = goldDone
         int completeTick = 0; //used to determine some parts of completion stage
-        int ticksTillEnemySpawn = 100;
+        int ticksTillEnemySpawn = 20;
         //int beginningGold = 0;
     
         spawnAsteroids(asteroid);
@@ -495,6 +495,7 @@ class PlayState: public State
         
         attachmentList = character->attachments;
         curGame->synergyHandler->applySynergies(player);
+        curGame->crewHandler->applyCrew(player);
         
         ParticleSystem shipParticles(1000, 20, 5, 250, 1, Color::Red, 180);
         ParticleSystem hitParticles(50, 50, 10, 50, 3, Color::White, 180);
@@ -506,27 +507,21 @@ class PlayState: public State
         bool shipHit, enemyHit, enemyKilled = false; //used to control particles
         //backParticles.setEmitter(Vector2f(screenW, screenH/2));
         sf::Clock clock;
+        float elapsedTime = clock.getElapsedTime().asSeconds();
         
         //Pre-round attachment check!
         for (auto i:character->attachments)
         {
             if (i->name == "Time Dilator")
-            {
                 mapTimeDilationPercentage = i->baseDamage;
-            }
-            
             else if (i->name == "Hull Booster")
-            {
-                player->maxHealth = player->maxHealth + (player->maxHealth * (i->baseDamage * player->utilityMult));
-                player -> health = player -> maxHealth;
-            }
-            
+                player->healthMult += (i->baseDamage * player->utilityMult);
             else if (i->name == "Speed Booster")
-            {
                 player->speedMult = player->speedMult + (i->baseDamage * player->utilityMult);
-            }
         }
         startGameSpeed = startGameSpeed * (1 - mapTimeDilationPercentage);
+        player -> maxHealth = round(player->maxHealth * player -> healthMult);
+        player -> health = player -> maxHealth;
         
         
         sf::Music music;
@@ -570,13 +565,13 @@ class PlayState: public State
         
             //Player Movement
             if (Keyboard::isKeyPressed(Keyboard::W))
-                player->moveActor(Actor::up);
+                player->moveActor(Actor::up, elapsedTime);
             if (Keyboard::isKeyPressed(Keyboard::S))
-	         player->moveActor(Actor::down);
+	         player->moveActor(Actor::down, elapsedTime);
             if (Keyboard::isKeyPressed(Keyboard::A))
-	         player->moveActor(Actor::left);
+	         player->moveActor(Actor::left, elapsedTime);
             if (Keyboard::isKeyPressed(Keyboard::D))
-	         player->moveActor(Actor::right);    
+	         player->moveActor(Actor::right, elapsedTime);    
 	         
 	     //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))
@@ -829,7 +824,7 @@ class PlayState: public State
                    explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
                    enemyKilled = true;
                 }
-                i -> enemyMove();
+                i -> enemyMove(elapsedTime);
                 i->enemyAttack(&enemyBulletList, &entities);
                 i->ability(enemyList, &bulletList, app);
             
@@ -843,6 +838,7 @@ class PlayState: public State
              //update particles
             shipParticles.setEmitter(sf::Vector2f(player->x - 30, player->y - 5));
             sf::Time elapsed = clock.restart();
+            elapsedTime = elapsed.asSeconds();
             shipParticles.update(elapsed, true);
             hitParticles.update(elapsed, enemyHit);
             explosionParticles.update(elapsed, enemyKilled);
@@ -851,10 +847,6 @@ class PlayState: public State
             backParticles2.update(elapsed, true);
             backParticles3.update(elapsed, true);
             
-            app.draw(shipParticles);
-            app.draw(hitParticles);
-            app.draw(explosionParticles);
-            app.draw(shipHitParticles);
             for(auto i:entities) i->draw(app, &shader);
             for (auto i:entities)
             {
@@ -888,6 +880,10 @@ class PlayState: public State
                     app.draw(circle2);
                 }
             }
+            app.draw(shipParticles);
+            app.draw(hitParticles);
+            app.draw(explosionParticles);
+            app.draw(shipHitParticles);
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);

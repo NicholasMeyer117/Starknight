@@ -17,7 +17,7 @@ class Attachment
 {
     public:
     int firerate; //ticks per activation
-    float baseDamage, baseShotSpeed;
+    float baseDamage, baseShotSpeed, baseFirerate;
     float damage, shotSpeed;
     bool passive; //true = provides passive effect, false = provides effect on tick
     int credits; //cost
@@ -48,7 +48,7 @@ class Cannon: public Attachment
     {
         classList.push_back(Gun);
         name = "Cannon";
-        firerate = 60;
+        baseFirerate = 60;
         credits = 5;
         baseDamage = 5;
         baseShotSpeed = 20;
@@ -64,6 +64,7 @@ class Cannon: public Attachment
     {
         damage = baseDamage * player->damageMult;
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
+        firerate = baseFirerate / player->fireRateMult;
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
@@ -82,7 +83,7 @@ class Cannon: public Attachment
         if ((level == 1 and num == 2) or (level == 2 and num == 3))
         {
             level++;
-            firerate = firerate/2;
+            baseFirerate = baseFirerate/2;
             baseDamage = baseDamage*2;
             credits = credits*2;
         }
@@ -97,7 +98,7 @@ class MachineGun: public Attachment
     {
         classList.push_back(Gun);
         name = "Machine Gun";
-        firerate = 15;
+        baseFirerate = 15;
         credits = 5;
         baseDamage = 2;
         baseShotSpeed = 25;
@@ -113,6 +114,7 @@ class MachineGun: public Attachment
     {
         damage = baseDamage * player->damageMult;
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
+        firerate = baseFirerate / player->fireRateMult;
         if (tick%firerate == 0)
         {
             NormalBullet *b = new NormalBullet();
@@ -131,7 +133,7 @@ class MachineGun: public Attachment
         if ((level == 1 and num == 2) or (level == 2 and num == 3))
         {
             level++;
-            firerate = firerate/1.5;
+            baseFirerate = baseFirerate/1.5;
             baseDamage = baseDamage*1.5;
             credits = credits*2;
         }
@@ -146,7 +148,7 @@ class RepairDroid: public Attachment
     {
         name = "Repair Droid";
         classList.push_back(Repair);
-        firerate = 300;
+        baseFirerate = 300;
         credits = 5;
         baseDamage = 5;
         soundBuffer.loadFromFile("sounds/heal.wav");
@@ -159,6 +161,7 @@ class RepairDroid: public Attachment
     void activate(int tick, std::vector<Entity*> *entities, std::vector<Bullet*> *bulletList, Actor *player)
     {
         damage = baseDamage * player->healingMult;
+        firerate = baseFirerate / player->fireRateMult;
         if (tick%firerate == 0)
         {
             if (player->health < player->maxHealth)
@@ -193,7 +196,7 @@ class SiphonDroid: public Attachment
         classList.push_back(Repair);
         classList.push_back(Gun);
         credits = 10;
-        firerate = 75;
+        baseFirerate = 75;
         baseDamage = 5;
         baseShotSpeed = 20;
         soundBuffer.loadFromFile("sounds/laser.wav");
@@ -208,6 +211,7 @@ class SiphonDroid: public Attachment
     {
         damage = baseDamage * player->damageMult;
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
+        firerate = baseFirerate / player->fireRateMult;
         if (tick%firerate == 0)
         {
             SiphonBullet *b = new SiphonBullet();
@@ -243,7 +247,7 @@ class Shotgun: public Attachment
     {
         classList.push_back(Gun);
         name = "Shotgun";
-        firerate = 120;
+        baseFirerate = 120;
         credits = 5;
         baseDamage = 5;
         baseShotSpeed = 15;
@@ -261,6 +265,7 @@ class Shotgun: public Attachment
         float diagShotSpeed = 3.75 * player->bulletSpeedMult;
         shotSpeed = baseShotSpeed * player->bulletSpeedMult;
         damage = baseDamage * player->damageMult;
+        firerate = baseFirerate / player->fireRateMult;
         if (tick%firerate == 0)
         {
             DiagonalBullet *b1 = new DiagonalBullet(true, true, cone);
@@ -312,7 +317,7 @@ class Shotgun: public Attachment
         if ((level == 1 and num == 2) or (level == 2 and num == 3))
         {
             level++;
-            firerate = firerate/1.5;
+            baseFirerate = baseFirerate/1.5;
             baseDamage = baseDamage*2;
             cone = cone*2;
             credits = credits*2;
@@ -411,7 +416,7 @@ class SeekerDart: public Attachment
         name = "Seeker Dart";
         classList.push_back(Seeker);
         credits = 5;
-        firerate = 60;
+        baseFirerate = 60;
         baseDamage = 2;
         baseShotSpeed = 15;
         attachNum = 8;
@@ -433,6 +438,7 @@ class SeekerDart: public Attachment
         
         shotSpeed = baseShotSpeed * player->bulletSpeedMult;
         damage = baseDamage * player->damageMult;
+        firerate = baseFirerate / player->fireRateMult;
         if (tick%firerate == 0)
         {
     
@@ -455,7 +461,7 @@ class SeekerDart: public Attachment
         if ((level == 1 and num == 2) or (level == 2 and num == 3))
         {
             level++;
-            firerate = firerate/1.5;
+            baseFirerate = baseFirerate/1.5;
             baseDamage = baseDamage + 2;
             credits = credits*2;
         }

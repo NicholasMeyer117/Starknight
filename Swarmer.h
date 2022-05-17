@@ -40,7 +40,7 @@ class Swarmer: public Enemy //number one!
         enemyType = swarmer;
     }
     
-    void enemyMove()
+    void enemyMove(float elapsed)
     {
     
         if (attackCounter > 0)
@@ -48,23 +48,23 @@ class Swarmer: public Enemy //number one!
             //std::cout << "ATTACKING";
             if (attackCounter >= 150)
             {
-            	moveActor(left);
-            	moveActor(left);
-            	moveActor(left);
-            	moveActor(left);
+            	moveActor(left, elapsed);
+            	moveActor(left, elapsed);
+            	moveActor(left, elapsed);
+            	moveActor(left, elapsed);
             }
             else
             {
-            	moveActor(right);
-            	moveActor(right);
-            	moveActor(right);
-            	moveActor(right);
+            	moveActor(right, elapsed);
+            	moveActor(right, elapsed);
+            	moveActor(right, elapsed);
+            	moveActor(right, elapsed);
             }
             attackCounter--;
         }
         if (!reachedBegin)
         {
-            moveActor(left);
+            moveActor(left, elapsed);
             int spawnZone = screenW - (relUnitX * 5) - (rand() % (relUnitX * 100));
             if (x <= spawnZone)
                 reachedBegin = true;
@@ -73,13 +73,13 @@ class Swarmer: public Enemy //number one!
         {
             if (movingUp)
             {
-                moveActor(up);
+                moveActor(up, elapsed);
                 if (y <= relUnitY * 17)
                     movingUp = false;
             }
             else
             {
-                moveActor(down);
+                moveActor(down, elapsed);
                 if (y >= relUnitY * 90)
                     movingUp = true;
             }

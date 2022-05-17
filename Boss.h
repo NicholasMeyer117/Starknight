@@ -58,14 +58,14 @@ class PirateLord: public Boss
         Parts[2]->yPos = y + 150;
     }
     
-    void enemyMove()
+    void enemyMove(float elapsed)
     {
         if (!reachedBegin)
         {
-            moveActor(left);
+            moveActor(left, elapsed);
             for (auto i:Parts)
             {
-                i->moveActor(left);
+                i->moveActor(left, elapsed);
             }
             if (x <= screenW - screenW/8)
                 reachedBegin = true;
@@ -75,20 +75,20 @@ class PirateLord: public Boss
         {
             if (movingUp)
             {
-                moveActor(up);
+                moveActor(up, elapsed);
                 for (auto i:Parts)
                 {
-                    i->moveActor(up);
+                    i->moveActor(up, elapsed);
                 }
                 if (y <= screenH/10)
                     movingUp = false;
             }
             else
             {
-                moveActor(down);
+                moveActor(down, elapsed);
                 for (auto i:Parts)
                 {
-                    i->moveActor(down);
+                    i->moveActor(down, elapsed);
                 }
                 if (y >= screenH - screenH/10)
                     movingUp = true;
