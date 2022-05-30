@@ -25,6 +25,7 @@
 #include "EnergyShield.h"
 #include "ProgressBar.h"
 #include "ParticleSystem.h"
+#include "AOE.h"
 
 class PlayState: public State
 {
@@ -43,6 +44,7 @@ class PlayState: public State
     std::vector<Attachment*> attachmentList;
     std::vector<Enemy*> miscEnemyList; //uncoventional enemies i dont want in enemyList: shields, etc
     std::vector<Boss*> bosses;
+    std::vector<AOE*> AOElist;
     Character *character = new Character;
     
     Game *curGame;
@@ -183,7 +185,7 @@ class PlayState: public State
             
             app.setView(view);
             screenShakeCounter++;   
-            cout << "\nscreenShakeCounter: " << screenShakeCounter << "\n";
+            //cout << "\nscreenShakeCounter: " << screenShakeCounter << "\n";
         }
     
     }
@@ -470,7 +472,7 @@ class PlayState: public State
         completeScreen.setOrigin(completeScreen.getSize().x/2, completeScreen.getSize().y/2);
         completeScreen.setPosition(screenW/2, screenH/2);
     
-        float startGameSpeed = 10;
+        float startGameSpeed = 400;
         float curGameSpeed = startGameSpeed;
         //bool secondBarsSpawned = false;
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
@@ -487,7 +489,7 @@ class PlayState: public State
         int numBossExplosions = 0;
         int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = completeScreenDone, 3 = textDone, 4 = goldDone
         int completeTick = 0; //used to determine some parts of completion stage
-        int ticksTillEnemySpawn = 20;
+        int ticksTillEnemySpawn = 100;
         //int beginningGold = 0;
     
         spawnAsteroids(asteroid);
@@ -506,8 +508,10 @@ class PlayState: public State
         ParticleSystem backParticles3(400, 20000, 2, 200, 4, Color::White, 0, screenH/8, screenH, screenW, 0, 50);
         bool shipHit, enemyHit, enemyKilled = false; //used to control particles
         //backParticles.setEmitter(Vector2f(screenW, screenH/2));
-        sf::Clock clock;
+        sf::Clock clock; //for movement
+        sf::Clock eventClock; //for events
         float elapsedTime = clock.getElapsedTime().asSeconds();
+        float eventElapsedTime = eventClock.getElapsedTime().asMilliseconds();
         
         //Pre-round attachment check!
         for (auto i:character->attachments)
@@ -532,7 +536,15 @@ class PlayState: public State
     
         while (app.isOpen())
         {
-            tick++;
+            eventElapsedTime = eventClock.getElapsedTime().asMilliseconds();
+            bool advanceTick = false;
+            if (eventElapsedTime >= 17)
+            {
+                tick++;
+                advanceTick = true;
+                eventElapsedTime = eventClock.restart().asMilliseconds();
+            }
+            //cout << "\n " << eventElapsedTime << "\n";
             if (completeStage >= 2)
             {
                 completeTick++;
@@ -596,6 +608,7 @@ class PlayState: public State
             enemyList = removeDeadEntity(enemyList);
             bulletList = removeDeadEntity(bulletList);
             enemyBulletList = removeDeadEntity(enemyBulletList);
+            AOElist = removeDeadEntity(AOElist);
         
         
             if (!levelComplete)
@@ -603,14 +616,14 @@ class PlayState: public State
                 if (asteroid->x <= (-relUnitX * 15))
                 {
                    int randNum = rand() % 2;
-                   cout << "\nasteroid: " << randNum << "\n";
+                   //cout << "\nasteroid: " << randNum << "\n";
                    if (randNum == 1)
                        asteroid = asteroid1;
                    else if(randNum == 0)
                        asteroid = asteroid2;
                 }
                 gameProgress = moveAsteroids(asteroid, curGameSpeed, gameProgress);
-                curGameSpeed = (startGameSpeed + (gameProgress/2));// * (1 - mapTimeDilationPercentage);
+                curGameSpeed = (startGameSpeed + (gameProgress * 25)) * elapsedTime;// * (1 - mapTimeDilationPercentage);
                 moveCredit(credit, curGameSpeed);
             }
             else if (completeScreen.getFillColor().a != 200)
@@ -623,12 +636,6 @@ class PlayState: public State
             {
                 completeStage = 2;
             }
-        
-            /*if (secondBarsSpawned == false and bar1->x <= screenW/2)
-            {
-                spawnBars(bar3, bar4);
-                secondBarsSpawned = true;
-            }*/
         
             //update is player hit
             shipHit = false;
@@ -690,9 +697,15 @@ class PlayState: public State
             }
         
             //check all attachments to activate
-            for (auto i:attachmentList)
+            
+            
+            for (int i = 0; i < AOElist.size(); i++)
             {
-                i->activate(tick, &entities, &bulletList, player);
+                //cout << AOElist.size();
+                AOElist.at(i)->AoeUpdate(elapsedTime);
+                AOElist.at(i)->update();
+                AOElist.at(i)->checkDamage(&enemyList);
+                AOElist.at(i)->checkBullets(&enemyBulletList);
             }
              
             //spawn enemies
@@ -776,44 +789,12 @@ class PlayState: public State
             app.draw(backParticles1);
             //for(auto i:shieldList) 
                 //app.draw(i->circle);
-                
-            
-                
+                 
             //Update Conventional Enemies
+            for(auto i:entities) i->draw(app, &shader);
             for (auto i:enemyList)
             {
-            
-                /*if (curGame->showHitBoxes)
-                {
-                    
-                    sf::RectangleShape hitBox;
-                    i->boundingBox=i->sprite.getGlobalBounds();
-                    hitBox.setSize(sf::Vector2f(i->boundingBox.width, i->boundingBox.height));
-                    hitBox.setFillColor(sf::Color::Transparent);
-                    hitBox.setOutlineColor(sf::Color::Red);
-                    hitBox.setOutlineThickness(5);
-                    //hitBox2.setOrigin(i->rect->width/2, i->rect->height/2);
-                    hitBox.setPosition(i->boundingBox.left, i->boundingBox.top);
-                    
-                    sf::CircleShape circle;
-                    circle.setRadius(5);
-                    circle.setOutlineColor(sf::Color::Red);
-                    circle.setOutlineThickness(5);
-                    circle.setOrigin(5, 5);
-                    circle.setPosition(i->sprite.getPosition().x, i->sprite.getPosition().y);
-                    
-                    sf::CircleShape circle2;
-                    circle2.setRadius(5);
-                    circle2.setOutlineColor(sf::Color::Blue);
-                    circle2.setOutlineThickness(5);
-                    circle2.setOrigin(5, 5);
-                    circle2.setPosition(i->x, i->y);
-                    
-                    app.draw(hitBox);
-                    app.draw(circle);
-                    app.draw(circle2);
-                }
-                */
+
                 if (!(i->bulletsPassThrough))
                 {
                     Bullet *temp = checkSpriteCollisions(i, bulletList);
@@ -835,7 +816,7 @@ class PlayState: public State
                    enemyKilled = true;
                 }
                 i -> enemyMove(elapsedTime);
-                i->enemyAttack(&enemyBulletList, &entities);
+                i->enemyAttack(&enemyBulletList, &entities, advanceTick);
                 i->ability(enemyList, &bulletList, app);
             
                 
@@ -844,6 +825,18 @@ class PlayState: public State
                     //i->ticksSinceLastFire = 0;
 
             } 
+            
+            for (auto i:attachmentList)
+            {
+                i->activate(&entities, &bulletList, player);
+                i->activate(&AOElist, player);
+            }
+            
+            for (auto i:AOElist)
+            {
+                if (i->visible == true)
+                    app.draw(i->AOEcircle);
+            }
             
              //update particles
             shipParticles.setEmitter(sf::Vector2f(player->x - 30, player->y - 5));
@@ -857,7 +850,6 @@ class PlayState: public State
             backParticles2.update(elapsed, true);
             backParticles3.update(elapsed, true);
             
-            for(auto i:entities) i->draw(app, &shader);
             for (auto i:entities)
             {
                 if(curGame->showHitBoxes and i->sprite.getTexture()!=NULL)
@@ -871,7 +863,7 @@ class PlayState: public State
                     //hitBox2.setOrigin(i->rect->width/2, i->rect->height/2);
                     hitBox.setPosition(i->boundingBox.left, i->boundingBox.top);
                     
-                    sf::CircleShape circle;
+                    /*sf::CircleShape circle;
                     circle.setRadius(5);
                     circle.setOutlineColor(sf::Color::Red);
                     circle.setOutlineThickness(5);
@@ -887,7 +879,7 @@ class PlayState: public State
                     
                     app.draw(hitBox);
                     app.draw(circle);
-                    app.draw(circle2);
+                    app.draw(circle2);*/
                 }
             }
             app.draw(shipParticles);

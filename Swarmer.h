@@ -87,7 +87,7 @@ class Swarmer: public Enemy //number one!
         }
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
     
         if (ticksSinceLastFire == firerate)
@@ -97,7 +97,7 @@ class Swarmer: public Enemy //number one!
                 attackCounter = 300;
             ticksSinceLastFire = 0;  
         }
-        else
+        else if (advanceTick)
             ticksSinceLastFire++;                   
     }
     

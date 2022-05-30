@@ -32,7 +32,7 @@ class Game
     sf::Font gameFont;
     Character *character = new Character;
     std::vector<State*> stateList; //0=mainMenu, 1=Hub, 2=game, 3=Shop, 4=Settings)
-    std::array<Texture, 5> bulletTextureList;
+    std::array<Texture, 6> bulletTextureList;
     SynergyHandler *synergyHandler = new SynergyHandler();
     CrewHandler *crewHandler = new CrewHandler();
     
@@ -49,7 +49,7 @@ class Game
         relUnitX = screenWidth/100;
         relUnitY = screenHeight/100;
         
-        Texture b1, b2, b3, b4, b5;
+        Texture b1, b2, b3, b4, b5, b6;
         b1.loadFromFile("images/bullet.png");
         bulletTextureList[0] = b1;
         b2.loadFromFile("images/greenBullet.png");
@@ -60,6 +60,9 @@ class Game
         bulletTextureList[3] = b4;
         b5.loadFromFile("images/dartBullet.png");
         bulletTextureList[4] = b5;
+        b6.loadFromFile("images/missile.png");
+        bulletTextureList[5] = b6;
+        
         
     }
     
@@ -73,6 +76,7 @@ class Game
             area++;
         }
     }
+    
     
     void changeState();
     

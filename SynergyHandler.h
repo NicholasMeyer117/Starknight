@@ -18,8 +18,8 @@ class SynergyHandler
     Synergy synergies[12] = {{"Gun", 0, 0, sf::Color::Red},
                             {"Repair", 0, 1, sf::Color::Green},
                             {"Utility", 0, 2, Color(255, 165, 0)},
-                            {"Seeker", 0},
-                            {"AOE", 0},
+                            {"Seeker", 0, 3, Color(128, 0, 128)},
+                            {"AOE", 0, 4, Color(255, 255, 255)},
                             {"Support", 0},
                             {"Bleeder", 0},
                             {"Merchant", 0},
@@ -30,7 +30,7 @@ class SynergyHandler
                             
     SynergyHandler()
     {
-        Texture s1, s2, s3;
+        Texture s1, s2, s3, s4, s5;
         s1.loadFromFile("images/gun.png");
         synergyTextureList.push_back(s1);
         
@@ -39,6 +39,12 @@ class SynergyHandler
         
         s3.loadFromFile("images/utility.png");
         synergyTextureList.push_back(s3);
+        
+        s4.loadFromFile("images/seeker.png");
+        synergyTextureList.push_back(s4);
+        
+        s5.loadFromFile("images/aoe.png");
+        synergyTextureList.push_back(s5);
         
         for (auto i:synergyTextureList)
         {
@@ -58,11 +64,15 @@ class SynergyHandler
     void applySynergies(Actor *player)
     {
         if (synergies[0].level >= 2)
-            player->bulletSpeedMult = 2;
+            player->bulletSpeedMult = 1.5;
         if (synergies[1].level >= 2)
             player->healingMult = 1.5;
         if (synergies[2].level >= 2)
             player->utilityMult = 1.5;
+        if (synergies[3].level >= 2)
+            player->bulletSpeedMult = 1.5;
+        if (synergies[4].level >= 2)
+            player->aoeRadiusMult = 1.5;
     }
     
     
@@ -80,6 +90,10 @@ class SynergyHandler
                     synergies[1].level++;
                 else if (attachClass==Attachment::attachClass::Utility)
                     synergies[2].level++;
+                else if (attachClass==Attachment::attachClass::Seeker)
+                    synergies[3].level++;
+                else if (attachClass==Attachment::attachClass::Aoe)
+                    synergies[4].level++;
             }
         }
     }

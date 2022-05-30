@@ -14,10 +14,27 @@
 class ItemHandler
 {
     public:
+    std::vector<Item*> equippedItems;
+    std::vector<Item*> commonItemPool;
+    std::vector<Item*> rareItemPool;
+    std::vector<Item*> legendaryItemPool;
     ItemHandler()
     {
     
     }
+    
+    void displayItems()
+    {
+    
+    
+    }
+    
+    int chooseItem()
+    {
+    
+    }
+    
+    
 
 
 }

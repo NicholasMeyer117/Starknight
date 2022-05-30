@@ -1,7 +1,7 @@
 #include "Actor.h"
 
 void Actor::createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames, 
-float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, float HealthMult, float HealingMult, float UtilityMult)
+float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, float HealthMult, float HealingMult, float UtilityMult, float AoeRadiusMult)
 {
     health = Health;
     maxHealth = Health;
@@ -20,6 +20,7 @@ float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, fl
     healthMult = HealthMult;
     healingMult = HealingMult;
     utilityMult = UtilityMult;
+    aoeRadiusMult = AoeRadiusMult;
     
     isActor = true;
 

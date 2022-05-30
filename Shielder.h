@@ -92,7 +92,7 @@ class Shielder: public Enemy
         int distance = sqrt((dx * dx) + (dy * dy));
         //cout << "\nDistance: " + std::to_string(distance);
         //cout << "\nmust be less than: " + std::to_string(shield.circle.getRadius() * 1 + entity.R * 1) + "\n";
-        if (distance < shield.circle.getRadius() * 1 + entity.R * 1)
+        if (distance < shield.shieldShape.getRadius() * 1 + entity.R * 1)
             return true;
         return false;
     }
@@ -100,7 +100,10 @@ class Shielder: public Enemy
     void updateShield(EnergyShield *shield)
     {
         if (shield->health <= shield->maxHealth/2)
-            shield->circle.setOutlineColor(sf::Color::Red);
+        {
+            shield->shieldShape.setOutlineColor(sf::Color(255, 0, 0, 200));
+            shield->shieldShape.setFillColor(sf::Color(255, 0, 0, 100));
+        }
     }
     
     std::vector<EnergyShield*> removeDeadShield(std::vector<EnergyShield*> shields)
@@ -151,7 +154,7 @@ class Shielder: public Enemy
             
             shieldList[i]->x = shieldList[i]->enemy->x;
             shieldList[i]->y = shieldList[i]->enemy->y;
-            shieldList[i]->circle.setPosition(shieldList[i]->enemy->x, shieldList[i]->enemy->y);
+            shieldList[i]->shieldShape.setPosition(shieldList[i]->enemy->x, shieldList[i]->enemy->y);
             for (int j = 0; j < bulletList->size(); j++)
             {
                 if (shieldCollision(*bulletList->at(j), *shieldList.at(i)))
@@ -165,7 +168,7 @@ class Shielder: public Enemy
                 }
             }
 
-            window.draw(shieldList[i]->circle); 
+            window.draw(shieldList[i]->shieldShape); 
         }
         
     }

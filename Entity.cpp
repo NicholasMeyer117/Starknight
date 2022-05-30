@@ -47,6 +47,33 @@
        return boundingBox.intersects(a->boundingBox);
    
    }
+   
+   bool Entity::isSpriteCollideWithCircle(sf::CircleShape cir)
+   {
+       boundingBox = sprite.getGlobalBounds();
+       sf::Vector2f topLeft(boundingBox.left, boundingBox.top);
+       sf::Vector2f topRight(boundingBox.left + boundingBox.width, boundingBox.top);
+       sf::Vector2f botLeft(boundingBox.left, boundingBox.top + boundingBox.height);
+       sf::Vector2f botRight(boundingBox.left + boundingBox.width, boundingBox.top + boundingBox.height);
+
+       return circleContains(cir, topLeft) || 
+       circleContains(cir, topRight) || 
+       circleContains(cir, botLeft) || 
+       circleContains(cir, botRight);
+   }
+   
+   bool Entity::circleContains(sf::CircleShape cir, sf::Vector2f corner)
+   {
+       sf::Vector2f center = cir.getPosition();
+       float a = (corner.x - center.x);
+       float b = (corner.y - center.y);
+       a *= a;
+       b *= b;
+       float r = cir.getRadius() * cir.getRadius();
+
+       return (( a + b ) < r);
+   
+   }
 
    bool Entity::isCollide(Entity *a)
    {
@@ -88,15 +115,14 @@
          absAngle = sprite.getRotation();
      }
      else
+         app.draw(rectangle);
+     /*else if (isCircle == false)
      {
          app.draw(rectangle);
      }
+     else
+         app.draw(circle);*/
 
-     CircleShape circle(R);
-     circle.setFillColor(Color(255,0,0,170));
-     circle.setPosition(x,y);
-     circle.setOrigin(R,R);
-     //app.draw(circle);
      
    }
 
@@ -119,11 +145,6 @@
      }
 
      isHit = false;
-     CircleShape circle(R);
-     circle.setFillColor(Color(255,0,0,170));
-     circle.setPosition(x,y);
-     circle.setOrigin(R,R);
-     //app.draw(circle);
      
    }
 

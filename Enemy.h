@@ -31,7 +31,7 @@ class Enemy: public Actor
     
     virtual void enemyMove(float elapsed){}
     
-    virtual void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities){}
+    virtual void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick){}
     
     virtual void ability(std::vector<Enemy*> enemyList, std::vector<Bullet*> *bulletList, RenderWindow &window){}
     

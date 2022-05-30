@@ -70,7 +70,7 @@ class MachineGunner: public Enemy
         }
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
         if (ticksSinceLastFire == firerate)
         { 
@@ -92,7 +92,7 @@ class MachineGunner: public Enemy
                 volleyNum = 0;
             }
         }
-        else
+        else if (advanceTick)
             ticksSinceLastFire++;  
                     
     }

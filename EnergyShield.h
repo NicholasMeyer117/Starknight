@@ -15,7 +15,7 @@
 class EnergyShield: public Actor
 {
     public:
-    sf::CircleShape circle;
+    sf::CircleShape shieldShape;
     Enemy *enemy;
     
     void takeDamage(float damage)
@@ -28,13 +28,14 @@ class EnergyShield: public Actor
     void createShield(int x, int y, int r, Enemy *newEnemy)
     {
         enemy = newEnemy;
-        circle.setPosition(x, y);
-        circle.setRadius(r);
-        circle.setOrigin(r, r);
-        circle.setPointCount(100);
-        circle.setOutlineThickness(10);
-        circle.setOutlineColor(sf::Color::Cyan);
-        circle.setFillColor(sf::Color::Transparent);
+        shieldShape.setPosition(x, y);
+        shieldShape.setRadius(r);
+        shieldShape.setOrigin(r, r);
+        shieldShape.setPointCount(100);
+        shieldShape.setOutlineThickness(5);
+        shieldShape.setOutlineColor(sf::Color(0, 255, 255, 200));
+        shieldShape.setFillColor(sf::Color(0, 255, 255, 100));
+        
     }
     
     

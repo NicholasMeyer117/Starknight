@@ -67,7 +67,7 @@ class TriShooter: public Enemy
         }
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
         if (ticksSinceLastFire == firerate)
         { 
@@ -93,7 +93,7 @@ class TriShooter: public Enemy
         
             ticksSinceLastFire = 0;    
          }
-         else
+         else if (advanceTick)
             ticksSinceLastFire++;                    
     }
 

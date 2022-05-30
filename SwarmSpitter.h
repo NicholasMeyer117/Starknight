@@ -70,7 +70,7 @@ class SwarmSpitter: public Enemy //number one!
         }
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
         for (int i = 0; i < bombBulletList.size(); i++)
         {
@@ -121,7 +121,7 @@ class SwarmSpitter: public Enemy //number one!
             bombBulletList.push_back(b); 
             ticksSinceLastFire = 0;  
         }
-        else
+        else if (advanceTick)
             ticksSinceLastFire++;                   
     }
     

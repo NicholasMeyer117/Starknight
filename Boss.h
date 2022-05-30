@@ -138,7 +138,7 @@ class PirateLord: public Boss
         }
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
         if (ticksSinceLastFire == firerate && bulletsPassThrough == false && health > 0)
         { 
@@ -188,7 +188,7 @@ class PirateLord: public Boss
                 volleyNum = 0;
             }
         }
-        else if (bulletsPassThrough == false)
+        else if (bulletsPassThrough == false and advanceTick)
             ticksSinceLastFire++;                   
     }
 
@@ -246,7 +246,7 @@ class PirateTurret: public Boss
         
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
         
         if (ticksSinceLastFire == firerate)
@@ -321,7 +321,7 @@ class PirateTurret: public Boss
             
             }
         }
-        else
+        else if (advanceTick)
             ticksSinceLastFire++;                   
     }
     
@@ -366,7 +366,7 @@ class PirateTurret2: public Boss
         
     }
     
-    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities)
+    void enemyAttack(std::vector<Bullet*> *bulletList, std::vector<Entity*> *entities, bool advanceTick)
     {
         
         if (ticksSinceLastFire == firerate)
@@ -383,7 +383,7 @@ class PirateTurret2: public Boss
             }
             
         }
-        else
+        else if (advanceTick)
             ticksSinceLastFire++;                   
     }
     

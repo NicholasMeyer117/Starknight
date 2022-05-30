@@ -51,7 +51,7 @@ class SeekerBullet: public Bullet
     void update(float elapsed)
     {
         Entity* enemy = getClosestEnemy();
-        if (enemy != NULL)
+        if (enemy != NULL and enemy->life != 0)
         {
             cout << "\nentity x: " << enemy->x << " entity y: " << enemy->y << "\n";
             Vector2f direction = normalize(Vector2f(enemy->x - x, enemy->y - y));
@@ -60,7 +60,7 @@ class SeekerBullet: public Bullet
             y += (bulletSpeed * direction.y) * elapsed;
         }
         else
-            x += bulletSpeed;
+            x += bulletSpeed * elapsed;
     
     }
     

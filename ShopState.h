@@ -13,6 +13,7 @@
 #include "Attachment.h"
 #include "Enemy.h"
 #include "Character.h"
+//#include "ParticleSystem.h"
 //#include "SynergyHandler.h"
 
 using namespace std;
@@ -32,11 +33,12 @@ class ShopState: public State
     std::vector<ImageButton*> attachmentSlotButtons; //Vector of buttons for equipped attachments
     Character *character = new Character;
     SynergyHandler *synergyHandler = new SynergyHandler;
+    ParticleSystem *clickParticles = new ParticleSystem(500, 100, 5, 200, 2, Color::White);
     int screenW;
     int screenH;
     int relUnitX;
     int relUnitY;
-    int numOfAttachments = 9; //total number of different attachments
+    int numOfAttachments = 11; //total number of different attachments
     sf::Font gameFont;
     sf::Text source;
     
@@ -51,8 +53,8 @@ class ShopState: public State
         character = game->character;
         synergyHandler = game->synergyHandler;
         
-        Texture t1, t2, t3, t4, t5, t6, t7, t8, t9;
-        t1.loadFromFile("images/cannon.png");
+        Texture t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11;
+        t1.loadFromFile("images/cannon.png"); 
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
         textureList.push_back(t2);
@@ -70,8 +72,12 @@ class ShopState: public State
         textureList.push_back(t8);
         t9.loadFromFile("images/seekerDart.png");
         textureList.push_back(t9);
+        t10.loadFromFile("images/voidBomber.png");
+        textureList.push_back(t10);
+        t11.loadFromFile("images/seekerMissile.png");
+        textureList.push_back(t11);
         
-        Texture i1, i2, i3, i4, i5, i6, i7, i8, i9;
+        Texture i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11;
         i1.loadFromFile("images/cannon.png");
         textureList.push_back(i1);
         i2.loadFromFile("images/machineGun.png");
@@ -90,6 +96,10 @@ class ShopState: public State
         textureList.push_back(i8);
         i9.loadFromFile("images/seekerDart.png");
         textureList.push_back(i9);
+        i10.loadFromFile("images/voidBomber.png");
+        textureList.push_back(i10);
+        i11.loadFromFile("images/seekerMissile.png");
+        textureList.push_back(i11);
 
         
         for (auto i:textureList)
@@ -304,8 +314,41 @@ class ShopState: public State
                 shopAttachments.push_back(seekerDart);
                 return 0;
             
+            }
+            case 9:
+            {
+                VoidBomber *voidBomber = new VoidBomber();
+                cost = voidBomber->credits;
+                curAtc = voidBomber;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3 and isReroll)
+                         return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
+                }
+                button->createIcon(textureList[9], spriteList[9], butNum, 250, 250, &gameFont, ("Void Bomber: " + to_string(cost) + " Cr"), 20, cost);
+                shopAttachments.push_back(voidBomber);
+                return 0;
             
-            
+            }
+            case 10:
+            {
+                SeekerMissile *seekerMissile = new SeekerMissile(bulletSpriteList[5]);
+                cost = seekerMissile->credits;
+                curAtc = seekerMissile;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3 and isReroll)
+                         return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
+                }
+                button->createIcon(textureList[10], spriteList[10], butNum, 250, 250, &gameFont, ("Seeker Missile: " + to_string(cost) + " Cr"), 20, cost);
+                shopAttachments.push_back(seekerMissile);
+                return 0;
             
             }
         }
@@ -329,11 +372,15 @@ class ShopState: public State
     String getSynDesc(String name)
     {
         if (name == "Gun")
-            return "Gun Synergy: Shot speed increased by 100% for all guns";
+            return "Gun Synergy: Shot speed increased by 50% for all guns";
         else if (name == "Repair")
             return "Repair Synergy: Healing effectiveness increased by 50% for all repair attachments";
         else if (name == "Utility")
             return "Utility Synergy: Effectiveness increased by 50% for all utility attachments";
+        else if (name == "Seeker")
+            return "Seeker Synergy: Shot speed increased by 50% for all Seeker attachments";
+        else if (name == "AOE")
+            return "AOE Synergy: Radius increased by 50% for all AOE attachments";
             
         return "Nothing";
     }
@@ -351,11 +398,11 @@ class ShopState: public State
             if (levelNum == 0)
                 return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s\nSpeed: 20\nDamage: 5";
             else if (levelNum == 1)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s  ->  2/s\nSpeed: 20\nDamage: 5  ->  10";
+                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 1/s  ->  1.5/s\nSpeed: 20\nDamage: 5  ->  7.5";
             else if (levelNum == 2)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 2/s  ->  4/s\nSpeed: 20\nDamage: 10  ->  20";
+                return "Cannon: Fires a single medium damage shot (Gun) -> that explods on impact (AOE)\nFirerate: 1.5/s\nSpeed: 20\nDamage: 7.5  ->  10\nAOE Damage: 0 -> 2";
             else if (levelNum == 3)
-                return "Cannon: Fires a single medium damage shot (Gun)\nFirerate: 4/s\nSpeed: 20\nDamage: 20";
+                return "Cannon: Fires a single medium damage shot that exlodes on impact (Gun) (AOE)\nFirerate: 1.5/s\nSpeed: 20\nDamage: 10\nAOE Damage: 2";
         }
         else if (name == "Machine Gun")
         {
@@ -437,16 +484,38 @@ class ShopState: public State
         else if (name == "Seeker Dart")
         {
             if (levelNum == 0)
-                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 1/s\nSpeed: 15\nDamage: 2\n";
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearest enemy (Gun) (Seeker)\nFirerate: 1/s\nSpeed: 15\nDamage: 2\n";
             else if (levelNum == 1)
-                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 1/s -> 1.5/s\nSpeed: 15\nDamage: 2 -> 4\n";
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearest enemy (Gun) (Seeker)\nFirerate: 1/s -> 1.5/s\nSpeed: 15\nDamage: 2 -> 4\n";
             else if (levelNum == 2)
-                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 1.5/s -> 2.25/s\nSpeed: 15\nDamage: 4 -> 6\n";
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearest enemy (Gun) (Seeker)\nFirerate: 1.5/s -> 2.25/s\nSpeed: 15\nDamage: 4 -> 6\n";
             else if (levelNum == 3)
-                return "Seeker Dart: Fires a low damage dart that homes in on the nearesr enemy (Gun) (Seeker)\nFirerate: 2.25/s\nSpeed: 15\nDamage: 6\n";
-        
-        
-        
+                return "Seeker Dart: Fires a low damage dart that homes in on the nearest enemy (Gun) (Seeker)\nFirerate: 2.25/s\nSpeed: 15\nDamage: 6\n";
+
+        }
+        else if (name == "Void Bomber")
+        {
+            if (levelNum == 0)
+                return "Void Bomber: Fires an AOE blast that destroys all enemy bullets (AOE)\nFirerate: 1/3s\nSpeed: 15\nArea: 50\n";
+            else if (levelNum == 1)
+                return "Void Bomber: Fires an AOE blast that destroys all enemy bullets (AOE)\nFirerate: 1/3s\nSpeed: 15\nArea: 50 -> 75\n";
+            else if (levelNum == 2)
+                return "Void Bomber: Fires an AOE blast that destroys all enemy bullets (AOE)\nFirerate: 1/3s -> 1/2s\nSpeed: 15 -> 10\nArea: 75\n";
+            else if (levelNum == 3)
+                return "Void Bomber: Fires an AOE blast that destroys all enemy bullets (AOE)\nFirerate: 1/2s\nSpeed: 10\nArea: 75\n";
+
+        }
+        else if (name == "Seeker Missile")
+        {
+            if (levelNum == 0)
+                return "Seeker Missile: Fires a seeking missile that explodes on impact (Seeker) (AOE)\nDamage: 10\nAOE Damage: 5\nFirerate: 1/3s\nSpeed: 10\nArea: 100\n";
+            else if (levelNum == 1)
+                return "Seeker Missile: Fires a seeking missile that explodes on impact (Seeker) (AOE)\nDamage: 10 -> 15\nAOE Damage: 5 -> 7.5\nFirerate: 1/3s\nSpeed: 10\nArea: 100\n";
+            else if (levelNum == 2)
+                return "Seeker Missile: Fires a seeking missile that explodes on impact (Seeker) (AOE)\nDamage: 15\nAOE Damage: 7.5\nFirerate: 1/3s -> 1/2s\nSpeed: 10\nArea: 100 -> 150\n";
+            else if (levelNum == 3)
+                return "Seeker Missile: Fires a seeking missile that explodes on impact (Seeker) (AOE)\nDamage: 15\nAOE Damage: 7.5\nFirerate: 1/2s\nSpeed: 10\nArea: 150\n";
+
         }
         return "No Name"; 
     }
@@ -528,6 +597,7 @@ class ShopState: public State
         buttonList.push_back(sellButton);
         
         srand(time(NULL));
+        sf::Clock clock;
         
         rollShop(1);
         rollShop(2);
@@ -567,6 +637,7 @@ class ShopState: public State
         {
             pixelPos = sf::Mouse::getPosition(app);
             worldPos = app.mapPixelToCoords(pixelPos);
+            bool buttonClicked = false;
         
             Event event;
             while (app.pollEvent(event))
@@ -601,6 +672,9 @@ class ShopState: public State
                                 i->leftClicked = true;
                             else if (Mouse::isButtonPressed(Mouse::Right))
                                 i->rightClicked = true; 
+                                
+                            clickParticles->setEmitter(sf::Vector2f(worldPos.x, worldPos.y));
+                            buttonClicked = true;
                         }
                     }   
                     
@@ -767,6 +841,9 @@ class ShopState: public State
                 }
                 shopButtonList[i]->leftClicked = false;
             }
+            
+            sf::Time elapsed = clock.restart();
+            clickParticles->update(elapsed, buttonClicked);
 
             //draw
             
@@ -801,6 +878,7 @@ class ShopState: public State
                 }
             }
             drawText(": " + std::to_string(character->credits), 20, 95, 61, app);
+            app.draw(*clickParticles);
             app.display();
             app.clear(Color(100,100,100,255));
         }

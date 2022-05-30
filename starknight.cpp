@@ -39,7 +39,7 @@ int main() {
     Game *game = new Game;
     int state = 0;
     
-    RenderWindow app(VideoMode(screenW, screenH), "Starknight!");
+    RenderWindow app(VideoMode(screenW, screenH), "Starknight!", sf::Style::Fullscreen);
     sf::View view(sf::Vector2f(screenW/2, screenH/2), sf::Vector2f(screenW, screenH));
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     app.setView(view);

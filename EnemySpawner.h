@@ -150,12 +150,13 @@ class EnemySpawner
                         else
                             return spawn(6);
                     case 4: 
-                        if (!contains(enemyList, Enemy::EnemyType::shielder))
-                            return spawn(3);
-                        else if (randNum <= 25)
+                        
+                        if (randNum <= 25)
                             return spawn(1);
                         else if (randNum > 25 and randNum <=65)
                             return spawn(2);
+                        else if (!contains(enemyList, Enemy::EnemyType::shielder))
+                            return spawn(3);
                         else
                             return spawn(6);
                 
