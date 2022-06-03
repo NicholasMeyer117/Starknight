@@ -53,7 +53,7 @@ class SolidCircle: public AOE
     void AoeUpdate(float elapsed)
     {
     
-        moveActor(right, elapsed);
+        moveActor(right);
         AOEcircle.setPosition(xPos,yPos);
         if (x>2000 || x<-1000) life=0;
 

@@ -26,6 +26,12 @@
 #include "ProgressBar.h"
 #include "ParticleSystem.h"
 #include "AOE.h"
+#include "ItemHandler.h"
+
+//Global Variables
+extern int screenW;
+extern int screenH;
+float elapsedTime;
 
 class PlayState: public State
 {
@@ -48,8 +54,6 @@ class PlayState: public State
     Character *character = new Character;
     
     Game *curGame;
-    int screenW;
-    int screenH;
     int relUnitX;
     int relUnitY;
     int screenShakeCounter = 0;
@@ -59,8 +63,8 @@ class PlayState: public State
     
     void createState(Game *game)
     {
-        screenW = game->screenWidth;
-        screenH = game->screenHeight;
+        //screenW = game->screenWidth;
+        //screenH = game->screenHeight;
         source = game->source;
         gameFont = game->gameFont;
         curGame = game;
@@ -465,6 +469,7 @@ class PlayState: public State
         std::cout << "\nScreen Width0: " + std::to_string(screenW);
         EnemySpawner *enemySpawner = new EnemySpawner;
         enemySpawner->createSpawner(enemySpriteList, bulletSpriteList, screenW, screenH);
+        ItemHandler *itemHandler = new ItemHandler();
         
         RectangleShape completeScreen;
         completeScreen.setSize(sf::Vector2f(screenW, screenH));
@@ -510,7 +515,7 @@ class PlayState: public State
         //backParticles.setEmitter(Vector2f(screenW, screenH/2));
         sf::Clock clock; //for movement
         sf::Clock eventClock; //for events
-        float elapsedTime = clock.getElapsedTime().asSeconds();
+        elapsedTime = clock.getElapsedTime().asSeconds();
         float eventElapsedTime = eventClock.getElapsedTime().asMilliseconds();
         
         //Pre-round attachment check!
@@ -577,13 +582,13 @@ class PlayState: public State
         
             //Player Movement
             if (Keyboard::isKeyPressed(Keyboard::W))
-                player->moveActor(Actor::up, elapsedTime);
+                player->moveActor(Actor::up);
             if (Keyboard::isKeyPressed(Keyboard::S))
-	         player->moveActor(Actor::down, elapsedTime);
+	         player->moveActor(Actor::down);
             if (Keyboard::isKeyPressed(Keyboard::A))
-	         player->moveActor(Actor::left, elapsedTime);
+	         player->moveActor(Actor::left);
             if (Keyboard::isKeyPressed(Keyboard::D))
-	         player->moveActor(Actor::right, elapsedTime);    
+	         player->moveActor(Actor::right);    
 	         
 	     //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))

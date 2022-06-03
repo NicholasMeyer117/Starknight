@@ -62,10 +62,10 @@ class PirateLord: public Boss
     {
         if (!reachedBegin)
         {
-            moveActor(left, elapsed);
+            moveActor(left);
             for (auto i:Parts)
             {
-                i->moveActor(left, elapsed);
+                i->moveActor(left);
             }
             if (x <= screenW - screenW/8)
                 reachedBegin = true;
@@ -75,20 +75,20 @@ class PirateLord: public Boss
         {
             if (movingUp)
             {
-                moveActor(up, elapsed);
+                moveActor(up);
                 for (auto i:Parts)
                 {
-                    i->moveActor(up, elapsed);
+                    i->moveActor(up);
                 }
                 if (y <= screenH/10)
                     movingUp = false;
             }
             else
             {
-                moveActor(down, elapsed);
+                moveActor(down);
                 for (auto i:Parts)
                 {
-                    i->moveActor(down, elapsed);
+                    i->moveActor(down);
                 }
                 if (y >= screenH - screenH/10)
                     movingUp = true;

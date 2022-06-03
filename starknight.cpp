@@ -26,8 +26,8 @@
 using namespace sf;
 using namespace std;
 float DEGTORAD = 0.017453f;
-const int screenW = sf::VideoMode::getDesktopMode().width;//1920;
-const int screenH = sf::VideoMode::getDesktopMode().height;//1080;
+int screenW = sf::VideoMode::getDesktopMode().width;//1920;
+int screenH = sf::VideoMode::getDesktopMode().height;//1080;
     
 sf::Text source;
 sf::Font mainGameFont;

@@ -26,22 +26,22 @@ float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, fl
 
 }
 
-void Actor::moveActor(enum direction dir, float elapsed)
+void Actor::moveActor(enum direction dir)
 {
 
     switch(dir)
     {
         case up : 
-            yPos = yPos - ((speed * speedMult) * elapsed);
+            yPos = yPos - ((speed * speedMult) * elapsedTime);
             break;
         case down : 
-            yPos = yPos + ((speed * speedMult) * elapsed);
+            yPos = yPos + ((speed * speedMult) * elapsedTime);
             break;
         case right : 
-            xPos = xPos + ((speed * speedMult) * elapsed);
+            xPos = xPos + ((speed * speedMult) * elapsedTime);
             break;
         case left : 
-            xPos = xPos - ((speed * speedMult) * elapsed);
+            xPos = xPos - ((speed * speedMult) * elapsedTime);
             break;
         
     }

@@ -10,6 +10,8 @@
 #include "Entity.h"
 #define PI 3.14159265
 
+extern float elapsedTime;
+
 //An Entity that moves and acts on in dynamic ways
 class Actor: public Entity
 {
@@ -27,7 +29,7 @@ class Actor: public Entity
     float DamageMult = 1.0, float FireRateMult = 1.0, float BulletSpeedMult = 1.0, float SpeedMult = 1.0, 
     float HealthMult = 1.0, float HealingMult = 1.0, float UtilityMult = 1.0,float AoeRadiusMult = 1.0);
 
-    void moveActor(enum direction, float elapsed);
+    void moveActor(enum direction);
     
     void setActorPosition(float X, float Y);
     

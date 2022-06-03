@@ -16,6 +16,9 @@
 #include "CrewHandler.h"
 #define PI 3.14159265
 
+extern int screenW;
+extern int screenH;
+
 class Game
 {
 
@@ -23,7 +26,7 @@ class Game
     RenderWindow app;
     enum gameState {mainMenu, hub, game, shop, settings};
     int area = 1; //each area consists of several levels and ends with a boss
-    int level = 1;
+    int level = 3;
     int screenWidth;
     int screenHeight;
     int relUnitX;
@@ -44,10 +47,10 @@ class Game
     {
         source = Source;
         gameFont = font;
-        screenWidth = W;
-        screenHeight = H;
-        relUnitX = screenWidth/100;
-        relUnitY = screenHeight/100;
+        screenWidth = screenW;
+        screenHeight = screenH;
+        relUnitX = screenW/100;
+        relUnitY = screenH/100;
         
         Texture b1, b2, b3, b4, b5, b6;
         b1.loadFromFile("images/bullet.png");

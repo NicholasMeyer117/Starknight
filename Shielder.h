@@ -48,7 +48,7 @@ class Shielder: public Enemy
     {
         if (!reachedBegin)
         {
-            moveActor(left, elapsed);
+            moveActor(left);
             int spawnZone = screenW - (relUnitX * 5) - (rand() % (relUnitX * 100));
             if (x <= spawnZone)
                 reachedBegin = true;
@@ -57,13 +57,13 @@ class Shielder: public Enemy
         {
             if (movingUp)
             {
-                moveActor(up, elapsed);
+                moveActor(up);
                 if (y <= relUnitY * 17)
                     movingUp = false;
             }
             else
             {
-                moveActor(down, elapsed);
+                moveActor(down);
                 if (y >= relUnitY * 90)
                     movingUp = true;
             }
