@@ -28,6 +28,8 @@ using namespace std;
 float DEGTORAD = 0.017453f;
 int screenW = sf::VideoMode::getDesktopMode().width;//1920;
 int screenH = sf::VideoMode::getDesktopMode().height;//1080;
+RenderWindow app(VideoMode(screenW, screenH), "Starknight!", sf::Style::Fullscreen);
+View view(sf::Vector2f(screenW/2, screenH/2), sf::Vector2f(screenW, screenH));
     
 sf::Text source;
 sf::Font mainGameFont;
@@ -39,8 +41,7 @@ int main() {
     Game *game = new Game;
     int state = 0;
     
-    RenderWindow app(VideoMode(screenW, screenH), "Starknight!", sf::Style::Fullscreen);
-    sf::View view(sf::Vector2f(screenW/2, screenH/2), sf::Vector2f(screenW, screenH));
+    //app
     view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
     app.setView(view);
     app.setFramerateLimit(60);

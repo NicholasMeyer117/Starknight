@@ -18,12 +18,13 @@
 
 extern int screenW;
 extern int screenH;
+extern RenderWindow app;
+extern View view;
 
 class Game
 {
 
     public:
-    RenderWindow app;
     enum gameState {mainMenu, hub, game, shop, settings};
     int area = 1; //each area consists of several levels and ends with a boss
     int level = 3;

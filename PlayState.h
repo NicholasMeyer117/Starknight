@@ -27,6 +27,7 @@
 #include "ParticleSystem.h"
 #include "AOE.h"
 #include "ItemHandler.h"
+#include "PauseState.h"
 
 //Global Variables
 extern int screenW;
@@ -74,7 +75,7 @@ class PlayState: public State
     
     }
     
-    void emptyState()
+    void emptyState(Actor *player)
     {
         buttonList.clear();
         entities.clear();
@@ -86,6 +87,7 @@ class PlayState: public State
         enemyBulletList.clear();
         enemySpriteList.clear();
         bulletSpriteList.clear();
+        entities.push_back(player);
     
     }
     
@@ -333,15 +335,22 @@ class PlayState: public State
         e9.loadFromFile("images/pirateTurret2.png");
         e10.loadFromFile("images/pirateMachineGunner.png");
         
+        Texture pauseTex;
+        pauseTex.create(screenW, screenH);
+        
         //uniform vec4 flashColor;
         //flashColor.a = 1.0;//1.0 for 100% effect to 0.0 for 0% effect
-        sf::Shader shader;
-        shader.loadFromFile("flash.frag", sf::Shader::Fragment);//use your own 
+        sf::Shader shader, glowShader;
+        shader.loadFromFile("shaders/flash.frag", sf::Shader::Fragment);//use your own 
         //file path
         shader.setUniform("flashColor", sf::Glsl::Vec4(1, 1, 1, 1));//from left to 
         //right: red,green,blue,alpha. Alpha is useless in this shader file.
         //max is 1, not 255.
         //window.draw(yoursprite, &shader);
+        glowShader.loadFromFile("shaders/glow.frag", sf::Shader::Fragment);
+        glowShader.setUniform("redGlow", sf::Glsl::Vec4(1, 0, 0, 1));
+        glowShader.setUniform("blueGlow", sf::Glsl::Vec4(0, 0, 1, 1));
+        
 
         p1.setSmooth(true);
         //t2.setSmooth(true);
@@ -482,7 +491,7 @@ class PlayState: public State
         //bool secondBarsSpawned = false;
         float gameProgress = 0; // ticks each time a bar passes (dynamic)
         float levelProgress = 0; // ticks depending on tick (static)
-        float maxLevelProgress = 4000; // level is over when levelProgress = maxLevelProgress
+        float maxLevelProgress = 300; // level is over when levelProgress = maxLevelProgress
         float mapTimeDilationPercentage = 0; //percentage that game speed is slowed down
         int progressPercent = 0;
         int tick = 0;
@@ -492,9 +501,11 @@ class PlayState: public State
         bool bossDeath = false;
         bool levelComplete= false;
         int numBossExplosions = 0;
-        int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = completeScreenDone, 3 = textDone, 4 = goldDone
+        int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = player moved, 3 = completeScreenDone, 4 = textDone, 5 = goldDone
         int completeTick = 0; //used to determine some parts of completion stage
         int ticksTillEnemySpawn = 100;
+        int nextLevelSetting = 0; //0 = level in progress, 1 = reg level next, 2 challenge and reg choice next
+        float glowValue = 0.0; //Used to set strength of after level glow
         //int beginningGold = 0;
     
         spawnAsteroids(asteroid);
@@ -550,7 +561,7 @@ class PlayState: public State
                 eventElapsedTime = eventClock.restart().asMilliseconds();
             }
             //cout << "\n " << eventElapsedTime << "\n";
-            if (completeStage >= 2)
+            if (completeStage >= 3)
             {
                 completeTick++;
             }
@@ -572,11 +583,16 @@ class PlayState: public State
                 
                 if (event.type == Event::KeyPressed)
                 {
-                     if (event.key.code == Keyboard::Space)
+                     if (event.key.code == Keyboard::Escape)
                      {
-                   
-                     }
-             
+                         //pauseTex.copyToImage().saveToFile("images/screenshot.png");
+                         PauseState *pauseState = new PauseState(curGame, pauseTex);
+	                 pauseState->Run();
+	                 app.setView(view);
+	                 sf::Time elapsed = clock.restart();
+                         elapsedTime = 0;
+	                 continue;
+                     }             
                  }
             }
         
@@ -592,7 +608,7 @@ class PlayState: public State
 	         
 	     //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))
-	         return -1;                   
+	         return -1;   
          
             //set particle emmitter bools to false
             enemyHit = false;
@@ -637,22 +653,28 @@ class PlayState: public State
                 completeScreen.setFillColor(Color(curCol.r, curCol.g, curCol.b, curCol.a + 2));
             }
             //Stage 2 of level complete
-            else if (completeScreen.getFillColor().a == 200 and completeStage == 1)
+            else if (completeScreen.getFillColor().a == 200 and completeStage == 2)
             {
-                completeStage = 2;
+                completeStage = 3;
             }
         
             //update is player hit
             shipHit = false;
-            switch(checkIfPlayerHit(player, collidableEntities, asteroid, enemyList, enemyBulletList, &shipHitParticles))
+            
+            if (completeStage == 0)
             {
-                case 3:
-                    shipHit = true;
-                    player -> isHit = true;
-                case 2:
-                    shipHit = true;
-                case 1:
-                    shipHit = true;
+                switch(checkIfPlayerHit(player, collidableEntities, asteroid, enemyList, enemyBulletList, &shipHitParticles))
+                {
+            
+                    case 3:
+                        shipHit = true;
+                        player -> isHit = true;
+                    case 2:
+                        shipHit = true;
+                    case 1:
+                        shipHit = true;
+                }
+                    
             }
 
             screenShake(app, shipHit);
@@ -714,7 +736,7 @@ class PlayState: public State
             }
              
             //spawn enemies
-            if (tick != 0 and tick%ticksTillEnemySpawn == 0 and !levelComplete)
+            if (tick != 0 and tick%ticksTillEnemySpawn == 0 and completeStage == 0)
             {
                 Enemy* newEnemy = enemySpawner->checkToSpawn(curGame->level, curGame->area, tick, enemyList);
                 if (newEnemy != NULL)
@@ -774,15 +796,28 @@ class PlayState: public State
             if (progressPercent >= 100 and completeStage == 0)
             {
                 completeStage = 1;
-                levelComplete = true;
-                for (auto i:enemyList)
-                    i->health = 0;
-                emptyState();
+                nextLevelSetting = 1;
+                for (int i = 0; i < enemyList.size(); i++)
+                    enemyList[i]->life = 0;
+                emptyState(player);
+                    
                 //return 3;
             }
             
+            if (completeStage == 1)
+            {
+                if (glowValue < 1.0)
+                    glowValue = glowValue + 0.01;
+                if (player->x >= screenW)
+                {
+                    completeStage = 2;
+                    levelComplete = true;
+                    entities.clear();
+                }
+            }
+            
             //Stage 4 of level complete
-            else if (completeTick == 100 and completeStage == 3)
+            else if (completeTick == 100 and completeStage == 4)
             {
                 curGame->nextStage();
                 return 3;
@@ -887,10 +922,13 @@ class PlayState: public State
                     app.draw(circle2);*/
                 }
             }
-            app.draw(shipParticles);
+            
+            if (completeStage < 2)
+                app.draw(shipParticles);
             app.draw(hitParticles);
             app.draw(explosionParticles);
             app.draw(shipHitParticles);
+            
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
@@ -898,21 +936,28 @@ class PlayState: public State
             
             app.draw(completeScreen);
             
-            //Stage 3 of complete Stage
-            if ((completeTick == 100 and completeStage == 2) or completeStage > 2)
+            //Stage 4 of complete Stage
+            if ((completeTick == 100 and completeStage == 3) or completeStage > 3)
             {
                 drawText("Level Complete", 60, screenW/3, screenH - 16 * (screenH/20), app);
                 drawText("Credits Collected: " + to_string(numCreditsCollectedRound), 40, screenW/3, screenH - 13 * (screenH/20), app);
                 drawText("Enemies Killed: " + to_string(numEnemiesKilledRound), 40, screenW/3, screenH - 12 * (screenH/20), app);
-                if (completeStage == 2)
+                for (int i = 0; i < itemHandler -> itemChoices.size(); i++)
                 {
-                    completeStage = 3;
+                    Item *curItem = itemHandler -> itemChoices.at(i);
+                    drawText(curItem->name + ":", 20, (relUnitX * 10) + (relUnitX * i * 30), (relUnitY * 60), app);
+                    drawText(curItem->desc + ":", 14, (relUnitX * 10) + (relUnitX * i * 30), (relUnitY * 65), app);
+                } 
+                if (completeStage == 3)
+                {
+                    completeStage = 4;
                     completeTick = 0;
                 }
                 
             }
             
             app.display();
+            pauseTex.update(app);
             app.clear(Color::Black);
             RectangleShape rectangle;
             rectangle.setSize(Vector2f(screenW, screenH));
@@ -921,7 +966,11 @@ class PlayState: public State
             else if (curGame -> area == 2)
             	rectangle.setFillColor(Color(5, 73, 7, 200));
             	
-            app.draw(rectangle);
+            glowShader.setUniform("baseColor", sf::Glsl::Vec4(rectangle.getFillColor()));
+            glowShader.setUniform("setting", nextLevelSetting);
+            glowShader.setUniform("globalGlowStr", glowValue);
+            app.draw(rectangle, &glowShader);
+            //app.draw(rectangle);
         }
     
     
