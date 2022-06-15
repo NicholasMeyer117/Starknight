@@ -30,6 +30,10 @@ void main()
     if (setting == 1)
     {
         glowColor = redGlow;
+        glowStrY = (gl_FragCoord.y)/(screenSize.y);
+        glowStrY = 2.0 * glowStrY;
+        if (glowStrY > 1.0)
+            glowStrY = 2.0 - glowStrY;
     }
     else if (setting == 2 && gl_FragCoord.y > screenSize.y/2.0)
     {

@@ -130,7 +130,6 @@ class ShopState: public State
         int synergyCounterCol = 0;
         for (int i = 0; i < sizeof(synergyHandler->synergies)/sizeof(synergyHandler->synergies[0]); i++)
         {
-            cout<<"\nLevel: " << synergyHandler->synergies[i].level << "\n";
             if (synergyHandler->synergies[i].level >= 2)
             {
                 synergyHandler->addSynergyBox(relUnitX * 5 + (10 * relUnitX * synergyCounterCol), 
@@ -771,7 +770,6 @@ class ShopState: public State
                         //character->attachments.erase(i);
                         (character->credits) += (character->attachments[i])->credits;
                         //string test = character->attachments[i]->name;
-                        cout << "\n" + character->attachments[i]->name + ": " + to_string(character->attachments[i]->credits) + "\n";
                         character->attachments.erase(next(begin(character->attachments), + i));
                         attachmentSlotButtons.clear();
                         for (int j = 0; j < character->attachments.size(); j++)
@@ -818,13 +816,10 @@ class ShopState: public State
                     }
                     else if (alreadyHas->level < 3)
                     {
-                        cout << "LEVEL: " << alreadyHas -> level << "\n";
                         alreadyHas->upgrade();
-                        cout << "LEVEL IS NOW: " << alreadyHas -> level << "\n";
                     }
                     else
                     {
-                        cout << "LEVEL: " << alreadyHas -> level << "\n";
                         continue;
                         
                     }

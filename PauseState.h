@@ -9,6 +9,7 @@
 #include <stdlib.h> 
 #include <math.h>
 #include <cstring>
+#include "Actor.h"
 
 using namespace sf;
 using namespace std;
@@ -26,9 +27,10 @@ class PauseState
     sf::Font gameFont;
     sf::Text source;
     sf::View *pauseView;//(sf::Vector2f(screenW/2, screenH/2), sf::Vector2f(screenW/2, screenH/2));
+    Actor *player;
     Texture pauseTex;
     
-    PauseState(Game *game, Texture PauseTex)
+    PauseState(Game *game, Texture PauseTex, Actor *Player)
     {
         source = game->source;
         gameFont = game->gameFont;
@@ -36,6 +38,7 @@ class PauseState
         relUnitX = game->relUnitX;
         relUnitY = game->relUnitY;
         
+        player = Player;
         pauseTex = PauseTex;
         pauseView = new View(sf::Vector2f(screenW/2, screenH/2), sf::Vector2f(screenW, screenH));
         pauseView->setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
@@ -50,6 +53,38 @@ class PauseState
         source.setPosition(xposition,yposition);
         source.setFillColor(Color::White);
         window.draw(source);
+    }
+    
+    void displayLevelInfo(Actor *player, sf::RenderWindow& app)
+    {
+        drawText("Level Info:", 20, (relUnitX * 5), (relUnitY * 14), app);
+        drawText("Area: " + to_string(curGame->area), 16, (relUnitX * 5), (relUnitY * 18), app);
+        drawText("Level: " + to_string(curGame->level), 16, (relUnitX * 5), (relUnitY * 22), app);
+    
+    
+    }
+    
+    void displayPlayerMults(Actor *player, sf::RenderWindow& app)
+    {
+        drawText("Player Multipliers:", 20, (relUnitX * 75), (relUnitY * 60), app);
+        drawText("Speed Mult: " + to_string(player->speedMult), 16, (relUnitX * 75), (relUnitY * 64), app);
+        drawText("Health Mult: " + to_string(player->healthMult), 16, (relUnitX * 75), (relUnitY * 68), app);
+        drawText("Damage Mult: " + to_string(player->damageMult), 16, (relUnitX * 75), (relUnitY * 72), app);
+        drawText("Firerate Mult: " + to_string(player->fireRateMult), 16, (relUnitX * 75), (relUnitY * 76), app);
+        drawText("Bullet Speed Mult: " + to_string(player->bulletSpeedMult), 16, (relUnitX * 75), (relUnitY * 80), app);
+        drawText("Healing Mult: " + to_string(player->healingMult), 16, (relUnitX * 75), (relUnitY * 84), app);
+    }
+    
+    void displayPlayerStats(Actor *player, sf::RenderWindow& app)
+    {
+        drawText("Player Stats:", 20, (relUnitX * 75), (relUnitY * 14), app);
+        drawText("Current Health: " + to_string(player->health), 16, (relUnitX * 75), (relUnitY * 18), app);
+        drawText("Max Health: " + to_string(player->maxHealth), 16, (relUnitX * 75), (relUnitY * 22), app);
+        drawText("Shields: " + to_string(player->shields), 16, (relUnitX * 75), (relUnitY * 26), app);
+        drawText("Speed: " + to_string(player->speed), 16, (relUnitX * 75), (relUnitY * 30), app);
+        drawText("iFrames: " + to_string(player->iFrames), 16, (relUnitX * 75), (relUnitY * 34), app);
+    
+    
     }
     
     int Run()
@@ -76,6 +111,9 @@ class PauseState
             }
             app.clear(Color::White);
             app.draw(pauseImage);
+            displayPlayerStats(player, app);
+            displayPlayerMults(player, app);
+            displayLevelInfo(player, app);
             drawText("PAUSED", 60, relUnitX * 45, relUnitY * 40, app);
             app.display();
 

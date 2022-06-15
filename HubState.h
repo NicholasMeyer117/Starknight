@@ -379,6 +379,8 @@ class HubState: public State
             {
                 buttonList[0]->leftClicked = false;
                 curChar->shipType = curShipNum;
+                shipSprites.clear();
+                crewSlotButtons.clear();
                 return 3;
             
             }

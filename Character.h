@@ -9,6 +9,7 @@
 #include <cstring>
 #include "Entity.h"
 #include "Attachment.h"
+#include "Item.h"
 #define PI 3.14159265
 
 using namespace sf;
@@ -25,6 +26,7 @@ class Character
     int shipType = 0; //fighter, tank, interceptor, smuggler, weaponsPlatform, commandShip, techShip
     
     std::vector<Attachment*> attachments;
+    std::vector<Item*> items;
     std::array<bool, 4> crewUnlocks; //element corresponds to crew ID, to check if members are unlocked across a save file
     
     void resetCredits();

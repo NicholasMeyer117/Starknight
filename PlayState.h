@@ -237,6 +237,21 @@ class PlayState: public State
         window.draw(source);
     }
     
+    void drawChallengeText(int gameType, int levelProgress, sf::RenderWindow& window)
+    {
+        if (gameType == 1)
+        {
+            if (10 < levelProgress and levelProgress < 40)
+            {
+                drawText("DONT GET HIT", 50, relUnitX * 40, relUnitY * 45, app);
+            }
+            else if (levelProgress >= 40)
+            {
+                drawText("DONT GET HIT", 25, relUnitX * 45, relUnitY * 5, app);
+            }
+        }
+    }
+    
     int checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, Entity *asteroid, std::vector<Enemy*> enemyList, std::vector<Bullet*> enemyBulletList, ParticleSystem *particles)
     {
         int code = 0; //0 = not hit, 1 = collided, 2 = collided with enemy, 3 = hit by bullet
@@ -478,7 +493,7 @@ class PlayState: public State
         std::cout << "\nScreen Width0: " + std::to_string(screenW);
         EnemySpawner *enemySpawner = new EnemySpawner;
         enemySpawner->createSpawner(enemySpriteList, bulletSpriteList, screenW, screenH);
-        ItemHandler *itemHandler = new ItemHandler();
+        ItemHandler *itemHandler = new ItemHandler(character);
         
         RectangleShape completeScreen;
         completeScreen.setSize(sf::Vector2f(screenW, screenH));
@@ -500,11 +515,15 @@ class PlayState: public State
         bool spawnedBoss = false;
         bool bossDeath = false;
         bool levelComplete= false;
+        bool challengeSucceeded = true;
+        bool itemIsChosen = false; //For levels where an item is granted at the end, checks boolean before continuing
+        bool isPlayerDead = false;
         int numBossExplosions = 0;
         int completeStage = 0; //0 = levelOngoing, 1 = levelBeaten, 2 = player moved, 3 = completeScreenDone, 4 = textDone, 5 = goldDone
         int completeTick = 0; //used to determine some parts of completion stage
         int ticksTillEnemySpawn = 100;
         int nextLevelSetting = 0; //0 = level in progress, 1 = reg level next, 2 challenge and reg choice next
+        int currentLevelType = 0;
         float glowValue = 0.0; //Used to set strength of after level glow
         //int beginningGold = 0;
     
@@ -514,6 +533,7 @@ class PlayState: public State
         attachmentList = character->attachments;
         curGame->synergyHandler->applySynergies(player);
         curGame->crewHandler->applyCrew(player);
+        curGame->setUpLevel(currentLevelType, maxLevelProgress);
         
         ParticleSystem shipParticles(1000, 20, 5, 250, 1, Color::Red, 180);
         ParticleSystem hitParticles(50, 50, 10, 50, 3, Color::White, 180);
@@ -539,6 +559,25 @@ class PlayState: public State
             else if (i->name == "Speed Booster")
                 player->speedMult = player->speedMult + (i->baseDamage * player->utilityMult);
         }
+        
+        //Pre-round item check
+        cout << "\nPre-round Item Check:\n";
+        for (auto i:character->items)
+        {
+             cout << i->name;
+             if (i->name == "Caliber Upgrade")
+                 player->damageMult += 0.15;
+             else if (i->name == "Advanced Load Mechanism")
+                 player->fireRateMult+= 0.15;
+             else if (i ->name == "Reinforced Hull")
+             {
+                 player->speedMult -= 0.1;
+             }
+        }
+        
+        
+        
+        
         startGameSpeed = startGameSpeed * (1 - mapTimeDilationPercentage);
         player -> maxHealth = round(player->maxHealth * player -> healthMult);
         player -> health = player -> maxHealth;
@@ -586,7 +625,7 @@ class PlayState: public State
                      if (event.key.code == Keyboard::Escape)
                      {
                          //pauseTex.copyToImage().saveToFile("images/screenshot.png");
-                         PauseState *pauseState = new PauseState(curGame, pauseTex);
+                         PauseState *pauseState = new PauseState(curGame, pauseTex, player);
 	                 pauseState->Run();
 	                 app.setView(view);
 	                 sf::Time elapsed = clock.restart();
@@ -650,7 +689,7 @@ class PlayState: public State
             else if (completeScreen.getFillColor().a != 200)
             {
                 Color curCol = completeScreen.getFillColor();
-                completeScreen.setFillColor(Color(curCol.r, curCol.g, curCol.b, curCol.a + 2));
+                completeScreen.setFillColor(Color(curCol.r, curCol.g, curCol.b, curCol.a + 4));
             }
             //Stage 2 of level complete
             else if (completeScreen.getFillColor().a == 200 and completeStage == 2)
@@ -673,6 +712,30 @@ class PlayState: public State
                         shipHit = true;
                     case 1:
                         shipHit = true;
+                }
+                if (shipHit and currentLevelType == 1)
+                {
+                    levelProgress = maxLevelProgress;
+                    curGame ->nextStageType = 0;
+                    for (int i = 0; i < enemyList.size(); i++)
+                        enemyList[i]->life = 0;
+                    emptyState(player);
+                    completeStage = 2;
+                    levelComplete = true;
+                    challengeSucceeded = false;
+                    entities.clear();
+                }
+                if (player->health <= 0)
+                {
+                    isPlayerDead = true;
+                    levelProgress = maxLevelProgress;
+                    for (int i = 0; i < enemyList.size(); i++)
+                        enemyList[i]->life = 0;
+                    emptyState(player);
+                    completeStage = 2;
+                    levelComplete = true;
+                    entities.clear();
+                
                 }
                     
             }
@@ -796,7 +859,7 @@ class PlayState: public State
             if (progressPercent >= 100 and completeStage == 0)
             {
                 completeStage = 1;
-                nextLevelSetting = 1;
+                nextLevelSetting = curGame->getNextStageChoices();
                 for (int i = 0; i < enemyList.size(); i++)
                     enemyList[i]->life = 0;
                 emptyState(player);
@@ -810,6 +873,15 @@ class PlayState: public State
                     glowValue = glowValue + 0.01;
                 if (player->x >= screenW)
                 {
+                    if (nextLevelSetting == 1)
+                        curGame -> nextStageType = 0;
+                    else if (nextLevelSetting == 2)
+                    {
+                        if (player->y <= screenH/2)
+                            curGame -> nextStageType = 0;
+                        else if (player->y > screenH/2)
+                            curGame -> nextStageType = 1;
+                    }
                     completeStage = 2;
                     levelComplete = true;
                     entities.clear();
@@ -817,8 +889,15 @@ class PlayState: public State
             }
             
             //Stage 4 of level complete
-            else if (completeTick == 100 and completeStage == 4)
+            else if ((completeTick == 50 and completeStage == 4) or itemIsChosen)
             {
+                if (isPlayerDead)
+                {
+                    character->items.clear();
+                    character->attachments.clear();
+                    curGame->restartGame();
+                    return 0;
+                }
                 curGame->nextStage();
                 return 3;
             }
@@ -934,28 +1013,48 @@ class PlayState: public State
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
             drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
             
+            drawChallengeText(currentLevelType, levelProgress, app);
+            
             app.draw(completeScreen);
             
             //Stage 4 of complete Stage
-            if ((completeTick == 100 and completeStage == 3) or completeStage > 3)
+            if ((completeTick >= 50 and completeStage == 3) or completeStage > 3)
             {
-                drawText("Level Complete", 60, screenW/3, screenH - 16 * (screenH/20), app);
-                drawText("Credits Collected: " + to_string(numCreditsCollectedRound), 40, screenW/3, screenH - 13 * (screenH/20), app);
-                drawText("Enemies Killed: " + to_string(numEnemiesKilledRound), 40, screenW/3, screenH - 12 * (screenH/20), app);
-                for (int i = 0; i < itemHandler -> itemChoices.size(); i++)
+                if (!isPlayerDead)
                 {
-                    Item *curItem = itemHandler -> itemChoices.at(i);
-                    drawText(curItem->name + ":", 20, (relUnitX * 10) + (relUnitX * i * 30), (relUnitY * 60), app);
-                    drawText(curItem->desc + ":", 14, (relUnitX * 10) + (relUnitX * i * 30), (relUnitY * 65), app);
-                } 
-                if (completeStage == 3)
+                    if (currentLevelType == 0 or challengeSucceeded == true)
+                        drawText("Level Complete", 60, relUnitX * 40, relUnitY * 20, app);
+                    else
+                        drawText("Challenge Failed", 60, relUnitX * 40, relUnitY * 20, app);
+                    drawText("Credits Collected: " + to_string(numCreditsCollectedRound), 40, relUnitX * 40, relUnitY * 30, app);
+                    drawText("Enemies Killed: " + to_string(numEnemiesKilledRound), 40, relUnitX * 40, relUnitY * 35, app);
+                }
+                else
+                {
+                    drawText("YOU DIED", 60, relUnitX * 40, relUnitY * 20, app);
+                }
+                if (currentLevelType == 1 and challengeSucceeded)
+                {
+                    for (int i = 0; i < itemHandler -> itemChoices.size(); i++)
+                    {
+                        Item *curItem = itemHandler -> itemChoices.at(i);
+                        drawText(curItem->name + ":", 20, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 70), app);
+                        drawText(curItem->desc + ":", 14, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 75), app);
+                        curItem->createButton((relUnitX * 20) + (relUnitX * i * 30), (relUnitY * 55), 150, 150);
+                        itemHandler->checkIfItemHovered();
+                        app.draw(curItem->button.icon);
+                    } 
+                    itemIsChosen = itemHandler->checkIfItemChosen();
+                    
+                }
+                if (completeStage == 3 and (currentLevelType == 0 or itemIsChosen or !challengeSucceeded))
                 {
                     completeStage = 4;
                     completeTick = 0;
                 }
                 
             }
-            
+                        
             app.display();
             pauseTex.update(app);
             app.clear(Color::Black);

@@ -8,6 +8,7 @@
 #include <math.h>
 #include <cstring>
 #include <unistd.h>
+#include "Button.h"
 
 class Item
 {
@@ -22,13 +23,26 @@ class Item
     sf::RectangleShape synRec;
     sf::Sprite sprite;
     sf::Texture tex;
+    ImageButton button;
     
-    Item(string Name, int RarityLevel, int ItemID, string Desc)
+    Item(string Name, int RarityLevel, int ItemID, string Desc, Texture texture,Sprite Sprite)
     {
         name = Name;
         rarityLevel = RarityLevel;
         itemID = ItemID;
         desc = Desc;
+        tex = texture;
+        sprite = Sprite;
+    }
+    
+    void createButton(int x, int y, double w, double h)
+    {
+        //button = new ImageButton;
+        button.createImageButton(tex, sprite, x, y, w, h);
+        button.icon.setOrigin(w/2, h/2);
+        button.rect = button.icon.getGlobalBounds();
+    
+    
     }
 
 

@@ -27,11 +27,13 @@ class Game
     public:
     enum gameState {mainMenu, hub, game, shop, settings};
     int area = 1; //each area consists of several levels and ends with a boss
-    int level = 3;
+    int level = 1;
     int screenWidth;
     int screenHeight;
     int relUnitX;
     int relUnitY;
+    
+    int nextStageType = 0; //0 = regular level, 1 = Don't get hit challenge level
     sf::Text source;
     sf::Font gameFont;
     Character *character = new Character;
@@ -69,6 +71,12 @@ class Game
         
         
     }
+    void restartGame()
+    {
+        area = 1;
+        level = 1;
+        crewHandler->crewList.clear();
+    }
     
     void nextStage()
     {
@@ -81,10 +89,29 @@ class Game
         }
     }
     
+    int getNextStageChoices()
+    {
+        if (level == 4)
+            return 1;
+        srand(time(NULL));
+        int randNum = rand() % 2 + 1;
+        return randNum;
+    
+    }
+    
     
     void changeState();
     
-    void beginLevel();
+    void setUpLevel(int &currentLevelType, float &maxLevelProgress)
+    {
+        currentLevelType = nextStageType;
+        if (currentLevelType == 0)
+            maxLevelProgress = 4000;
+        else if (currentLevelType == 1)
+            maxLevelProgress = 4000;
+            
+    
+    }
     
     
     
