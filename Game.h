@@ -69,7 +69,6 @@ class Game
         b6.loadFromFile("images/missile.png");
         bulletTextureList[5] = b6;
         
-        
     }
     void restartGame()
     {
@@ -93,8 +92,9 @@ class Game
     {
         if (level == 4)
             return 1;
-        srand(time(NULL));
-        int randNum = rand() % 2 + 1;
+        //srand(time(NULL));
+        //int randNum = rand() % 2 + 1;
+        int randNum = 2;
         return randNum;
     
     }
@@ -106,9 +106,9 @@ class Game
     {
         currentLevelType = nextStageType;
         if (currentLevelType == 0)
-            maxLevelProgress = 4000;
+            maxLevelProgress = 2000;
         else if (currentLevelType == 1)
-            maxLevelProgress = 4000;
+            maxLevelProgress = 2000;
             
     
     }

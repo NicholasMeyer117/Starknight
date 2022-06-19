@@ -14,13 +14,14 @@ public:
     int timeAlive = 0;
     float baseSpeed = 50.f;
     float baseAngle;
+    int cone;
     float spawnSpeed;
     int maxH, minH, maxW, minW;
     int firsts;
     int opacity;
     Color color;
-    ParticleSystem(unsigned int count, float Lifetime, float Size, float Speed, int Type, Color COLOR, float Angle = 90.f, 
-    int MaxH = 0, int MinH = 0, int MaxW = 0, int MinW = 0, int Opacity = 255) :
+    ParticleSystem(unsigned int count, float Lifetime, float Size, float Speed, int Type, Color COLOR, float Angle = 90.f,
+    int MaxH = 0, int MinH = 0, int MaxW = 0, int MinW = 0, int Opacity = 255, int Cone = 90) :
     m_particles(count),
     m_vertices(sf::Quads, count),
     m_lifetime(sf::seconds(3.f)),
@@ -32,6 +33,7 @@ public:
         timeAlive = Lifetime;
         baseSpeed = Speed;
         baseAngle = Angle;
+        cone = Cone;
         maxW = MaxW;
         minW = MinW;
         maxH = MaxH;

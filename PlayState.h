@@ -252,51 +252,68 @@ class PlayState: public State
         }
     }
     
-    int checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, Entity *asteroid, std::vector<Enemy*> enemyList, std::vector<Bullet*> enemyBulletList, ParticleSystem *particles)
+    int checkIfPlayerHit(Actor *player, std::vector<Entity*> collidableEntities, Entity *asteroid, std::vector<Enemy*> enemyList, std::vector<Bullet*> enemyBulletList, ParticleSystem *particles, itemActivation *myActiveItems)
     {
         int code = 0; //0 = not hit, 1 = collided, 2 = collided with enemy, 3 = hit by bullet
         if (player -> ticksSinceLastHit > player -> iFrames)
         {
-	    if (checkCollisions(player, collidableEntities) != NULL)
-	    {
-	        player->xPos = 200;
-	        player->yPos = 400;
-	        player -> health = player->health - 10; 
-	        player -> ticksSinceLastHit = 0;
-	        code = 1;
-	    }
-	    
-	    if(checkSpriteCollisions(player, asteroid) != NULL)
-	    {
-	        player -> health = player->health - 10; 
-	        player -> ticksSinceLastHit = 0;
-	        code = 1;
-	    }
-	    
-	    Enemy *enemy = checkSpriteCollisions(player, enemyList);
-	    if (enemy != NULL)
-	    {
-	        player -> health = player->health - 10; 
-	        enemy -> takeDamage(100);
-	        player -> ticksSinceLastHit = 0;
-	        code = 2;
-	        //explosionParticles.setEmitter(sf::Vector2f(enemy->x, enemy->y));
+	        if (checkCollisions(player, collidableEntities) != NULL)
+	        {
+	            player->xPos = 200;
+	            player->yPos = 400;
+	            player -> health = player->health - 10; 
+	            player -> ticksSinceLastHit = 0;
+	            code = 1;
+	        }
+	        
+	        if(checkSpriteCollisions(player, asteroid) != NULL)
+	        {
+	            player -> health = player->health - 10; 
+	            player -> ticksSinceLastHit = 0;
+	            code = 1;
+	        }
+	        
+	        Enemy *enemy = checkSpriteCollisions(player, enemyList);
+	        if (enemy != NULL)
+	        {
+	            player -> health = player->health - 10; 
+	            enemy -> takeDamage(100);
+	            player -> ticksSinceLastHit = 0;
+	            code = 2;
+	            //explosionParticles.setEmitter(sf::Vector2f(enemy->x, enemy->y));
+	        }
+    
+	        Bullet *temp = checkSpriteCollisions(player, enemyBulletList);
+	        if (temp != NULL)
+	        {
+	            player -> health = player->health - temp->damage; 
+	            particles->setEmitter(sf::Vector2f(temp->x, temp->y));
+	            temp -> life = 0;
+	            player -> ticksSinceLastHit = 0;
+	            code = 3;
+	        }
+
+            if (code > 0)
+            {
+                if (player->health <= player->maxHealth/2 and myActiveItems->fury == myActiveItems->notActive)
+                {
+                    myActiveItems->fury = myActiveItems->active;
+                    player->damageMult+=0.2;
+                    player->fireRateMult+=0.2;
+                }
+                if (myActiveItems->panic == myActiveItems->notActive)
+                {
+                    myActiveItems->panic = myActiveItems->active;
+                    player->damageMult+=0.2;
+                    player->fireRateMult+=0.2;
+                }
+            }
+	        
 	    }
 
-	    Bullet *temp = checkSpriteCollisions(player, enemyBulletList);
-	    if (temp != NULL)
-	    {
-	        player -> health = player->health - temp->damage; 
-	        particles->setEmitter(sf::Vector2f(temp->x, temp->y));
-	        temp -> life = 0;
-	        player -> ticksSinceLastHit = 0;
-	        code = 3;
-	    }
-	    
-	}
-	
-	player -> ticksSinceLastHit++;
-	return code;
+        
+	    player -> ticksSinceLastHit++;
+	    return code;
     }
     
     
@@ -350,7 +367,7 @@ class PlayState: public State
         e9.loadFromFile("images/pirateTurret2.png");
         e10.loadFromFile("images/pirateMachineGunner.png");
         
-        Texture pauseTex;
+        Texture pauseTex;       
         pauseTex.create(screenW, screenH);
         
         //uniform vec4 flashColor;
@@ -364,8 +381,7 @@ class PlayState: public State
         //window.draw(yoursprite, &shader);
         glowShader.loadFromFile("shaders/glow.frag", sf::Shader::Fragment);
         glowShader.setUniform("redGlow", sf::Glsl::Vec4(1, 0, 0, 1));
-        glowShader.setUniform("blueGlow", sf::Glsl::Vec4(0, 0, 1, 1));
-        
+        glowShader.setUniform("blueGlow", sf::Glsl::Vec4(0, 0, 1, 1));   
 
         p1.setSmooth(true);
         //t2.setSmooth(true);
@@ -535,7 +551,7 @@ class PlayState: public State
         curGame->crewHandler->applyCrew(player);
         curGame->setUpLevel(currentLevelType, maxLevelProgress);
         
-        ParticleSystem shipParticles(1000, 20, 5, 250, 1, Color::Red, 180);
+        ParticleSystem shipParticles(100, 10, 1, 50, 1, Color::Red, 180,0,0,0,0,255, 30);
         ParticleSystem hitParticles(50, 50, 10, 50, 3, Color::White, 180);
         ParticleSystem explosionParticles(200, 50, 10, 100, 2, Color(255, 165, 0));
         ParticleSystem shipHitParticles(50, 50, 10, 100, 3, Color::Yellow, 0);
@@ -558,10 +574,12 @@ class PlayState: public State
                 player->healthMult += (i->baseDamage * player->utilityMult);
             else if (i->name == "Speed Booster")
                 player->speedMult = player->speedMult + (i->baseDamage * player->utilityMult);
+
         }
         
         //Pre-round item check
         cout << "\nPre-round Item Check:\n";
+        struct itemActivation myActiveItems;
         for (auto i:character->items)
         {
              cout << i->name;
@@ -573,9 +591,22 @@ class PlayState: public State
              {
                  player->speedMult -= 0.1;
              }
+             else if (i->name == "Altered Ballistics")
+             {
+                 player->fireRateMult+=0.2;
+                 player->bulletSpeedMult-=0.2;
+             }
+             else if (i->name == "Fury")
+                myActiveItems.fury = myActiveItems.notActive;
+            else if (i->name == "Ghost Bullets")
+                myActiveItems.ghostBullets = myActiveItems.active;
+            else if (i->name == "Projectile Disruptor Field")
+                myActiveItems.projDisruptorField = myActiveItems.active;
+            else if (i->name == "Extra choice [Item]")
+                itemHandler->itemChoicesNum = 4;
+            else if (i->name == "Panic")
+                myActiveItems.panic = myActiveItems.notActive;
         }
-        
-        
         
         
         startGameSpeed = startGameSpeed * (1 - mapTimeDilationPercentage);
@@ -634,6 +665,17 @@ class PlayState: public State
                      }             
                  }
             }
+            
+            RectangleShape rectangle;
+            rectangle.setSize(Vector2f(screenW, screenH));
+            if (curGame -> area == 1)
+            	rectangle.setFillColor(Color(56,10,56,200));
+            else if (curGame -> area == 2)
+            	rectangle.setFillColor(Color(5, 73, 7, 200));
+            
+            glowShader.setUniform("baseColor", sf::Glsl::Vec4(rectangle.getFillColor()));
+            glowShader.setUniform("setting", nextLevelSetting);
+            glowShader.setUniform("globalGlowStr", glowValue);
         
             //Player Movement
             if (Keyboard::isKeyPressed(Keyboard::W))
@@ -645,6 +687,8 @@ class PlayState: public State
             if (Keyboard::isKeyPressed(Keyboard::D))
 	         player->moveActor(Actor::right);    
 	         
+	    
+	         
 	     //Quit Game
 	     if (Keyboard::isKeyPressed(Keyboard::Q))
 	         return -1;   
@@ -654,6 +698,8 @@ class PlayState: public State
             enemyKilled = false;
             
             //update entities
+            itemHandler->checkActiveItems(player, &myActiveItems);
+
             for (int i = 0; i < bulletList.size(); i++)
             {
                 bulletList.at(i)->update(elapsedTime);
@@ -695,6 +741,7 @@ class PlayState: public State
             else if (completeScreen.getFillColor().a == 200 and completeStage == 2)
             {
                 completeStage = 3;
+                itemHandler->chooseItems();
             }
         
             //update is player hit
@@ -702,7 +749,7 @@ class PlayState: public State
             
             if (completeStage == 0)
             {
-                switch(checkIfPlayerHit(player, collidableEntities, asteroid, enemyList, enemyBulletList, &shipHitParticles))
+                switch(checkIfPlayerHit(player, collidableEntities, asteroid, enemyList, enemyBulletList, &shipHitParticles, &myActiveItems))
                 {
             
                     case 3:
@@ -741,7 +788,9 @@ class PlayState: public State
             }
 
             screenShake(app, shipHit);
-        
+            drawText("Ship Coords: " + to_string(player->x) + "," + to_string(player->y), 20, relUnitX * 40, relUnitY * 20, app);
+            glowShader.setUniform("shipCoords", sf::Vector2f(player->x, player->y));
+            app.draw(rectangle, &glowShader);
             //update misc enemies
             for (auto i:miscEnemyList)
             {
@@ -755,6 +804,7 @@ class PlayState: public State
                 }
             } 
             
+            //check enemy bullet collisions
             for (int i = 0; i < enemyBulletList.size(); i++)
             {
                 Bullet *temp = checkSpriteCollisions(asteroid, enemyBulletList);
@@ -766,15 +816,24 @@ class PlayState: public State
                 }
             }
             
+            //check player bullet collisions
             for (int i = 0; i < bulletList.size(); i++)
             {
                 Bullet *temp = checkSpriteCollisions(asteroid, bulletList);
-                if (temp != NULL)
+                if (temp != NULL and myActiveItems.ghostBullets != myActiveItems.active)
                 {
                     temp->life = 0;
                     enemyHit = true;
                     hitParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
                 }
+                temp = checkSpriteCollisions(bulletList[i], enemyBulletList);
+                if (myActiveItems.projDisruptorField == myActiveItems.active and temp != NULL)
+                {
+                    temp->life = 0;
+                    explosionParticles.setEmitter(sf::Vector2f(temp->x, temp->y));
+                    enemyKilled = true;
+                }
+
             }
         
             //check if picked up gold
@@ -994,11 +1053,11 @@ class PlayState: public State
                     circle2.setOutlineColor(sf::Color::Blue);
                     circle2.setOutlineThickness(5);
                     circle2.setOrigin(5, 5);
-                    circle2.setPosition(i->x, i->y);
+                    circle2.setPosition(i->x, i->y);*/
                     
                     app.draw(hitBox);
-                    app.draw(circle);
-                    app.draw(circle2);*/
+                    //app.draw(circle);
+                    //app.draw(circle2);
                 }
             }
             
@@ -1012,6 +1071,8 @@ class PlayState: public State
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
             drawText("Progress: " + std::to_string(levelProgress), 20, 500, 20, app);
             drawText("Progress: " + std::to_string(progressPercent), 20, 500, 50, app);
+            drawText("Fury status: " + to_string(myActiveItems.fury), 20, relUnitX * 25, relUnitY * 25, app);
+            drawText("Panic status: " + to_string(myActiveItems.panic), 20, relUnitX * 25, relUnitY * 30, app);
             
             drawChallengeText(currentLevelType, levelProgress, app);
             
@@ -1035,12 +1096,23 @@ class PlayState: public State
                 }
                 if (currentLevelType == 1 and challengeSucceeded)
                 {
+                    int itemScreenWidth = relUnitX * 80;
+                    int totalShapesWidth = itemHandler -> itemChoices.size() * 150;
+                    int remainingWidth = itemScreenWidth - totalShapesWidth;
+                    int spaceBetween = remainingWidth/(itemHandler -> itemChoices.size() - 1);
+
                     for (int i = 0; i < itemHandler -> itemChoices.size(); i++)
                     {
                         Item *curItem = itemHandler -> itemChoices.at(i);
-                        drawText(curItem->name + ":", 20, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 70), app);
-                        drawText(curItem->desc + ":", 14, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 75), app);
-                        curItem->createButton((relUnitX * 20) + (relUnitX * i * 30), (relUnitY * 55), 150, 150);
+                        int currentTotalShapesWidth = i * 150;
+                        int itemPos = (relUnitX * 5) + currentTotalShapesWidth + (i * spaceBetween);
+
+                        //drawText(curItem->name + ":", 20, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 70), app);
+                        //drawText(curItem->desc + ":", 14, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 75), app);
+                        drawText(curItem->name + ":", 20, itemPos, (relUnitY * 70), app);
+                        drawText(curItem->desc + ":", 14, itemPos, (relUnitY * 75), app);
+                        //curItem->createButton((relUnitX * 20) + (relUnitX * i * 30), (relUnitY * 55), 150, 150);
+                        curItem->createButton(itemPos + (relUnitX * 5), (relUnitY * 55), 150, 150);
                         itemHandler->checkIfItemHovered();
                         app.draw(curItem->button.icon);
                     } 
@@ -1054,21 +1126,11 @@ class PlayState: public State
                 }
                 
             }
-                        
             app.display();
             pauseTex.update(app);
             app.clear(Color::Black);
-            RectangleShape rectangle;
-            rectangle.setSize(Vector2f(screenW, screenH));
-            if (curGame -> area == 1)
-            	rectangle.setFillColor(Color(56,10,56,200));
-            else if (curGame -> area == 2)
-            	rectangle.setFillColor(Color(5, 73, 7, 200));
-            	
-            glowShader.setUniform("baseColor", sf::Glsl::Vec4(rectangle.getFillColor()));
-            glowShader.setUniform("setting", nextLevelSetting);
-            glowShader.setUniform("globalGlowStr", glowValue);
-            app.draw(rectangle, &glowShader);
+            
+            //app.draw(randomSprite);
             //app.draw(rectangle);
         }
     
