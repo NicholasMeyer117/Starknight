@@ -1,13 +1,15 @@
 #include "Actor.h"
 
 void Actor::createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames, 
-float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, float HealthMult, float HealingMult, float UtilityMult, float AoeRadiusMult)
+float ContactDamage, float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, float HealthMult, 
+float HealingMult, float UtilityMult, float AoeRadiusMult, float ContactDamageMult)
 {
     health = Health;
     maxHealth = Health;
     shields = Shields;
     speed = Speed;
     firerate = Firerate;
+    contactDamage = ContactDamage;
     isEnemy = IsEnemy;
     iFrames = IFrames;
     xPos = x;
@@ -21,6 +23,7 @@ float DamageMult, float FireRateMult, float BulletSpeedMult, float SpeedMult, fl
     healingMult = HealingMult;
     utilityMult = UtilityMult;
     aoeRadiusMult = AoeRadiusMult;
+    contactDamageMult = ContactDamageMult;
     
     isActor = true;
 

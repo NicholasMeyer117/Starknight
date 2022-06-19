@@ -137,6 +137,7 @@ class PlayState: public State
     
         //move hitbox
         asteroid->setPosition(screenW + 600, (relUnitY * 10) + randNum);
+        asteroid->contactDamage = 10;
     }
     
     int moveAsteroids(Entity *asteroid, float speed, int progress)
@@ -268,7 +269,10 @@ class PlayState: public State
 	        
 	        if(checkSpriteCollisions(player, asteroid) != NULL)
 	        {
-	            player -> health = player->health - 10; 
+                int contDam = asteroid->contactDamage;
+                if (myActiveItems->reinforcedHull == myActiveItems->active)
+                    contDam = contDam/2;
+	            player -> health = player->health - contDam;
 	            player -> ticksSinceLastHit = 0;
 	            code = 1;
 	        }
@@ -276,8 +280,11 @@ class PlayState: public State
 	        Enemy *enemy = checkSpriteCollisions(player, enemyList);
 	        if (enemy != NULL)
 	        {
-	            player -> health = player->health - 10; 
-	            enemy -> takeDamage(100);
+                int contDam = enemy->contactDamage * enemy->contactDamageMult;
+                if (myActiveItems->reinforcedHull == myActiveItems->active)
+                    contDam = contDam/2;
+	            player -> health = player->health - (contDam); 
+	            enemy -> takeDamage(player->contactDamage * player->contactDamageMult);
 	            player -> ticksSinceLastHit = 0;
 	            code = 2;
 	            //explosionParticles.setEmitter(sf::Vector2f(enemy->x, enemy->y));
@@ -323,16 +330,16 @@ class PlayState: public State
         {
             case 0:
                 player->settings(playerShipSpriteList[character->shipType],200,400,52,75,0,20);
-                //health, shields, speed, firerate, is enemy, IFrames, damageMult, fireRateMult, bulletSpeedMult, SpeedMult, HealthMult, HealingMult, utilityMult
-                player->createActor(100, 100, 250, 10, false, 50, 1, 1, 1, 1, 1, 1, 1);
+                //health, shields, speed, firerate, is enemy, IFrames, contactDamage, damageMult, fireRateMult, bulletSpeedMult, SpeedMult, HealthMult, HealingMult, utilityMult
+                player->createActor(100, 100, 250, 10, false, 50, 10, 1, 1, 1, 1, 1, 1, 1);
                 return;
             case 1:
                 player->settings(playerShipSpriteList[character->shipType],200,400,75,91,0,20);
-                player->createActor(125, 100, 250, 10, false, 50, 1.25, 1, 1, 0.75, 1, 1, 1);
+                player->createActor(125, 100, 250, 10, false, 50, 15, 1.25, 1, 1, 0.75, 1, 1, 1);
                 return;
             case 2:
                 player->settings(playerShipSpriteList[character->shipType],200,400,50,50,0,20);
-                player->createActor(75, 100, 250, 10, false, 50, 1.25, 1, 1, 1.25, 1, 1, 1);
+                player->createActor(75, 100, 250, 10, false, 50, 5, 1.25, 1, 1, 1.25, 1, 1, 1);
                 return;
         }
     
@@ -582,21 +589,26 @@ class PlayState: public State
         struct itemActivation myActiveItems;
         for (auto i:character->items)
         {
-             cout << i->name;
-             if (i->name == "Caliber Upgrade")
-                 player->damageMult += 0.15;
-             else if (i->name == "Advanced Load Mechanism")
-                 player->fireRateMult+= 0.15;
-             else if (i ->name == "Reinforced Hull")
-             {
-                 player->speedMult -= 0.1;
-             }
-             else if (i->name == "Altered Ballistics")
-             {
-                 player->fireRateMult+=0.2;
-                 player->bulletSpeedMult-=0.2;
-             }
-             else if (i->name == "Fury")
+            cout << i->name;
+            if (i->name == "Caliber Upgrade")
+               player->damageMult += 0.15;
+            else if (i->name == "Advanced Load Mechanism")
+                player->fireRateMult+= 0.15;
+            else if (i ->name == "Reinforced Hull")
+            {
+                myActiveItems.reinforcedHull = myActiveItems.active;
+                player->speedMult -= 0.1;
+            }
+            else if (i->name == "Altered Ballistics")
+            {
+                player->fireRateMult+=0.2;
+                player->bulletSpeedMult-=0.2;
+            }
+            else if (i->name == "Deadly Hull")
+            {
+                player->contactDamage += 100;
+            }
+            else if (i->name == "Fury")
                 myActiveItems.fury = myActiveItems.notActive;
             else if (i->name == "Ghost Bullets")
                 myActiveItems.ghostBullets = myActiveItems.active;

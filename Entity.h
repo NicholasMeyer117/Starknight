@@ -21,6 +21,8 @@ class Entity
    //x,y refer to current pixel position in window, while xPos and yPos are positons relative to origin
    float x,y,xPos,yPos,w,h,dx,dy,R,angle;
    float absAngle;
+   float contactDamage = 0;
+   float contactDamageMult = 1.0;
    bool life = 1;
    bool isHit = false;
    bool isActor = false;

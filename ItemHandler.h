@@ -23,6 +23,7 @@ struct itemActivation
     itemStatus ghostBullets = notEquipped;
     itemStatus projDisruptorField = notEquipped;
     itemStatus panic = notEquipped;
+    itemStatus reinforcedHull = notEquipped;
 
 };
 
@@ -93,7 +94,8 @@ class ItemHandler
         
         character = Character;
         
-        character->items.push_back(commonItemPool[4]);
+        character->items.push_back(commonItemPool[2]);
+        character->items.push_back(legendaryItemPool[0]);
         //character->items.push_back(rareItemPool[1]);
         //character->items.push_back(rareItemPool[2]);
         //character->items.push_back(legendaryItemPool[2]);

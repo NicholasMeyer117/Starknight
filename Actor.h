@@ -24,10 +24,10 @@ class Actor: public Entity
     int iFrames;
     enum direction {up, down, left, right};
     
-    //health, shields, speed, firerate, is enemy, IFrames, damageMult, fireRateMult, bulletSpeedMult, SpeedMult, HealthMult, HealingMult, utilityMult
+    //health, shields, speed, firerate, is enemy, IFrames, contactDamage, damageMult, fireRateMult, bulletSpeedMult, SpeedMult, HealthMult, HealingMult, utilityMult
     void createActor(int Health, int Shields, float Speed, float Firerate, bool IsEnemy, int IFrames,
-    float DamageMult = 1.0, float FireRateMult = 1.0, float BulletSpeedMult = 1.0, float SpeedMult = 1.0, 
-    float HealthMult = 1.0, float HealingMult = 1.0, float UtilityMult = 1.0,float AoeRadiusMult = 1.0);
+    float ContactDamage = 10, float DamageMult = 1.0, float FireRateMult = 1.0, float BulletSpeedMult = 1.0, float SpeedMult = 1.0, 
+    float HealthMult = 1.0, float HealingMult = 1.0, float UtilityMult = 1.0,float AoeRadiusMult = 1.0, float ContactDamageMult = 1.0);
 
     void moveActor(enum direction);
     
