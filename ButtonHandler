@@ -1,0 +1,38 @@
+#pragma once
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <SFML/Graphics.hpp>
+#include <time.h>
+#include <list>
+#include <math.h>
+#include <cstring>
+#include <unistd.h>
+#include "Button.h"
+
+extern RenderWindow app;
+
+class ButtonHandler
+{
+    public:
+
+
+    bool checkIfButtonClicked()
+    {
+
+        pixelPos = sf::Mouse::getPosition(app);
+        worldPos = app.mapPixelToCoords(pixelPos);
+
+
+        return 0;
+    }
+
+    int checkIfButtonClickedFromList()
+    {
+        return -1;
+    }
+
+
+
+
+};

@@ -28,6 +28,7 @@
 #include "AOE.h"
 #include "ItemHandler.h"
 #include "PauseState.h"
+#include "ButtonHandler.h"
 
 //Global Variables
 extern int screenW;
@@ -517,6 +518,7 @@ class PlayState: public State
         EnemySpawner *enemySpawner = new EnemySpawner;
         enemySpawner->createSpawner(enemySpriteList, bulletSpriteList, screenW, screenH);
         ItemHandler *itemHandler = new ItemHandler(character);
+        ButtonHandler *buttonHandler = new ButtonHandler();
         
         RectangleShape completeScreen;
         completeScreen.setSize(sf::Vector2f(screenW, screenH));
@@ -675,7 +677,14 @@ class PlayState: public State
                          elapsedTime = 0;
 	                 continue;
                      }             
-                 }
+                }
+                else if (event.type == sf::Event::MouseButtonPressed) 
+                {
+                    for (int i = 0; i < buttonList.size(); i++)
+                    {
+                        buttonHandler->checkIfButtonLeftClicked(buttonList[i]);
+                    }
+                }
             }
             
             RectangleShape rectangle;
@@ -754,6 +763,10 @@ class PlayState: public State
             {
                 completeStage = 3;
                 itemHandler->chooseItems();
+                Button *rerollItemButton = new Button;
+                rerollItemButton->createButton(relUnitX * 50, relUnitY * 50, 200, 50, &gameFont, "Reroll", 20); 
+                rerollItemButton->visible = true;
+                buttonList.push_back(rerollItemButton);
             }
         
             //update is player hit
@@ -1078,6 +1091,13 @@ class PlayState: public State
             app.draw(hitParticles);
             app.draw(explosionParticles);
             app.draw(shipHitParticles);
+
+            //check buttons
+            if (buttonList.size() > 0 and buttonList[0]->leftClicked == true)
+            {
+                buttonList[0]->leftClicked = false;
+                itemHandler -> chooseItems();
+            }
             
             drawText(": " + std::to_string(character->credits), 20, 65, 12, app);
             drawText(": " + std::to_string(player->health), 20, 65, 60, app);
@@ -1119,16 +1139,21 @@ class PlayState: public State
                         int currentTotalShapesWidth = i * 150;
                         int itemPos = (relUnitX * 5) + currentTotalShapesWidth + (i * spaceBetween);
 
-                        //drawText(curItem->name + ":", 20, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 70), app);
-                        //drawText(curItem->desc + ":", 14, (relUnitX * 15) + (relUnitX * i * 30), (relUnitY * 75), app);
-                        drawText(curItem->name + ":", 20, itemPos, (relUnitY * 70), app);
-                        drawText(curItem->desc + ":", 14, itemPos, (relUnitY * 75), app);
-                        //curItem->createButton((relUnitX * 20) + (relUnitX * i * 30), (relUnitY * 55), 150, 150);
-                        curItem->createButton(itemPos + (relUnitX * 5), (relUnitY * 55), 150, 150);
+                        drawText(curItem->name + ":", 20, itemPos, (relUnitY * 80), app);
+                        drawText(curItem->desc + ":", 14, itemPos, (relUnitY * 85), app);
+                        curItem->createButton(itemPos + (relUnitX * 10), (relUnitY * 65), 150, 150);
                         itemHandler->checkIfItemHovered();
                         app.draw(curItem->button.icon);
                     } 
                     itemIsChosen = itemHandler->checkIfItemChosen();
+                    for(auto i:buttonList)
+                    {
+                        if (i->visible == true)
+                        {
+                            app.draw(i->rectangle);
+                            app.draw(i->buttonText);
+                        }
+                    }
                     
                 }
                 if (completeStage == 3 and (currentLevelType == 0 or itemIsChosen or !challengeSucceeded))

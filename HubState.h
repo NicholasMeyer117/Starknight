@@ -165,7 +165,7 @@ class HubState: public State
         Sprite sprite;
         ImageButton *button = new ImageButton;
         sprite = crewSprites[curCrewNum];
-        button->createImageButton(crewTextures[ID], sprite, relUnitX * 90, relUnitY * 13 + ((relUnitY * 20) * slotNum), 100, 100);
+        button->createImageButton(crewTextures[ID], sprite, relUnitX * 90, relUnitY * 12 + ((relUnitY * 20) * slotNum), 100, 100);
         button->icon.setScale(1.5, 1.5);
         button->icon.setOrigin(50, 50);
         crewSlotButtons.push_back(button);
@@ -416,10 +416,16 @@ class HubState: public State
             crewButton->icon = crewSprites[curCrewNum];
             crewButton->icon.setTexture(crewTextures[curCrewNum]);
             app.draw(crewButton -> icon);
-            for(auto i:slotDiamonds)
-                app.draw(i);
             for (auto i:crewSlotButtons)
             	app.draw(i->icon);
+            int slotDiamondsCounter = 0;
+            for(auto i:slotDiamonds)
+            {
+                if (crewSlotButtons.size() > slotDiamondsCounter)
+                    i.setFillColor(Color::Transparent);
+                slotDiamondsCounter++;
+                app.draw(i);
+            }
             for(auto i:buttonList)
             {
                 app.draw(i->rectangle);

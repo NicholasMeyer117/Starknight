@@ -91,6 +91,8 @@ class ItemHandler
         sprite.setTexture(t22);
         item = new Item("Ghost Bullets", 2, 22, "Nothing stands in your way\n\nProjectiles pass through asteroids", t22, sprite);
         legendaryItemPool.push_back(item);
+
+        srand(time(NULL));
         
         character = Character;
         
@@ -164,7 +166,6 @@ class ItemHandler
     void chooseItems()
     {
         itemChoices.clear();
-        srand(time(NULL));
         for (int i = 0; i < itemChoicesNum; i++)
         {
             int randNum = rand() % 100 + 1;
