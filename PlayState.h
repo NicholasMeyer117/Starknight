@@ -315,6 +315,11 @@ class PlayState: public State
                     player->damageMult+=0.2;
                     player->fireRateMult+=0.2;
                 }
+                if (myActiveItems->cumulativeFirepower == myActiveItems->active)
+                {
+                    player->damageMult-=myActiveItems->cumFireDamage;
+                    myActiveItems->cumFireDamage=0;
+                }
             }
 	        
 	    }
@@ -620,6 +625,10 @@ class PlayState: public State
                 itemHandler->itemChoicesNum = 4;
             else if (i->name == "Panic")
                 myActiveItems.panic = myActiveItems.notActive;
+            else if (i->name == "Steady Aim")
+                myActiveItems.steadyAim = myActiveItems.notActive;
+            else if (i->name == "Cumulative Firepower")
+                myActiveItems.cumulativeFirepower = myActiveItems.active;
         }
         
         
@@ -710,9 +719,9 @@ class PlayState: public State
 	         
 	    
 	         
-	     //Quit Game
-	     if (Keyboard::isKeyPressed(Keyboard::Q))
-	         return -1;   
+	        //Quit Game
+	        if (Keyboard::isKeyPressed(Keyboard::Q))
+	             return -1;   
          
             //set particle emmitter bools to false
             enemyHit = false;
@@ -1017,6 +1026,11 @@ class PlayState: public State
                    numEnemiesKilledRound++;
                    explosionParticles.setEmitter(sf::Vector2f(i->x, i->y));
                    enemyKilled = true;
+                   if (myActiveItems.cumulativeFirepower == myActiveItems.active)
+                   {
+                        player->damageMult+=0.025;
+                        myActiveItems.cumFireDamage+=0.025;
+                   }
                 }
                 i -> enemyMove(elapsedTime);
                 i->enemyAttack(&enemyBulletList, &entities, advanceTick);

@@ -24,6 +24,9 @@ struct itemActivation
     itemStatus projDisruptorField = notEquipped;
     itemStatus panic = notEquipped;
     itemStatus reinforcedHull = notEquipped;
+    itemStatus steadyAim = notEquipped;
+    itemStatus cumulativeFirepower = notEquipped;
+    float cumFireDamage = 0;
 
 };
 
@@ -36,7 +39,7 @@ class ItemHandler
     std::vector<Item*> rareItemPool;
     std::vector<Item*> legendaryItemPool;
     Character *character;
-    Texture t1,t2,t3,t4,t5,t10,t11,t12,t20,t21,t22;
+    Texture t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25;
     int itemChoicesNum = 3;
     ItemHandler(Character *Character)
     {
@@ -45,9 +48,20 @@ class ItemHandler
         t3.loadFromFile("images/item3.png");
         t4.loadFromFile("images/item4.png");
         t5.loadFromFile("images/item1.png");
+        t6.loadFromFile("images/item1.png");
+        t7.loadFromFile("images/item2.png");
+        t8.loadFromFile("images/item3.png");
+        t9.loadFromFile("images/item4.png");
         t10.loadFromFile("images/item10.png");
         t11.loadFromFile("images/item11.png");
         t12.loadFromFile("images/item12.png");
+        t13.loadFromFile("images/item10.png");
+        t14.loadFromFile("images/item11.png");
+        t15.loadFromFile("images/item12.png");
+        t16.loadFromFile("images/item10.png");
+        t17.loadFromFile("images/item11.png");
+        t18.loadFromFile("images/item12.png");
+        t19.loadFromFile("images/item12.png");
         t20.loadFromFile("images/item20.png");
         t21.loadFromFile("images/item21.png");
         t22.loadFromFile("images/item22.png");
@@ -64,19 +78,30 @@ class ItemHandler
         sprite.setTexture(t4);
         item = new Item("Altered Ballistics", 0, 3, "Increases fire-rate at the cost of bullet speed\n\nGuns have 20% greater firerate\nGuns have 20% less bullet speed", t4, sprite);
         commonItemPool.push_back(item);
+        sprite.setTexture(t5);
         item = new Item("Panic", 0, 4, "Increase your damage and firerate when hit\n\nDamage and firerate increased by 20%\nfor 5 seconds when hit", t5, sprite);
+        commonItemPool.push_back(item);
+        sprite.setTexture(t6);
+        item = new Item("Steady Aim", 0, 5, "Increase your firerate when not moving\n\nFirerate increased by 20%\nwhen not moving", t6, sprite);
         commonItemPool.push_back(item);
         
         //Rare Items
         sprite.setTexture(t10);
         item = new Item("Extra choice [Attachment]", 1, 10, "Your patronage is appreciated\n\nExtra attachment option available", t10, sprite);
         rareItemPool.push_back(item);
+
         sprite.setTexture(t11);
         item = new Item("Extra choice [Item]", 1, 11, "Your patronage is appreciated\n\nExtra item option available", t11, sprite);
         rareItemPool.push_back(item);
+
         sprite.setTexture(t12);
         item = new Item("Fury", 1, 12, "Unleash your rage as death approaches\n\n20% increased damage when under 50% health\n20%increased firerate when under 50% health", t12, sprite);
         rareItemPool.push_back(item);
+
+        sprite.setTexture(t13);
+        item = new Item("Cumulative Firepower", 1, 13, "Do more damage for each enemy killed\n\n2.5% Damage increase for each enemy killed\nResets to 0 upon taking damage", t13, sprite);
+        rareItemPool.push_back(item);
+
         
         //Legendary Items
         sprite.setTexture(t20);
@@ -96,10 +121,10 @@ class ItemHandler
         
         character = Character;
         
-        character->items.push_back(commonItemPool[2]);
-        character->items.push_back(legendaryItemPool[0]);
+        character->items.push_back(commonItemPool[5]);
+        //character->items.push_back(legendaryItemPool[0]);
         //character->items.push_back(rareItemPool[1]);
-        //character->items.push_back(rareItemPool[2]);
+        character->items.push_back(rareItemPool[3]);
         //character->items.push_back(legendaryItemPool[2]);
         //character->items.push_back(legendaryItemPool[1]);
         //printAllItems();
@@ -201,6 +226,19 @@ class ItemHandler
             player -> damageMult-=0.2;
             player -> fireRateMult-=0.2;
             myActiveItems->panic = myActiveItems->notActive;
+        }
+        if (myActiveItems->steadyAim != myActiveItems->notEquipped)
+        {
+            if (!player->isMoving and myActiveItems->steadyAim == myActiveItems->notActive)
+            {
+                player ->fireRateMult+=0.25;
+                myActiveItems->steadyAim = myActiveItems->active;
+            }
+            else if (player->isMoving and myActiveItems->steadyAim == myActiveItems->active)
+            {
+                player ->fireRateMult-=0.25;
+                myActiveItems->steadyAim = myActiveItems->notActive;
+            }
         }
     }
     

@@ -31,7 +31,7 @@ float HealingMult, float UtilityMult, float AoeRadiusMult, float ContactDamageMu
 
 void Actor::moveActor(enum direction dir)
 {
-
+    isMoving = true;
     switch(dir)
     {
         case up : 
@@ -52,7 +52,8 @@ void Actor::moveActor(enum direction dir)
 
 void Actor::update()
 {
-
+    if (x == xPos and y == yPos)
+        isMoving = false;
     x = xPos;
     y = yPos;
 

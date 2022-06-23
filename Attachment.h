@@ -72,7 +72,7 @@ class Cannon: public Attachment
         damage = baseDamage * player->damageMult;
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         firerate = baseFirerate / player->fireRateMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             NormalBullet *b = new NormalBullet();
@@ -155,7 +155,7 @@ class MachineGun: public Attachment
         damage = baseDamage * player->damageMult;
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         firerate = baseFirerate / player->fireRateMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             NormalBullet *b = new NormalBullet();
@@ -207,7 +207,7 @@ class RepairDroid: public Attachment
     {
         damage = baseDamage * player->healingMult;
         firerate = baseFirerate / player->fireRateMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             if (player->health < player->maxHealth)
@@ -263,7 +263,7 @@ class SiphonDroid: public Attachment
         damage = baseDamage * player->damageMult;
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         firerate = baseFirerate / player->fireRateMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             SiphonBullet *b = new SiphonBullet();
@@ -320,7 +320,7 @@ class Shotgun: public Attachment
         shotSpeed = baseShotSpeed * player->bulletSpeedMult;
         damage = baseDamage * player->damageMult;
         firerate = baseFirerate / player->fireRateMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             DiagonalBullet *b1 = new DiagonalBullet(true, true, cone);
@@ -496,7 +496,7 @@ class SeekerDart: public Attachment
         shotSpeed = baseShotSpeed * player->bulletSpeedMult;
         damage = baseDamage * player->damageMult;
         firerate = baseFirerate / player->fireRateMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             SeekerBullet *b = new SeekerBullet(enemies);
@@ -552,7 +552,7 @@ class VoidBomber: public Attachment
         shotSpeed = baseShotSpeed*player->bulletSpeedMult;
         firerate = baseFirerate / player->fireRateMult;
         radius = baseRadius * player->aoeRadiusMult;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             SolidCircle *solidCircle = new SolidCircle(radius, true, sf::Color(0, 0, 0, 100), 0);
@@ -623,7 +623,7 @@ class SeekerMissile: public Attachment
         firerate = baseFirerate / player->fireRateMult;
         //radius = baseRadius;
         //aoeDamage = baseAoeDamage;
-        if (ticksSinceLastFire == firerate)
+        if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
             SeekerBullet *b = new SeekerBullet(enemies);

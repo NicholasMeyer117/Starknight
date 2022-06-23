@@ -33,7 +33,7 @@ class Game
     int relUnitX;
     int relUnitY;
     
-    int nextStageType = 1; //0 = regular level, 1 = Don't get hit challenge level
+    int nextStageType = 0; //0 = regular level, 1 = Don't get hit challenge level
     sf::Text source;
     sf::Font gameFont;
     Character *character = new Character;
@@ -106,9 +106,9 @@ class Game
     {
         currentLevelType = nextStageType;
         if (currentLevelType == 0)
-            maxLevelProgress = 100;
+            maxLevelProgress = 3000;
         else if (currentLevelType == 1)
-            maxLevelProgress = 100;
+            maxLevelProgress = 3000;
             
     
     }

@@ -27,6 +27,7 @@ class Entity
    bool isHit = false;
    bool isActor = false;
    bool visible = true;
+   bool isMoving = false;
    std::string name;
    Sprite sprite;
    sf::FloatRect boundingBox;
