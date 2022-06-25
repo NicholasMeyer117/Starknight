@@ -38,7 +38,7 @@ class ShopState: public State
     int screenH;
     int relUnitX;
     int relUnitY;
-    int numOfAttachments = 11; //total number of different attachments
+    int numOfAttachments = 12; //total number of different attachments
     sf::Font gameFont;
     sf::Text source;
     
@@ -53,7 +53,7 @@ class ShopState: public State
         character = game->character;
         synergyHandler = game->synergyHandler;
         
-        Texture t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11;
+        Texture t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12;
         t1.loadFromFile("images/cannon.png"); 
         textureList.push_back(t1);
         t2.loadFromFile("images/machineGun.png");
@@ -76,8 +76,10 @@ class ShopState: public State
         textureList.push_back(t10);
         t11.loadFromFile("images/seekerMissile.png");
         textureList.push_back(t11);
+        t12.loadFromFile("images/healingAura.png");
+        textureList.push_back(t12);
         
-        Texture i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11;
+        Texture i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12;
         i1.loadFromFile("images/cannon.png");
         textureList.push_back(i1);
         i2.loadFromFile("images/machineGun.png");
@@ -100,6 +102,8 @@ class ShopState: public State
         textureList.push_back(i10);
         i11.loadFromFile("images/seekerMissile.png");
         textureList.push_back(i11);
+        i12.loadFromFile("images/healingAura.png");
+        textureList.push_back(i12);
 
         
         for (auto i:textureList)
@@ -350,6 +354,24 @@ class ShopState: public State
                 return 0;
             
             }
+            case 11:
+            {
+                HealingAura *healingAura = new HealingAura();
+                cost = healingAura->credits;
+                curAtc = healingAura;
+                if (ifContains(curAtc) != NULL)
+                {
+                     cost = ifContains(curAtc)->credits;
+                     if (ifContains(curAtc)->level == 3 and isReroll)
+                         return 1;
+                     else if (ifContains(curAtc)->level == 3)
+                         cost = cost/2;
+                }
+                button->createIcon(textureList[11], spriteList[11], butNum, 250, 250, &gameFont, ("Healing Aura: " + to_string(cost) + " Cr"), 20, cost);
+                shopAttachments.push_back(healingAura);
+                return 0;
+            
+            }
         }
         return 0;
     }
@@ -514,6 +536,18 @@ class ShopState: public State
                 return "Seeker Missile: Fires a seeking missile that explodes on impact (Seeker) (AOE)\nDamage: 15\nAOE Damage: 7.5\nFirerate: 1/3s -> 1/2s\nSpeed: 10\nArea: 100 -> 150\n";
             else if (levelNum == 3)
                 return "Seeker Missile: Fires a seeking missile that explodes on impact (Seeker) (AOE)\nDamage: 15\nAOE Damage: 7.5\nFirerate: 1/2s\nSpeed: 10\nArea: 150\n";
+
+        }
+        else if (name == "Healing Aura")
+        {
+            if (levelNum == 0)
+                return "Healing Aura: Creates a healing aura at a random location that heals the player (Repair) (AOE)\nHealth: 1\nHealing Rate: 1/s\nRadius: 75\n";
+            else if (levelNum == 1)
+                return "Healing Aura: Creates a healing aura at a random location that heals the player (Repair) (AOE)\nHealth: 1\nHealing Rate: 1/s -> 1.5/s\nRadius: 75 -> 100\n";
+            else if (levelNum == 2)
+                return "Healing Aura: Creates a healing aura at a random -> (the player's) location that heals the player (Repair) (AOE)\nHealth: 1\nHealing Rate: 1.5/s\nRadius: 100\n";
+            else if (levelNum == 3)
+                return "Healing Aura: Creates a healing aura at the player's location that heals the player (Repair) (AOE)\nHealth: 1\nHealing Rate: 1.5/s\nRadius: 100\n";
 
         }
         return "No Name"; 

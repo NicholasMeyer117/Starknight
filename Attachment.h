@@ -14,9 +14,14 @@
 #include "AOE.h"
 #define PI 3.14159265
 
+extern int screenW;
+extern int screenH;
+
 class Attachment
 {
     public:
+    int relUnitX = screenW/100;
+    int relUnitY = screenH/100;
     int firerate; //ticks per activation
     float baseDamage, baseShotSpeed, baseFirerate, baseRadius, baseAoeDamage;
     float damage, shotSpeed, radius, aoeDamage;
@@ -101,7 +106,7 @@ class Cannon: public Attachment
             {
                 cout << "bullet dead\n";
                 cout << "explosion at: " << personalBulletList.at(i)->x << "," << personalBulletList.at(i)->y;
-                Explosion *explosion = new Explosion(radius, false, sf::Color(255, 0, 0, 100), aoeDamage);
+                Explosion *explosion = new Explosion(radius, false, sf::Color(255, 0, 0, 100), aoeDamage, false);
                 explosion -> createActor(0, 0, 0, 0, false, 0);
                 explosion -> noSpriteSettings(personalBulletList.at(i)->x,personalBulletList.at(i)->y,0,0, sf::Color(0, 0, 0, 100));
                 //explosion->circleSpriteSettings(personalBulletList.at(i)->x,personalBulletList.at(i)->y,sf::Color(0, 255, 255, 100), 100);
@@ -555,7 +560,7 @@ class VoidBomber: public Attachment
         if (ticksSinceLastFire >= firerate)
         {
             ticksSinceLastFire = 0;
-            SolidCircle *solidCircle = new SolidCircle(radius, true, sf::Color(0, 0, 0, 100), 0);
+            SolidCircle *solidCircle = new SolidCircle(radius, true, sf::Color(0, 0, 0, 100), 0, true);
             solidCircle -> noSpriteSettings(player->x,player->y,0,0, sf::Color(0, 0, 0, 100));
             solidCircle -> createActor(0, 0, shotSpeed, 0, false, 0);
             solidCircle->AOEcircle.setPosition(player->x,player->y);
@@ -652,7 +657,7 @@ class SeekerMissile: public Attachment
             {
                 cout << "bullet dead\n";
                 cout << "explosion at: " << personalBulletList.at(i)->x << "," << personalBulletList.at(i)->y;
-                Explosion *explosion = new Explosion(radius, false, sf::Color(255, 0, 0, 100), aoeDamage);
+                Explosion *explosion = new Explosion(radius, false, sf::Color(255, 0, 0, 100), aoeDamage, false);
                 explosion -> noSpriteSettings(personalBulletList.at(i)->x,personalBulletList.at(i)->y,0,0, sf::Color(0, 0, 0, 100));
                 explosion -> createActor(0, 0, 0, 0, false, 0);
                 explosion->AOEcircle.setPosition(personalBulletList.at(i)->x,personalBulletList.at(i)->y);
@@ -682,8 +687,95 @@ class SeekerMissile: public Attachment
         }
     }
 
-
-
 };
 
+class HealingAura: public Attachment
+{
+    public:
+    int phasesPerReset = 10;
+    int healingPhases = phasesPerReset;
+    SolidCircle *aura = nullptr;
+    HealingAura()
+    {
+        classList.push_back(Aoe);
+        classList.push_back(Repair);
+        name = "Healing Aura";
+        baseFirerate = 30;
+        credits = 5;
+        baseDamage = 1;
+        baseShotSpeed = 0;
+        baseRadius = 75;
+        attachNum = 11;
+        
+        soundBuffer.loadFromFile("sounds/laser.wav");
+        sound.setBuffer(soundBuffer);
+
+        srand(time(NULL));
+    }
+    
+    void activate(std::vector<AOE*> *AOElist, Actor *player)
+    {
+        shotSpeed = 0;
+        firerate = baseFirerate / player->fireRateMult;
+        radius = baseRadius * player->aoeRadiusMult;
+        damage = baseDamage * player->healingMult;
+        if (healingPhases >= phasesPerReset)
+        {
+            ticksSinceLastFire = 0;
+            healingPhases = 0;
+            int posX;
+            int posY;
+            if (level == 3)
+            {
+                posX = player->x;
+                posY = player->y;
+            }
+            else
+            {
+                posY = rand() % (screenH - (relUnitY * 10)) + (relUnitY * 5);
+                posX = rand() % (screenW - (relUnitX * 10)) + (relUnitX * 5);
+            }
+            SolidCircle *solidCircle = new SolidCircle(radius, true, sf::Color(0, 200, 0, 100), 0, false);
+            solidCircle -> noSpriteSettings(posX,posY,0,0, sf::Color(0, 0, 0, 100));
+            solidCircle -> createActor(0, 0, shotSpeed, 0, false, 0);
+            solidCircle->AOEcircle.setPosition(posX,posY);
+            AOElist->push_back(solidCircle);
+            if (aura != nullptr)
+                aura->life = 0;
+            aura = solidCircle;
+
+        }
+
+        if (ticksSinceLastFire >= firerate)
+        {
+            ticksSinceLastFire = 0;
+            if  (player->isSpriteCollideWithCircle(aura->AOEcircle) and player->health < player->maxHealth)
+            {
+                player->health += damage;
+            }
+            healingPhases++;
+            
+        }
+        else
+        {
+            ticksSinceLastFire++;
+        }
+
+    }
+    
+    void upgrade()
+    {
+        if (level < 3)
+        {
+            level++;
+            if (level == 2)
+            {
+                baseRadius = baseRadius + 25;
+                baseFirerate = baseFirerate/1.5;
+            }
+
+            credits = credits*2;
+        }
+    }
+};
 

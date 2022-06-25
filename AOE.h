@@ -19,8 +19,9 @@ class AOE: public Actor
     sf::Color color;
     sf::CircleShape AOEcircle;
     float baseDamage;
+    bool destroyBullets = false;
     
-    AOE(int r, bool IsMoving, sf::Color Color, float BaseDamage)
+    AOE(int r, bool IsMoving, sf::Color Color, float BaseDamage, bool DestroyBullets)
     {
         isMoving = IsMoving;
         color = Color;
@@ -32,6 +33,7 @@ class AOE: public Actor
         AOEcircle.setFillColor(color);
         
         baseDamage = BaseDamage;
+        destroyBullets = DestroyBullets;
     }
     
     virtual void checkDamage(std::vector<Enemy*> *enemyList){};
@@ -45,7 +47,7 @@ class AOE: public Actor
 class SolidCircle: public AOE
 {
     public:
-    SolidCircle(int r, bool IsMoving, sf::Color color, float BaseDamage) : AOE(r, IsMoving, color, BaseDamage) 
+    SolidCircle(int r, bool IsMoving, sf::Color color, float BaseDamage, bool DestroyBullets) : AOE(r, IsMoving, color, BaseDamage, DestroyBullets)
     {
         visible = true;
     }
@@ -63,7 +65,7 @@ class SolidCircle: public AOE
     {
         for (int i = 0; i < bulletList->size(); i++)
         {
-            if (bulletList->at(i)->isSpriteCollideWithCircle(AOEcircle))
+            if (destroyBullets and bulletList->at(i)->isSpriteCollideWithCircle(AOEcircle))
             {
                 bulletList->at(i) -> life = 0;
             }
@@ -82,7 +84,7 @@ class Explosion: public AOE
     int numOfFlicks = 0;
     bool damageDealt = false;
     
-    Explosion(int r, bool IsMoving, sf::Color color, float BaseDamage) : AOE(r, IsMoving, color, BaseDamage) {}   // Call the superclass constructor in the subclass' initialization list.
+    Explosion(int r, bool IsMoving, sf::Color color, float BaseDamage, bool DestroyBullets) : AOE(r, IsMoving, color, BaseDamage, DestroyBullets) {}   // Call the superclass constructor in the subclass' initialization list.
     
     void AoeUpdate(float elapsed)
     {

@@ -14,6 +14,8 @@ uniform int setting;
 
 uniform vec2 shipCoords;
 
+uniform vec2 screenSize;
+
 highp float NOISE_GRANULARITY = 0.5/255.0;
 
 highp float random(highp vec2 coords) {
@@ -23,7 +25,6 @@ highp float random(highp vec2 coords) {
 void main()
 {
 
-    vec2 screenSize = vec2(1920, 1080);
     highp vec2 position = gl_TexCoord[0].xy / screenSize;
     vec2 coords = gl_FragCoord.xy/screenSize;
     highp vec4 pixel_color = baseColor;   //texture2D(texture, gl_TexCoord[0].xy);
@@ -87,7 +88,7 @@ void main()
     pixel_color.g = pixel_color.g + colorDifference.g * glowStrX * glowStrY * glowStr;
     pixel_color.b = pixel_color.b + colorDifference.b * glowStrX * glowStrY * glowStr;
     
-    shipPos.y = 1000 - shipPos.y;
+    shipPos.y = screenSize.y - shipPos.y;
     thrustStrX = (gl_FragCoord.x - (shipPos.x - 150.0))/((shipPos.x - 10.0) - (shipPos.x - 150.0));
     thrustStrY = (gl_FragCoord.y - (shipPos.y - 15.0))/((shipPos.y + 15.0) - (shipPos.y - 15.0));
     if (thrustStrX < 0.0 || thrustStrX > 1.0)

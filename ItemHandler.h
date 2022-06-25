@@ -121,12 +121,12 @@ class ItemHandler
         
         character = Character;
         
-        character->items.push_back(commonItemPool[5]);
+        //character->items.push_back(commonItemPool[5]);
         //character->items.push_back(legendaryItemPool[0]);
         //character->items.push_back(rareItemPool[1]);
-        character->items.push_back(rareItemPool[3]);
+        //character->items.push_back(rareItemPool[3]);
         //character->items.push_back(legendaryItemPool[2]);
-        //character->items.push_back(legendaryItemPool[1]);
+        character->items.push_back(legendaryItemPool[2]);
         //printAllItems();
     }
     

@@ -395,6 +395,7 @@ class PlayState: public State
         glowShader.loadFromFile("shaders/glow.frag", sf::Shader::Fragment);
         glowShader.setUniform("redGlow", sf::Glsl::Vec4(1, 0, 0, 1));
         glowShader.setUniform("blueGlow", sf::Glsl::Vec4(0, 0, 1, 1));   
+        glowShader.setUniform("screenSize", sf::Glsl::Vec2(screenW, screenH));
 
         p1.setSmooth(true);
         //t2.setSmooth(true);
